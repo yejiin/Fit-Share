@@ -1,4 +1,4 @@
-package com.fitshare.backend.com.config;
+package com.fitshare.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
