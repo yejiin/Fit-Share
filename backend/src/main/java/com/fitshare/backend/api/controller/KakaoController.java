@@ -60,16 +60,5 @@ public class KakaoController {
         return mav;
     }
 
-    @GetMapping(value = "/logout")
-    @ApiOperation(value = "카카오 로그아웃",notes = "토큰을 만료 시킨 후 로그아웃한다.")
-    public ResponseEntity logout(){
-
-        // 1. redis에서 token 삭제
-
-        // 2. 카카오 서비스 로그아웃
-
-        return ResponseEntity.ok("로그아웃 되었습니다.");
-    }
-
 
 }
