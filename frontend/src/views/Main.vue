@@ -1,12 +1,11 @@
 <template>
   <div>
     <Navbar/>
-    <h1>home</h1>
     <div class="container">
 
       <!-- HostCloset -->
       <host-closet class="host-closet"></host-closet>
-
+      <shopping-room-list class="room-container"></shopping-room-list>
       <!-- 버튼 클릭 시 친구 아이콘 html / css tab 버전 -->
       <button class="friend-btn" @click="OpenTab">
         <img class="friend_icon" src="@/assets/friend_icon.png" alt="friend_icon">
@@ -25,16 +24,20 @@
 <script>
 import Navbar from '@/components/Navbar.vue'
 import Friend from '@/components/main/Friend.vue'
+import ShoppingRoomList from '@/components/main/ShoppingRoomList.vue'
 import { ref } from 'vue'
 import HostCloset from '../components/main/HostCloset.vue'
 
 export default {
   name: 'Main',
+  
   components: { 
     Navbar,
     Friend,
     HostCloset,
+    ShoppingRoomList,
   },
+
   setup() {
     const status = ref(false)
 
@@ -59,7 +62,10 @@ export default {
 .container {
   width: 1156px;
   height: 944px;
-  border: solid black;
+  /* border: solid black; */
+  position: relative;
+  padding: 0;
+  margin: 87px 142px 89px;
 }
 
 /* host 옷장 style */
@@ -83,6 +89,11 @@ export default {
   background-color: #8ABDBE;
   z-index: 1;
 }
+/* .room-container {
+  height: 775px;
+  width: 543px;
+  background-color: #FDFAF3;
+} */
 
 .friend_icon {
   width: 50px;
@@ -109,7 +120,6 @@ export default {
   left: 1100px;
 }
 
-
 .close-btn {
   width: 30px;
   height: 30px;
@@ -117,6 +127,16 @@ export default {
   position: fixed;
   top: 265px;
   left: 1100px;
+}
+
+.friend-btn {
+  width: 100px;
+  height: 100px;
+  border-radius: 50px;
+  position: relative;
+  left: 1095px;
+  /* top: 700px; */
+  background-color: #8ABDBE;
 }
 
 </style>
