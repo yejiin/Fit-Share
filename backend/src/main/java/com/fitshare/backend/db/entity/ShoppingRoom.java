@@ -45,7 +45,4 @@ public class ShoppingRoom extends BaseTimeEntity {
 
     @Column
     private Boolean isCustomShoppingMall;
-
-    @OneToOne(mappedBy = "shoppingRoom", fetch = FetchType.LAZY)
-    private GroupChat groupChat;
 }
