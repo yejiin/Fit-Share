@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
 import java.util.Optional;
 
 import static com.fitshare.backend.common.model.ResponseMessage.LOGIN;
@@ -34,7 +33,6 @@ public class KakaoController {
 
     @Autowired
     MemberService memberService;
-
 
     @GetMapping(value = "/login")
     @ApiOperation(value = "카카오 로그인", notes = "카카오 액세스 토큰으로 유저 정보를 받아 jwt토큰을 발급하고 전송하는 api입니다.")
@@ -59,7 +57,7 @@ public class KakaoController {
 
         // 4. JWT token 발급
         jwt = kakaoApiService.createToken(member.get().getId(), RoleType.USER);
-        
+
         KakaoLoginRes kakaoLoginRes = new KakaoLoginRes(member.get().getId(), jwt, member.get().getName(), member.get().getProfileImg());
 
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED, LOGIN, kakaoLoginRes));
