@@ -27,7 +27,7 @@ public class ShoppingRoomController {
 
     @ApiOperation(value = "쇼핑룸 생성")
     @PostMapping("")
-    public ResponseEntity<BaseResponseBody> makeRoom(@RequestBody MakeShoppingRoomReq req) {
+    public ResponseEntity<BaseResponseBody> makeShoppingRoom(@RequestBody MakeShoppingRoomReq req) {
         // TODO: 사용자 정보 얻기
         Long memberId = 1L;
 

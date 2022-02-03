@@ -1,12 +1,14 @@
 package com.fitshare.backend.db.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "room_participant")
 public class RoomParticipant extends CreatedTimeEntity {
