@@ -2,6 +2,7 @@ package com.fitshare.backend.api.service;
 
 import com.fitshare.backend.api.request.MakeShoppingRoomReq;
 import com.fitshare.backend.api.response.ShoppingRoomRes;
+import com.fitshare.backend.api.response.ShoppingRoomTokenRes;
 import com.fitshare.backend.common.exception.ExceedParticipantCountException;
 import com.fitshare.backend.common.exception.MemberNotFoundException;
 import com.fitshare.backend.common.exception.ShoppingMallNotFoundException;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,7 +45,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
     private Map<Long, Session> mapSessions = new ConcurrentHashMap<>();
 
     // openvidu 세션 참여자 정보 저장
-    private Map<Long, Map<Member, String>> mapSessionNamesTokens = new ConcurrentHashMap<>();
+    private Map<Long, Map<Long, String>> mapSessionNamesTokens = new ConcurrentHashMap<>();
 
     public ShoppingRoomServiceImpl(MemberRepository memberRepository, ShoppingRoomRepository shoppingRoomRepository, ShoppingMallRepository shoppingMallRepository,
                                    RoomParticipantRepository roomParticipantRepository,
@@ -63,17 +65,14 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
      **/
     @Transactional
     @Override
-    public ShoppingRoomRes makeShoppingRoom(Long memberId, MakeShoppingRoomReq req) {
+    public ShoppingRoomTokenRes makeShoppingRoom(Long memberId, MakeShoppingRoomReq req) {
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
 
-        String shoppingMallName = req.getShoppingMallName();
-        String shoppingMallUrl = req.getShoppingMallUrl();
-
         ShoppingRoom shoppingRoom = ShoppingRoom.builder()
                 .host(member)
-                .shoppingMallName(shoppingMallName)
-                .shoppingMallUrl(shoppingMallUrl)
+                .shoppingMallName(req.getShoppingMallName())
+                .shoppingMallUrl(req.getShoppingMallUrl())
                 .participantCount(req.getParticipantCount())
                 .password(req.getPassword())
                 .isPrivate(req.isPrivate())
@@ -87,8 +86,8 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
                     .orElseThrow(() -> new ShoppingMallNotFoundException(req.getShoppingMallId()));
             shoppingRoom.setShoppingMall(shoppingMall);
 
-            shoppingMallName = shoppingMall.getName();
-            shoppingMallUrl = shoppingMall.getUrl();
+            shoppingRoom.setShoppingMallName(shoppingMall.getName());
+            shoppingRoom.setShoppingMallUrl(shoppingMall.getUrl());
         }
 
         // 쇼핑룸 정보 DB 저장
@@ -98,7 +97,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
 
         String sessionToken = getSessionToken(OpenViduRole.PUBLISHER, shoppingRoom.getId(), member);
 
-        return new ShoppingRoomRes(shoppingRoom.getId(), shoppingMallName, shoppingMallUrl, sessionToken);
+        return new ShoppingRoomTokenRes(shoppingRoom.getId(), shoppingRoom.getShoppingMallName(), shoppingRoom.getShoppingMallUrl(), sessionToken);
     }
 
     /**
@@ -106,7 +105,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
      **/
     @Transactional
     @Override
-    public ShoppingRoomRes enterShoppingRoom(Long memberId, Long shoppingRoomId) {
+    public ShoppingRoomTokenRes enterShoppingRoom(Long memberId, Long shoppingRoomId) {
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
         ShoppingRoom shoppingRoom = shoppingRoomRepository.findById(shoppingRoomId).orElseThrow(() -> new ShoppingRoomNotFoundException(shoppingRoomId));
@@ -121,17 +120,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
         // 참여자 DB 저장
         roomParticipantRepository.save(new RoomParticipant(shoppingRoom, member));
 
-        String shoppingRoomName = shoppingRoom.getShoppingMallName();
-        String shoppingRoomUrl = shoppingRoom.getShoppingMallUrl();
-
-        if (!shoppingRoom.getIsCustomShoppingMall()) {
-            ShoppingMall shoppingMall = shoppingMallRepository.findById(shoppingRoom.getShoppingMall().getId())
-                    .orElseThrow(() -> new ShoppingMallNotFoundException(shoppingRoom.getShoppingMall().getId()));
-            shoppingRoomName = shoppingMall.getName();
-            shoppingRoomUrl = shoppingMall.getUrl();
-        }
-
-        return new ShoppingRoomRes(shoppingRoomId, shoppingRoomName, shoppingRoomUrl, sessionToken);
+        return new ShoppingRoomTokenRes(shoppingRoomId, shoppingRoom.getShoppingMallName(), shoppingRoom.getShoppingMallUrl(), sessionToken);
     }
 
     /**
@@ -146,7 +135,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
         if (this.mapSessions.get(shoppingRoomId) == null || this.mapSessionNamesTokens.get(shoppingRoomId) == null)
             throw new ShoppingRoomNotFoundException(shoppingRoomId);
 
-        if (this.mapSessionNamesTokens.get(shoppingRoomId).remove(member) != null) {
+        if (this.mapSessionNamesTokens.get(shoppingRoomId).remove(member.getId()) != null) {
             // 모두 방을 나갔다면
             if (this.mapSessionNamesTokens.get(shoppingRoomId).isEmpty()) {
                 // 세션 삭제
@@ -157,6 +146,14 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
             // 세션에 참여하고 있지 않음
             throw new MemberNotFoundException(memberId);
         }
+    }
+
+    /**
+     * 쇼핑룸 목록
+     **/
+    @Override
+    public List<ShoppingRoomRes> listShoppingRoom(Long memberId) {
+        return shoppingRoomRepository.getShoppingRoomByMemberId(memberId).orElse(null);
     }
 
     // openvidu 세션 속성 설정
@@ -188,7 +185,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
             token = session.createConnection(getConnectionProperties(role)).getToken();
 
             // 토큰 저장
-            this.mapSessionNamesTokens.get(shoppingRoomId).put(member, token);
+            this.mapSessionNamesTokens.get(shoppingRoomId).put(member.getId(), token);
         } catch (OpenViduJavaClientException | OpenViduHttpException e) {
             e.printStackTrace();
         }

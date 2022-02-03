@@ -42,9 +42,18 @@ public class ShoppingRoomController {
     @PostMapping("/{shoppingRoomId}")
     public ResponseEntity<BaseResponseBody> exitShoppingRoom(@PathVariable Long shoppingRoomId) {
         // TODO: 사용자 정보 얻기
-        Long memberId = 3L;
+        Long memberId = 1L;
 
         shoppingRoomService.exitShoppingRoom(memberId, shoppingRoomId);
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK, EXIT_SHOPPING_ROOM));
+    }
+
+    @ApiOperation(value = "쇼핑몰 목록", notes = "사용자의 친구가 라이브 중인 쇼핑몰 목록 반환")
+    @GetMapping("")
+    public ResponseEntity<BaseResponseBody> listShoppingRoom() {
+        // TODO: 사용자 정보 얻기
+        Long memberId = 1L;
+
+        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK, GET_SHOPPING_LIST, shoppingRoomService.listShoppingRoom(memberId)));
     }
 }
