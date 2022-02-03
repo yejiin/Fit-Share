@@ -67,7 +67,7 @@
             <label>공개범위</label>
             <span class="form-radio">
               <span @click="clickPublic()" class="radio-containers">
-                <input class="form-check-input" type="radio" name="flexRadioDefault" id="public">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" checked="checked" id="public">
                 <label class="form-check-label" for="public">공개</label>
               </span>
               <span @click="clickPrivate()" class="radio-containers">
@@ -83,7 +83,7 @@
 					</div>
 
           <!-- openvidu -->
-          ------------ 임시 -------------
+          <!-- ------------ 임시 -------------
 					<div>
 						<label>Participant</label>
 						<input v-model="myUserName" class="form-control" type="text" required>
@@ -91,10 +91,10 @@
 					<div>
 						<label>Session</label>
 						<input v-model="mySessionId" class="form-control" type="text" required>
-					</div>
+					</div> -->
 
 					<div class="text-center">
-            <button class="btn create-btn shadow-none" @click="goToRoom()">생성하기</button>
+            <button class="btn create-btn shadow-none" @click="makeRoom()">생성하기</button>
             <button class="btn shadow-none" @click="goToMain()">취소</button>
 					</div>        
 				</div>
@@ -106,7 +106,7 @@
 <script>
 import { reactive, ref, toRefs, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
-// import axios from 'axios'
+import axios from 'axios'
 
 export default {
   name: 'CreateRoom',
@@ -129,7 +129,7 @@ export default {
       mySessionId: 'sessionA',
       myUserName: 'participant12', 
 
-      mallOptions: [  // 서버 적용시 store에서 불러오는 방식으로 진행
+      shoppingMallList: [  // 서버 적용시 store에서 불러오는 방식으로 진행
         { id: 1, name: 'Nike', url: 'https://www.nike.com'},
         { id: 2, name: '무신사', url: 'https://www.musinsa.com'},
         { id: 3, name: '지그재그', url: 'https://www.zigzag.com'},
@@ -138,7 +138,7 @@ export default {
         { id: 6, name: 'ABC', url: 'https://www.abc.com'},
         { id: 7, name: '지마켓', url: 'https://www.gmarket.com'},
       ], 
-      isMall: true,  // 찾고자 하는 쇼핑몰이 리스트에 있는지 없는지 
+      isMall: true,  // 찾고자 하는 쇼핑몰이 리스트 존재여부
       mallName: null,
       mallUrl: null,
     })
@@ -158,9 +158,9 @@ export default {
     const filteredMalls = computed(() => {
       const query = searchQuery.value.toLowerCase();
       if (searchQuery.value === '') {
-        return state.mallOptions
+        return state.shoppingMallList
       }
-      return state.mallOptions.filter((mall) => {
+      return state.shoppingMallList.filter((mall) => {
         return Object.values(mall).some((word => String(word).toLowerCase().includes(query)))
       })
     })
@@ -203,34 +203,39 @@ export default {
     }
 
     // 쇼핑룸 생성
-    const goToRoom = async () => {
+    function makeRoom () {
+      // const mallId = null
       // if (selectedItem) {
-      //   const mallId = selectedItem.id
-      // } else {
-      //   const mallId = null
-      // }
-      // const roomData = {  
-      //   userId: ''  // username(or id) 필요 => DB host_id 저장 
-      //   mallId: mallId,  // null
-      //   mallName: state.mallName, // null
-      //   mallUrl: state.mallUrl,  // null
-      //   count: selectedCnt,
-      //   isPrivate: isPrivate,  // T/F
-      //   password: password,  // null
-      // }
-      // axios({
-      //   method : 'post',
-      //   url: 'room-api 추가',
-      //   data: roomData,
-      // })
-      //   .then(res => {
-      //     console.log(res.data)  // sessionId(=roomId), mall url 
-      //     router.push({ name: 'ShoppingRoom', params: { roomId: res.data.sessionId, mallUrl: res.data.mall_url }})
-      //   })
-      //   .catch(err => console.log(err))
+      //   console.log(selectedItem)
+      //   this.mallId = selectedItem.value.id
+      // } 
+
+      const roomData = {  
+        // userId: '',  // username(or id) 필요 => DB host_id 저장 
+        customShoppingMall: true,
+        participantCount: selectedCnt.value,
+        password: password.value,  // null
+        private: isPrivate.value,  // T/F
+        shoppingMallId: null,  // null (this.mallId)
+        shoppingMallName: state.mallName, // null
+        shoppingMallUrl: state.mallUrl,  // null
+      }
+      console.log(roomData)
+
+      axios({
+        method : 'post',
+        url: 'http://i6a405.p.ssafy.io:8081/api/v1/shopping-rooms/',
+        data: roomData,
+        // header: 
+      })
+        .then(res => {
+          console.log(res.data.data)  // sessionId(=roomId), mall url, token
+          router.push({ name: 'ShoppingRoom', params: { roomId: res.data.data.roomId, token: res.data.data.token, myUserName: state.myUserName }}) // mallUrl: res.data.mall_url
+        })
+        .catch(err => console.log(err))
 
 
-      router.push({ name: 'ShoppingRoom', params: { roomId: state.mySessionId, myUserName: state.myUserName } })
+      // router.push({ name: 'ShoppingRoom', params: { roomId: state.mySessionId, myUserName: state.myUserName } })
     }
 
     const goToMain = () => {
@@ -238,9 +243,9 @@ export default {
     }
 
     return { 
-      clickPrivate, goToRoom, goToMain, clickPublic, ...toRefs(state), counts,
-      searchQuery, selectedCnt ,selectedItem, isMallVisible, isCntVisible, filteredMalls,
-      selectItem, selectCnt, isPrivate, password,
+      clickPrivate, makeRoom, goToMain, clickPublic, 
+      ...toRefs(state), counts, searchQuery, selectedCnt ,selectedItem, isMallVisible, 
+      isCntVisible, filteredMalls, selectItem, selectCnt, isPrivate, password,
     }
   }
 }
