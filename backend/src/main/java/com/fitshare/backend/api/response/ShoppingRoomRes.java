@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MakeShoppingRoomRes {
+public class ShoppingRoomRes {
 
     @ApiModelProperty(name = "쇼핑룸 Id", example = "1")
     private Long shoppingRoomId;

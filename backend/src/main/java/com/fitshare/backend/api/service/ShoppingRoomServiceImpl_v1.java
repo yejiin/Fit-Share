@@ -2,7 +2,6 @@ package com.fitshare.backend.api.service;
 
 import com.fitshare.backend.api.request.MakeShoppingRoomReq;
 import com.fitshare.backend.api.response.ShoppingRoomRes;
-import com.fitshare.backend.common.exception.ExceedParticipantCountException;
 import com.fitshare.backend.common.exception.MemberNotFoundException;
 import com.fitshare.backend.common.exception.ShoppingMallNotFoundException;
 import com.fitshare.backend.common.exception.ShoppingRoomNotFoundException;
@@ -15,18 +14,14 @@ import com.fitshare.backend.db.repository.RoomParticipantRepository;
 import com.fitshare.backend.db.repository.ShoppingMallRepository;
 import com.fitshare.backend.db.repository.ShoppingRoomRepository;
 import io.openvidu.java.client.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Slf4j
-@Service
-public class ShoppingRoomServiceImpl implements ShoppingRoomService {
+public class ShoppingRoomServiceImpl_v1 implements ShoppingRoomService {
 
     private MemberRepository memberRepository;
     private ShoppingRoomRepository shoppingRoomRepository;
@@ -46,9 +41,9 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
     // openvidu 세션 참여자 정보 저장
     private Map<Long, Map<String, Member>> mapSessionNamesTokens = new ConcurrentHashMap<>();
 
-    public ShoppingRoomServiceImpl(MemberRepository memberRepository, ShoppingRoomRepository shoppingRoomRepository, ShoppingMallRepository shoppingMallRepository,
-                                   RoomParticipantRepository roomParticipantRepository,
-                                   @Value("${openvidu.url}") String openviduUrl, @Value("${openvidu.secret}") String secret) {
+    public ShoppingRoomServiceImpl_v1(MemberRepository memberRepository, ShoppingRoomRepository shoppingRoomRepository, ShoppingMallRepository shoppingMallRepository,
+                                      RoomParticipantRepository roomParticipantRepository,
+                                      @Value("${openvidu.url}") String openviduUrl, @Value("${openvidu.secret}") String secret) {
         this.memberRepository = memberRepository;
         this.shoppingRoomRepository = shoppingRoomRepository;
         this.shoppingMallRepository = shoppingMallRepository;
@@ -65,41 +60,53 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
     @Transactional
     @Override
     public ShoppingRoomRes makeShoppingRoom(Long memberId, MakeShoppingRoomReq req) {
+        ShoppingRoomRes res = new ShoppingRoomRes();
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
 
-        String shoppingMallName = req.getShoppingMallName();
-        String shoppingMallUrl = req.getShoppingMallUrl();
-
         ShoppingRoom shoppingRoom = ShoppingRoom.builder()
                 .host(member)
-                .shoppingMallName(shoppingMallName)
-                .shoppingMallUrl(shoppingMallUrl)
                 .participantCount(req.getParticipantCount())
-                .password(req.getPassword())
                 .isPrivate(req.isPrivate())
                 .isCustomShoppingMall(req.isCustomShoppingMall())
                 .isActive(true)
                 .build();
 
-        // DB에 있는 쇼핑몰을 사용할 경우
-        if (!req.isCustomShoppingMall()) {
+        // 쇼핑몰 정보 등록
+        if (req.isCustomShoppingMall()) {  // 쇼핑몰 직접 입력했을 경우
+            shoppingRoom.setShoppingMallName(req.getShoppingMallName());
+            shoppingRoom.setShoppingMallUrl(req.getShoppingMallUrl());
+
+            res.setShoppingRoomName(req.getShoppingMallName());
+            res.setShoppingRoomUrl(req.getShoppingMallUrl());
+        } else {  // DB에 있는 쇼핑몰을 사용할 경우
             ShoppingMall shoppingMall = shoppingMallRepository.findById(req.getShoppingMallId())
                     .orElseThrow(() -> new ShoppingMallNotFoundException(req.getShoppingMallId()));
             shoppingRoom.setShoppingMall(shoppingMall);
 
-            shoppingMallName = shoppingMall.getName();
-            shoppingMallUrl = shoppingMall.getUrl();
+            res.setShoppingRoomName(shoppingRoom.getShoppingMallName());
+            res.setShoppingRoomUrl(shoppingRoom.getShoppingMallUrl());
         }
+
+        // 비밀방인 경우 비밀번호 등록
+        if (req.isPrivate())
+            shoppingRoom.setPassword(req.getPassword());
+
+        String token = getSessionToken(OpenViduRole.PUBLISHER, shoppingRoom.getId(), member);
 
         // 쇼핑룸 정보 DB 저장
         shoppingRoomRepository.save(shoppingRoom);
-        // host member 참여자 DB에 저장
-        roomParticipantRepository.save(new RoomParticipant(shoppingRoom, member));
+//        // host member 를 참여자 DB 저장
+//        roomParticipantRepository.save(
+//                RoomParticipant
+//                        .builder()
+//                        .member(member).shoppingRoom(shoppingRoom)
+//                        .build()
+//        );
 
-        String sessionToken = getSessionToken(OpenViduRole.PUBLISHER, shoppingRoom.getId(), member);
-
-        return new ShoppingRoomRes(shoppingRoom.getId(), shoppingMallName, shoppingMallUrl, sessionToken);
+        res.setShoppingRoomId(shoppingRoom.getId());
+        res.setToken(token);
+        return res;
     }
 
     /**
@@ -112,27 +119,31 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
         ShoppingRoom shoppingRoom = shoppingRoomRepository.findById(shoppingRoomId).orElseThrow(() -> new ShoppingRoomNotFoundException(shoppingRoomId));
 
-        // 입장 가능 인원 확인
-        if (shoppingRoom.getParticipantCount() <= roomParticipantRepository.countByShoppingRoom(shoppingRoom)) {
-            throw new ExceedParticipantCountException();
-        }
-
-        String sessionToken = getSessionToken(OpenViduRole.SUBSCRIBER, shoppingRoomId, member);
+        String token = getSessionToken(OpenViduRole.SUBSCRIBER, shoppingRoomId, member);
 
         // 참여자 DB 저장
-        roomParticipantRepository.save(new RoomParticipant(shoppingRoom, member));
+//        roomParticipantRepository.save(
+//                RoomParticipant
+//                        .builder()
+//                        .member(member).shoppingRoom(shoppingRoom)
+//                        .build()
+//        );
 
-        String shoppingRoomName = shoppingRoom.getShoppingMallName();
-        String shoppingRoomUrl = shoppingRoom.getShoppingMallUrl();
+        ShoppingRoomRes res = new ShoppingRoomRes();
 
-        if (!shoppingRoom.getIsCustomShoppingMall()) {
+        if (shoppingRoom.getIsCustomShoppingMall()) {
+            res.setShoppingRoomName(shoppingRoom.getShoppingMallName());
+            res.setShoppingRoomUrl(shoppingRoom.getShoppingMallUrl());
+        } else {
             ShoppingMall shoppingMall = shoppingMallRepository.findById(shoppingRoom.getShoppingMall().getId())
                     .orElseThrow(() -> new ShoppingMallNotFoundException(shoppingRoom.getShoppingMall().getId()));
-            shoppingRoomName = shoppingMall.getName();
-            shoppingRoomUrl = shoppingMall.getUrl();
+            res.setShoppingRoomName(shoppingMall.getName());
+            res.setShoppingRoomUrl(shoppingMall.getUrl());
         }
+        res.setShoppingRoomId(shoppingRoomId);
+        res.setToken(token);
 
-        return new ShoppingRoomRes(shoppingRoomId, shoppingRoomName, shoppingRoomUrl, sessionToken);
+        return res;
     }
 
     // openvidu 세션 속성 설정
@@ -142,7 +153,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
                 .role(role)
                 .build();
     }
-
+    
     private String getSessionToken(OpenViduRole role, Long shoppingRoomId, Member member) {
         String token = "";
         try {
@@ -153,7 +164,6 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
                 session = this.openVidu.createSession();
 
                 // 세션 저장
-                log.debug("shoppingRoomId = {}, Session = {} 저장", shoppingRoomId, session);
                 this.mapSessions.put(shoppingRoomId, session);
                 this.mapSessionNamesTokens.put(shoppingRoomId, new ConcurrentHashMap<>());
             } else {

@@ -6,8 +6,6 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "room_participant")
@@ -24,4 +22,9 @@ public class RoomParticipant extends CreatedTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public RoomParticipant(ShoppingRoom shoppingRoom, Member member) {
+        this.shoppingRoom = shoppingRoom;
+        this.member = member;
+    }
 }
