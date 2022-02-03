@@ -20,7 +20,7 @@ public class ShoppingRoomController {
 
     private final ShoppingRoomService shoppingRoomService;
 
-    @ApiOperation(value = "쇼핑룸 생성")
+    @ApiOperation(value = "쇼핑룸 생성", notes = "<strong>쇼핑룸 생성</strong>을 통해 세션과 토큰을 생성 후 쇼핑몰 정보와 토큰 반환 => 입력되지 않은 password, shopping mall 정보는 null로 입력하기")
     @PostMapping("")
     public ResponseEntity<BaseResponseBody> makeShoppingRoom(@RequestBody MakeShoppingRoomReq req) {
         // TODO: 사용자 정보 얻기
@@ -29,12 +29,22 @@ public class ShoppingRoomController {
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED, MAKE_SHOPPING_ROOM, shoppingRoomService.makeShoppingRoom(memberId, req)));
     }
 
-    @ApiOperation(value = "쇼핑룸 입장")
+    @ApiOperation(value = "쇼핑룸 입장", notes = "<strong>입장하기</strong>를 통해 참가자가 쇼핑몰을 입장 후 쇼핑몰 정보와 토큰 반환")
     @GetMapping("/{shoppingRoomId}")
     public ResponseEntity<BaseResponseBody> enterShoppingRoom(@PathVariable Long shoppingRoomId) {
         // TODO: 사용자 정보 얻기
         Long memberId = 3L;
 
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK, ENTER_SHOPPING_ROOM, shoppingRoomService.enterShoppingRoom(memberId, shoppingRoomId)));
+    }
+
+    @ApiOperation(value = "쇼핑룸 나가기", notes = "<strong>쇼핑룸 나기기</strong>를 통해 쇼핑룸 비활성화 및 세션 정보 삭제")
+    @PostMapping("/{shoppingRoomId}")
+    public ResponseEntity<BaseResponseBody> exitShoppingRoom(@PathVariable Long shoppingRoomId) {
+        // TODO: 사용자 정보 얻기
+        Long memberId = 3L;
+
+        shoppingRoomService.exitShoppingRoom(memberId, shoppingRoomId);
+        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK, EXIT_SHOPPING_ROOM));
     }
 }

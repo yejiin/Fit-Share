@@ -6,4 +6,5 @@ import com.fitshare.backend.api.response.ShoppingRoomRes;
 public interface ShoppingRoomService {
     ShoppingRoomRes makeShoppingRoom(Long memberId, MakeShoppingRoomReq req);
     ShoppingRoomRes enterShoppingRoom(Long memberId, Long shoppingRoomId);
+    void exitShoppingRoom(Long memberId, Long shoppingRoomId);
 }

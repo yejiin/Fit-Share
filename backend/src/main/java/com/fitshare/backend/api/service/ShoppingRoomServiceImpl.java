@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -44,7 +43,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
     private Map<Long, Session> mapSessions = new ConcurrentHashMap<>();
 
     // openvidu 세션 참여자 정보 저장
-    private Map<Long, Map<String, Member>> mapSessionNamesTokens = new ConcurrentHashMap<>();
+    private Map<Long, Map<Member, String>> mapSessionNamesTokens = new ConcurrentHashMap<>();
 
     public ShoppingRoomServiceImpl(MemberRepository memberRepository, ShoppingRoomRepository shoppingRoomRepository, ShoppingMallRepository shoppingMallRepository,
                                    RoomParticipantRepository roomParticipantRepository,
@@ -113,7 +112,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
         ShoppingRoom shoppingRoom = shoppingRoomRepository.findById(shoppingRoomId).orElseThrow(() -> new ShoppingRoomNotFoundException(shoppingRoomId));
 
         // 입장 가능 인원 확인
-        if (shoppingRoom.getParticipantCount() <= roomParticipantRepository.countByShoppingRoom(shoppingRoom)) {
+        if (shoppingRoom.getParticipantCount() <= mapSessionNamesTokens.get(shoppingRoomId).size()) {
             throw new ExceedParticipantCountException();
         }
 
@@ -133,6 +132,31 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
         }
 
         return new ShoppingRoomRes(shoppingRoomId, shoppingRoomName, shoppingRoomUrl, sessionToken);
+    }
+
+    /**
+     * 쇼핑룸 나가기
+     **/
+    @Override
+    public void exitShoppingRoom(Long memberId, Long shoppingRoomId) {
+
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
+
+        // 나가려는 세션이 없다면
+        if (this.mapSessions.get(shoppingRoomId) == null || this.mapSessionNamesTokens.get(shoppingRoomId) == null)
+            throw new ShoppingRoomNotFoundException(shoppingRoomId);
+
+        if (this.mapSessionNamesTokens.get(shoppingRoomId).remove(member) != null) {
+            // 모두 방을 나갔다면
+            if (this.mapSessionNamesTokens.get(shoppingRoomId).isEmpty()) {
+                // 세션 삭제
+                this.mapSessions.remove(shoppingRoomId);
+                updateShoppingRoomStatus(shoppingRoomId);
+            }
+        } else {
+            // 세션에 참여하고 있지 않음
+            throw new MemberNotFoundException(memberId);
+        }
     }
 
     // openvidu 세션 속성 설정
@@ -164,10 +188,16 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
             token = session.createConnection(getConnectionProperties(role)).getToken();
 
             // 토큰 저장
-            this.mapSessionNamesTokens.get(shoppingRoomId).put(token, member);
+            this.mapSessionNamesTokens.get(shoppingRoomId).put(member, token);
         } catch (OpenViduJavaClientException | OpenViduHttpException e) {
             e.printStackTrace();
         }
         return token;
+    }
+
+    @Transactional
+    public void updateShoppingRoomStatus(Long shoppingRoomId) {
+        ShoppingRoom shoppingRoom = shoppingRoomRepository.findById(shoppingRoomId).orElseThrow(() -> new ShoppingRoomNotFoundException(shoppingRoomId));
+        shoppingRoom.setIsActive(false);
     }
 }
