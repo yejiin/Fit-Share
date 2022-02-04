@@ -53,7 +53,8 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public List<FriendRes> getFriendListByEmail(String friendEmail) {
-        return null;
+        Long memberId = 1L;
+        return friendRepository.findByMemberIdAndFriendEmailLike(memberId, friendEmail);
     }
 
     @Transactional
