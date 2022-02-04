@@ -32,13 +32,7 @@ public class FriendServiceImpl implements FriendService {
         }
 
         // 이미 친구일 경우 중복 방지
-        int friendCount = 0;
-        friendCount += friendRepository.countByMemberIdAndFriendId(memberId, friendId);
-        System.out.println("friendCount = " + friendCount);
-        friendCount += friendRepository.countByMemberIdAndFriendId(friendId, memberId);
-        System.out.println("friendCount = " + friendCount);
-
-        if (friendCount > 0) {
+        if (friendRepository.countByMemberIdAndFriendId(memberId, friendId) > 0) {
             throw new DuplicateException(memberId, friendId);
         }
 
