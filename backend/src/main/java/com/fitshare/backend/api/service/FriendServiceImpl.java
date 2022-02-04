@@ -102,7 +102,8 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public List<FriendRes> getFriendRequestList() {
-        return null;
+        Long memberId = 1L;
+        return friendRequestRepository.findByTargetMemberId(memberId);
     }
 
     @Transactional
