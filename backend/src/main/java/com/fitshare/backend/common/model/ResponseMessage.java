@@ -12,4 +12,7 @@ public class ResponseMessage {
     // Login
     public static final String LOGIN = "로그인 되었습니다.";
     public static final String LOGOUT = "로그아웃 되었습니다.";
+
+    // Member
+    public static final String SEARCH_MEMBERS_BY_EMAIL = "이메일로 사용자 조회 성공입니다.";
 }
