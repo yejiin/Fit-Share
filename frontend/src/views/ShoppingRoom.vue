@@ -42,8 +42,8 @@ import GroupChat from '@/components/room/GroupChat.vue';
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';   
 
-const OPENVIDU_SERVER_URL = "https://" + location.hostname + ":4443";
-const OPENVIDU_SERVER_SECRET = "MY_SECRET";
+// const OPENVIDU_SERVER_URL = "https://" + location.hostname + ":4443";
+// const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
 
 export default {
@@ -69,11 +69,15 @@ export default {
 
           isAudio: false,
           isVideo: false,
+
+          token: '',
         })
 
         // created 
         state.mySessionId = route.params.roomId  
-        state.myUserName = route.params.myUserName  // store에서 가져오기 
+        state.myUserName = route.params.myUserName  // store에서 사용자이름 가져오기 
+        
+        state.token = route.params.token  // 토큰 저장관련 이슈!!!!!
         
         // methods        
         const goToMain = () => {
@@ -121,10 +125,10 @@ export default {
           });
           
           // ------------- token 관련 method -----------------
-          getToken(state.mySessionId).then(token => {
-            state.session.connect(token, { clientData: state.myUserName })
-              .then(() => {
-                let publisher = state.OV.initPublisher(undefined, {
+
+          state.session.connect(state.token, { clientData: state.myUserName })
+            .then(() => {
+              let publisher = state.OV.initPublisher(undefined, {
                   audioSource: undefined, 
                   videoSource: undefined,
                   publishAudio: true,  	
@@ -140,17 +144,15 @@ export default {
 
                 // --- Publish your stream ---
                 state.session.publish(state.publisher);
-              })
-              .catch(error => {
+            })
+            .catch(error => {
                 console.log('There was an error connecting to the session:', error.code, error.message);
-              });
-          });
+            });
 
           window.addEventListener('beforeunload', leaveSession)
         }
 
-
-        // token method => 서버에서 진행 
+        // token method 
         // function getToken (sessionId) {
         //   axios({
         //     method: 'get',
@@ -160,52 +162,6 @@ export default {
         //     .then(res => res.data.token)
         //     .catch(err => console.log(err))
         // }
-        
-        const getToken = (mySessionId) => {  // sessionId가 data.id 해당
-          return createSession(mySessionId).then(sessionId => createToken(sessionId));  // 토큰 반환
-        }
-
-        const createSession = (sessionId) => {
-          return new Promise((resolve, reject) => {
-            axios
-              .post(`${OPENVIDU_SERVER_URL}/openvidu/api/sessions`, JSON.stringify({
-                customSessionId: sessionId, 
-              }), {
-                auth: {  
-                  username: 'OPENVIDUAPP',
-                  password: OPENVIDU_SERVER_SECRET,
-                },
-              })
-              .then(response => response.data)
-              .then(data => resolve(data.id))  // 'data.id = 회의실 이름(state의 mySessionID와 같음)'을 반환
-              .catch(error => {
-                if (error.response.status === 409) {
-                  resolve(sessionId);
-                } else {
-                  console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
-                  if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
-                    location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
-                  }
-                  reject(error.response);
-                }
-              });
-          });
-        }
-
-        const createToken = (sessionId) => {
-          return new Promise((resolve, reject) => {
-            axios
-              .post(`${OPENVIDU_SERVER_URL}/openvidu/api/sessions/${sessionId}/connection`, {}, {
-                auth: {
-                  username: 'OPENVIDUAPP',
-                  password: OPENVIDU_SERVER_SECRET,
-                },
-              })
-              .then(response => response.data)
-              .then(data => resolve(data.token))
-              .catch(error => reject(error.response));
-          });
-        }
 
         // created
         joinSession() 
@@ -232,7 +188,8 @@ export default {
         return { 
           // goToCreate,
           goToMain, offAudio, offVideo, onAudio, onVideo,
-          joinSession, getToken, createSession, createToken, 
+          joinSession, 
+          // getToken, createSession, createToken, 
           leaveSession, updateMainVideoStreamManager,
           ...toRefs(state)
         }
@@ -278,12 +235,13 @@ export default {
   text-align: center;
 }
 
-.btn {
+/* 확인! */
+.buttons .btn {  
   margin: 0 5px 0;
   cursor: pointer;
 }
 
-#buttonLeaveSession {
+.buttons #buttonLeaveSession {
   background-color: red;
   color: white;
   margin-left: 15px;
