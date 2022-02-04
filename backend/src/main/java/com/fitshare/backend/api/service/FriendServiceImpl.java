@@ -29,7 +29,7 @@ public class FriendServiceImpl implements FriendService {
         Long friendId = friendReq.getFriendId();
 
         // 친구를 요청한 사용자와 요청을 받은 사용자가 같을 경우 방지
-        if (memberId == friendId) {
+        if (memberId.equals(friendId)) {
             throw new InvalidException(memberId, friendId);
         }
 
@@ -62,7 +62,7 @@ public class FriendServiceImpl implements FriendService {
         Long memberId = 1L;
 
         // 친구 삭제를 요청한 사용자와 삭제할 사용자가 같을 경우 방지
-        if (memberId == friendId) {
+        if (memberId.equals(friendId)) {
             throw new InvalidException(memberId, friendId);
         }
 
