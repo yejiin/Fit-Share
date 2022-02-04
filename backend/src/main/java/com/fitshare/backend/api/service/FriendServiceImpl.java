@@ -108,7 +108,18 @@ public class FriendServiceImpl implements FriendService {
 
     @Transactional
     @Override
-    public void deleteFriendRequest(Long friendId) {
+    public void deleteFriendRequest(Long requesterId) {
+        Long memberId = 2L;
+
+        // 친구를 요청한 사용자와 거절할 사용자가 같을 경우 방지
+        if (memberId.equals(requesterId)) {
+            throw new InvalidException(memberId, requesterId);
+        }
+
+        // requesterId 가 memberId 에게 한 친구 요청을 거절(삭제)
+        if (friendRequestRepository.removeByMemberIdAndTargetMemberId(requesterId, memberId) != 1) {
+            throw new InvalidException(memberId, requesterId);
+        }
     }
 
 }

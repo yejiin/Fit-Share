@@ -19,6 +19,6 @@ public interface FriendService {
 
     List<FriendRes> getFriendRequestList();
 
-    void deleteFriendRequest(Long friendId);
+    void deleteFriendRequest(Long requesterId);
 
 }

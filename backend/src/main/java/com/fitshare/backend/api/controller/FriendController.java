@@ -1,7 +1,6 @@
 package com.fitshare.backend.api.controller;
 
 import com.fitshare.backend.api.request.FriendReq;
-
 import com.fitshare.backend.api.service.FriendService;
 import com.fitshare.backend.common.model.BaseResponseBody;
 import io.swagger.annotations.Api;
@@ -62,9 +61,9 @@ public class FriendController {
     }
 
     @ApiOperation(value = "친구 요청 삭제", notes = "사용자 고유 ID와 친구요청을 받은 친구의 고유 ID로 친구 요청을 삭제합니다.")
-    @DeleteMapping("/requests/{friendId}")
-    public ResponseEntity<BaseResponseBody> deleteFriendRequest(@PathVariable Long friendId) {
-        friendService.deleteFriendRequest(friendId);
+    @DeleteMapping("/requests/{requesterId}")
+    public ResponseEntity<BaseResponseBody> deleteFriendRequest(@PathVariable Long requesterId) {
+        friendService.deleteFriendRequest(requesterId);
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED, DELETE_FRIEND_REQUEST));
     }
 

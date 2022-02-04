@@ -30,4 +30,9 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, Lo
             " ORDER BY m.name")
     List<FriendRes> findByTargetMemberId(@Param("targetMemberId") Long targetMemberId);
 
+    /**
+     * friend_request table 에서 memberId 가 targetMemberId 에게 한 친구 요청을 삭제한다
+     */
+    int removeByMemberIdAndTargetMemberId(Long memberId, Long targetMemberId);
+
 }
