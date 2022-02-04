@@ -14,7 +14,7 @@
       <div class="components-container d-flex flex-row">
         <group-chat class="group-chat"></group-chat>
         <div>
-          <shopping-site class="shopping-site"></shopping-site>
+          <shopping-site :shopping-mall-url="shoppingMallUrl" class="shopping-site"></shopping-site>
           <!-- 화상회의 버튼 -->
           <div class="buttons">
             <button v-if="isAudio" class="btn shadow-none" @click="offAudio()"><i class="bi bi-mic-mute-fill"></i></button>
@@ -22,6 +22,10 @@
             <button v-if="isVideo" class="btn shadow-none" @click="offVideo()"><i class="bi bi-camera-video-off-fill"></i></button>
             <button v-if="!isVideo" class="btn shadow-none" @click="onVideo()"><i class="bi bi-camera-video-fill"></i></button>
             <input class="btn shadow-none" type="button" id="buttonLeaveSession" @click="leaveSession" value="나가기">
+            
+            <!-- overlay 테스트 -->
+            <button @click="filter()">filter</button>
+            <button @click="removeFilter()">remove</button>
           </div>
         </div>
         <closet class="closet"></closet>
@@ -31,20 +35,13 @@
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue';
+import { reactive, toRefs, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import axios from 'axios';
 import { OpenVidu } from 'openvidu-browser';
 import RoomVideo from '@/components/room/RoomVideo.vue';
 import ShoppingSite from '@/components/room/ShoppingSite.vue';
 import Closet from '@/components/room/Closet.vue';
 import GroupChat from '@/components/room/GroupChat.vue';
-
-axios.defaults.headers.post['Content-Type'] = 'application/json';   
-
-// const OPENVIDU_SERVER_URL = "https://" + location.hostname + ":4443";
-// const OPENVIDU_SERVER_SECRET = "MY_SECRET";
-
 
 export default {
     name: 'ShoppingRoom',
@@ -56,6 +53,8 @@ export default {
     setup () {
         const router = useRouter()
         const route = useRoute()
+        
+        let shoppingMallUrl = ref('')
 
         const state = reactive({
           OV: undefined,
@@ -65,19 +64,16 @@ export default {
           subscribers: [], 
 
           mySessionId: '',
-          myUserName: '',
+          myUserName: 'user1234',
 
           isAudio: false,
           isVideo: false,
-
-          token: '',
         })
 
         // created 
         state.mySessionId = route.params.roomId  
-        state.myUserName = route.params.myUserName  // store에서 사용자이름 가져오기 
+        shoppingMallUrl = route.params.mallId  
         
-        state.token = route.params.token  // 토큰 저장관련 이슈!!!!!
         
         // methods        
         const goToMain = () => {
@@ -103,6 +99,26 @@ export default {
         }
 
         // openvidu method
+        function filter() {
+          this.publisher.stream.applyFilter("GStreamerFilter", { command: "textoverlay text='Embedded text' valignment=top halignment=right" })
+            .then(() => {
+                console.log("Video rotated!");
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+
+        function removeFilter() {
+          this.publisher.stream.removeFilter()
+            .then(() => {
+                console.log("Filter removed");
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+
         const joinSession = () => {
           state.OV = new OpenVidu();
 
@@ -125,8 +141,7 @@ export default {
           });
           
           // ------------- token 관련 method -----------------
-
-          state.session.connect(state.token, { clientData: state.myUserName })
+          state.session.connect(route.params.token, { clientData: state.myUserName })
             .then(() => {
               let publisher = state.OV.initPublisher(undefined, {
                   audioSource: undefined, 
@@ -136,7 +151,7 @@ export default {
                   resolution: '640x480',  
                   frameRate: 30,			
                   insertMode: 'APPEND',	
-                  mirror: false       	
+                  mirror: false,
                 });
                 
                 state.mainStreamManager = publisher;
@@ -152,20 +167,6 @@ export default {
           window.addEventListener('beforeunload', leaveSession)
         }
 
-        // token method 
-        // function getToken (sessionId) {
-        //   axios({
-        //     method: 'get',
-        //     url: 'get-api',
-        //     data: { roomId: sessionId }
-        //   })
-        //     .then(res => res.data.token)
-        //     .catch(err => console.log(err))
-        // }
-
-        // created
-        joinSession() 
-
         const leaveSession = () => {
           if (state.session) state.session.disconnect();
 
@@ -177,7 +178,6 @@ export default {
 
           window.removeEventListener('beforeunload', leaveSession);
           goToMain()
-
         }
 
         const updateMainVideoStreamManager = (stream) => {  // 화상화면 클릭시 해당 화면이 메인으로 이동 
@@ -185,13 +185,14 @@ export default {
           state.mainStreamManager = stream;
         }
 
+        // created
+        joinSession() 
+
         return { 
-          // goToCreate,
           goToMain, offAudio, offVideo, onAudio, onVideo,
           joinSession, 
-          // getToken, createSession, createToken, 
           leaveSession, updateMainVideoStreamManager,
-          ...toRefs(state)
+          ...toRefs(state), shoppingMallUrl, filter, removeFilter,
         }
     }
 

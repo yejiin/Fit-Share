@@ -52,7 +52,7 @@ import Friend from '@/components/main/Friend.vue'
 import ShoppingRoomList from '@/components/main/ShoppingRoomList.vue'
 import HostCloset from '../components/main/HostCloset.vue'
 import { reactive, ref, toRefs } from 'vue'
-import { useRouter } from 'vue-router';
+// import { useRouter } from 'vue-router';
 // import axios from 'axios'
 
 export default {
@@ -66,7 +66,7 @@ export default {
   },
 
   setup() {
-    const router = useRouter()
+    // const router = useRouter()
 
     const status = ref(false)
     const selectedShoppingRoom = ref({})
@@ -111,7 +111,7 @@ export default {
       //     username: '',
       //     shoppingRoomId: '',
       //   },
-      //   // header: , 
+      //   headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` }
       // })
       //   .then(res => {
       //     // isPrivate 여부 => F: token, roomId, mallurl (username 필요X) / T: isPrivate, password
