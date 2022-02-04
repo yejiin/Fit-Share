@@ -37,11 +37,12 @@ public class FriendServiceImpl implements FriendService {
         if (friendRepository.countByMemberIdAndFriendId(memberId, friendId) > 0) {
             throw new DuplicateException(memberId, friendId);
         }
-
+        
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
-        Member target = memberRepository.findById(friendId).orElseThrow(() -> new MemberNotFoundException(friendId));
-        Friend friend = new Friend(member, target);
-        friendRepository.save(friend);
+        Member friend = memberRepository.findById(friendId).orElseThrow(() -> new MemberNotFoundException(friendId));
+
+        friendRepository.save(new Friend(member, friend));
+        friendRepository.save(new Friend(friend, member));
     }
 
     @Override
