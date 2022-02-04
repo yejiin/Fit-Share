@@ -1,12 +1,12 @@
 package com.fitshare.backend.db.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
-@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "friend_request")
 public class FriendRequest extends CreatedTimeEntity {

@@ -20,6 +20,8 @@ public class FriendServiceImpl implements FriendService {
     private FriendRepository friendRepository;
     private FriendRequestRepository friendRequestRepository;
 
+    // TODO: memberId JwtUtil에서 가져오기
+
     @Transactional
     @Override
     public void addFriend(FriendReq friendReq) throws RuntimeException {
@@ -44,7 +46,8 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public List<FriendRes> getFriendList() {
-        return null;
+        Long memberId = 1L;
+        return friendRepository.findByMemberId(memberId).orElse(null);
     }
 
     @Override
