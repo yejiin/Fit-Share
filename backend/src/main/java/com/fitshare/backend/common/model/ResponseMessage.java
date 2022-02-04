@@ -11,5 +11,5 @@ public class ResponseMessage {
 
     // Login
     public static final String LOGIN = "로그인 되었습니다.";
-
+    public static final String LOGOUT = "로그아웃 되었습니다.";
 }
