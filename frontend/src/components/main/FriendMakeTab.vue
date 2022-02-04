@@ -5,7 +5,7 @@
       class="input-box"
       type="text"
       v-model="SearchUser"
-      placeholder="이름 또는 이메일 검색"
+      placeholder="이메일 검색"
     >
 
     <!-- 이름, 이메일로 검색 시 나오는 users들 components -->
@@ -39,7 +39,7 @@ export default {
     const SearchedUsers = computed(() => {
       if (SearchUser.value) {
         return friends.value.filter(friend => {
-          return friend.name.includes(SearchUser.value)
+          return friend.email.includes(SearchUser.value)
         })
       }
       return ''
