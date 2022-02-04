@@ -3,8 +3,7 @@ package com.fitshare.backend.api.service;
 import com.fitshare.backend.api.request.FriendReq;
 import com.fitshare.backend.api.response.FriendRes;
 import com.fitshare.backend.common.exception.*;
-import com.fitshare.backend.db.entity.Friend;
-import com.fitshare.backend.db.entity.Member;
+import com.fitshare.backend.db.entity.*;
 import com.fitshare.backend.db.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -79,6 +78,26 @@ public class FriendServiceImpl implements FriendService {
     @Transactional
     @Override
     public void addFriendRequest(FriendReq friendReq) {
+        Long memberId = 1L;
+        Long targetMemberId = friendReq.getFriendId();
+
+        // 친구를 요청한 사용자와 요청을 받은 사용자가 같을 경우, 이미 친구일 경우 방지
+        if (memberId.equals(targetMemberId) || friendRepository.countByMemberIdAndFriendId(memberId, targetMemberId) > 0) {
+            throw new InvalidException(memberId, targetMemberId);
+        }
+
+        // 이미 친구요청이 존재할 경우 중복 방지
+        int requestCount = 0;
+        requestCount += friendRequestRepository.countByMemberIdAndTargetMemberId(memberId, targetMemberId);
+        requestCount += friendRequestRepository.countByMemberIdAndTargetMemberId(targetMemberId, memberId);
+        if (requestCount > 0) {
+            throw new DuplicateException(memberId, targetMemberId);
+        }
+
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
+        Member targetMember = memberRepository.findById(targetMemberId).orElseThrow(() -> new MemberNotFoundException(targetMemberId));
+
+        friendRequestRepository.save(new FriendRequest(member, targetMember));
     }
 
     @Override
