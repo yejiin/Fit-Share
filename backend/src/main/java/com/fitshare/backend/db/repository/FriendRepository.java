@@ -24,4 +24,6 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
             " ORDER BY m.name")
     Optional<List<FriendRes>> findByMemberId(@Param("memberId") Long memberId);
 
+    Optional<Friend> removeByMemberIdAndFriendId(Long memberId, Long friendId);
+
 }

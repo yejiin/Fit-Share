@@ -24,7 +24,7 @@ public class FriendServiceImpl implements FriendService {
 
     @Transactional
     @Override
-    public void addFriend(FriendReq friendReq) throws RuntimeException {
+    public void addFriend(FriendReq friendReq) {
         Long memberId = 1L;
         Long friendId = friendReq.getFriendId();
 
@@ -37,7 +37,7 @@ public class FriendServiceImpl implements FriendService {
         if (friendRepository.countByMemberIdAndFriendId(memberId, friendId) > 0) {
             throw new DuplicateException(memberId, friendId);
         }
-        
+
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
         Member friend = memberRepository.findById(friendId).orElseThrow(() -> new MemberNotFoundException(friendId));
 
@@ -59,6 +59,15 @@ public class FriendServiceImpl implements FriendService {
     @Transactional
     @Override
     public void deleteFriend(Long friendId) {
+        Long memberId = 1L;
+
+        // 친구 삭제를 요청한 사용자와 삭제할 사용자가 같을 경우 방지
+        if (memberId == friendId) {
+            throw new InvalidException(memberId, friendId);
+        }
+
+        friendRepository.removeByMemberIdAndFriendId(memberId, friendId);
+        friendRepository.removeByMemberIdAndFriendId(friendId, memberId);
     }
 
     @Transactional
