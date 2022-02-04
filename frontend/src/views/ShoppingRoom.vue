@@ -265,6 +265,7 @@ export default {
 .group-chat, .closet {
   width: 290px;
   height: 839px;
+  background-color: white;
 }
 
 .shopping-site {
