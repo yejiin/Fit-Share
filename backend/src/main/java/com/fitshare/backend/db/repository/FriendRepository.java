@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface FriendRepository extends JpaRepository<Friend, Long> {
@@ -22,8 +21,8 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
             " WHERE f.member.id = :memberId" +
             "   AND m.isActive = true" +
             " ORDER BY m.name")
-    Optional<List<FriendRes>> findByMemberId(@Param("memberId") Long memberId);
+    List<FriendRes> findByMemberId(@Param("memberId") Long memberId);
 
-    Optional<Friend> removeByMemberIdAndFriendId(Long memberId, Long friendId);
+    int removeByMemberIdAndFriendId(Long memberId, Long friendId);
 
 }

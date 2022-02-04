@@ -48,7 +48,7 @@ public class FriendServiceImpl implements FriendService {
     @Override
     public List<FriendRes> getFriendList() {
         Long memberId = 1L;
-        return friendRepository.findByMemberId(memberId).orElse(null);
+        return friendRepository.findByMemberId(memberId);
     }
 
     @Override
@@ -59,15 +59,20 @@ public class FriendServiceImpl implements FriendService {
     @Transactional
     @Override
     public void deleteFriend(Long friendId) {
-        Long memberId = 1L;
+        Long memberId = 2L;
 
         // 친구 삭제를 요청한 사용자와 삭제할 사용자가 같을 경우 방지
         if (memberId.equals(friendId)) {
             throw new InvalidException(memberId, friendId);
         }
 
-        friendRepository.removeByMemberIdAndFriendId(memberId, friendId);
-        friendRepository.removeByMemberIdAndFriendId(friendId, memberId);
+        int removeCount = 0;
+        removeCount += friendRepository.removeByMemberIdAndFriendId(memberId, friendId);
+        removeCount += friendRepository.removeByMemberIdAndFriendId(friendId, memberId);
+
+        if (removeCount != 2) {
+            throw new InvalidException(memberId, friendId);
+        }
     }
 
     @Transactional
