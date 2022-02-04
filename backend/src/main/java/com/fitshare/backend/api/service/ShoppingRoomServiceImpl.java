@@ -139,13 +139,15 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
             // 모두 방을 나갔다면
             if (this.mapSessionNamesTokens.get(shoppingRoomId).isEmpty()) {
                 // 세션 삭제
-                this.mapSessions.remove(shoppingRoomId);
+                closeSession(shoppingRoomId);
+                // 쇼핑룸 상태 변경
                 updateShoppingRoomStatus(shoppingRoomId);
             }
         } else {
             // 세션에 참여하고 있지 않음
             throw new MemberNotFoundException(memberId);
         }
+
     }
 
     /**
@@ -161,6 +163,10 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
         return new ConnectionProperties.Builder()
                 .type(ConnectionType.WEBRTC)
                 .role(role)
+                .kurentoOptions(
+                        new KurentoOptions.Builder()
+                                .allowedFilters(new String[]{"GStreamerFilter", "FaceOverlayFilter"})
+                                .build())
                 .build();
     }
 
@@ -190,6 +196,15 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
             e.printStackTrace();
         }
         return token;
+    }
+
+    private void closeSession(Long shoppingRoomId) {
+        try {
+            this.mapSessions.get(shoppingRoomId).close();
+            this.mapSessions.remove(shoppingRoomId);
+        } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+            e.printStackTrace();
+        }
     }
 
     @Transactional
