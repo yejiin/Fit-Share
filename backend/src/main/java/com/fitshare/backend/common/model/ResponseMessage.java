@@ -12,4 +12,8 @@ public class ResponseMessage {
     // Login
     public static final String LOGIN = "로그인 되었습니다.";
     public static final String LOGOUT = "로그아웃 되었습니다.";
+
+    // Cloth
+    public static final String ADD_CLOTH = "옷 추가 성공입니다.";
+    public static final String GET_CLOTHES_LIST = "옷 목록 조회 성공입니다.";
 }

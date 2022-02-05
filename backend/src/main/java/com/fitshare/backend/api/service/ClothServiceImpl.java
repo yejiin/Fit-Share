@@ -1,0 +1,78 @@
+package com.fitshare.backend.api.service;
+
+import com.fitshare.backend.api.request.AddClothReq;
+import com.fitshare.backend.api.response.AddClothRes;
+import com.fitshare.backend.db.entity.Cloth;
+import com.fitshare.backend.db.entity.RoomParticipant;
+import com.fitshare.backend.db.repository.ClothRepository;
+import com.fitshare.backend.db.repository.RoomParticipantRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ClothServiceImpl implements ClothService {
+
+    private ClothRepository clothRepository;
+    private RoomParticipantRepository roomParticipantRepository;
+
+    private static final String PYTHON_PATH = "";
+
+    /**
+     * 옷 추가
+     **/
+    @Override
+    public AddClothRes addCloth(AddClothReq req) {
+
+        Long memberId = req.getMemberId();
+        Long shoppingRoomId = req.getShoppingRoomId();
+        String imageUrl = req.getImageUrl();
+
+        // python backend/img_trans.py "imagUrl" "저장할 경로" "이미지 타이틀"
+        // 이미지타이틀 : 쇼핑룸id_멤버id_생성시간.png
+        RoomParticipant roomParticipant = roomParticipantRepository.findByMember_Id(memberId).orElse(null);
+
+        // 이미지 저장 경로, 제목 지정
+        SimpleDateFormat time = new SimpleDateFormat("yyyyMMdd_HHmmss");
+
+        String imagePath = "/백엔드기준경로/"+shoppingRoomId;
+        String imageTitle = shoppingRoomId+"_"+memberId+"_"+time.format(System.currentTimeMillis());
+
+        ProcessBuilder builder = new ProcessBuilder("python3", PYTHON_PATH, imageUrl, imagePath, imageTitle);
+
+        try {
+            Process process = builder.start();
+
+            int exitval = process.waitFor(); // 파이썬 프로세스가 종료 될 때 까지 기다린다.
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(),"euc-kr"));
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(">>>  " + line); // 표준출력에 쓴다
+            }
+            if(exitval != 0) {
+                // 비정상 종료
+                log.debug("{} 이미지 프로세스가 비정상적으로 종료되었습니다.",imageTitle);
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Cloth cloth = Cloth.builder()
+                .roomParticipant(roomParticipant)
+                .clothUrl("프론트 기준 경로"+shoppingRoomId+"/"+imageTitle)
+                .build();
+
+        // 옷 정보 DB 저장
+        clothRepository.save(cloth);
+
+        return new AddClothRes(cloth.getId(),cloth.getClothUrl());
+    }
+}
