@@ -10,6 +10,7 @@ import com.fitshare.backend.common.model.RoleType;
 import com.fitshare.backend.db.entity.Member;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,15 +23,14 @@ import static org.springframework.security.config.Elements.LOGOUT;
 
 
 @Api(value = "카카오 인증 API", tags = "Kakao")
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/kakao")
 public class KakaoController {
 
-    @Autowired
-    KakaoApiService kakaoApiService;
+    private final KakaoApiService kakaoApiService;
 
-    @Autowired
-    MemberService memberService;
+    private final MemberService memberService;
 
     @GetMapping(value = "/login")
     @ApiOperation(value = "카카오 로그인", notes = "카카오 액세스 토큰으로 유저 정보를 받아 jwt토큰을 발급하고 전송하는 api입니다.")
