@@ -1,6 +1,6 @@
 <template>
   <div>
-    <iframe id="example" class="site" title="example" src=""
+    <iframe id="example" class="site" title="example" :src="shoppingMallUrl"
       frameborder="0" width="859" height="780">
     </iframe>
   </div>
@@ -19,7 +19,7 @@ export default {
       // document.cookie = "safeCookie2=foo"
       // document.cookie = "crossCookie=bar; SameSite=None; Secure";
       
-      // document.cookie = "SameSite=None; Secure"
+      document.cookie = "SameSite=None; Secure"
       
       // document.cookie = 'cookie1=value1; SameSite=Lax';
       // document.cookie = 'cookie2=value2; SameSite=None; Secure';
@@ -32,10 +32,6 @@ export default {
 </script>
 
 <style>
-/*  https://www.naning9.com*/
-/* https://mixxo.com */
-/* https://www.musinsa.com/ */
-/* https://topten.topten10mall.com/ */
 
 iframe {
   background-color: white;

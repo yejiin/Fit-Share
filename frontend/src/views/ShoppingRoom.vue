@@ -42,6 +42,7 @@ import RoomVideo from '@/components/room/RoomVideo.vue';
 import ShoppingSite from '@/components/room/ShoppingSite.vue';
 import Closet from '@/components/room/Closet.vue';
 import GroupChat from '@/components/room/GroupChat.vue';
+import axios from 'axios'
 
 export default {
     name: 'ShoppingRoom',
@@ -64,7 +65,7 @@ export default {
           subscribers: [], 
 
           mySessionId: '',
-          myUserName: 'user1234',
+          myUserName: 'user1234',  // 임시 => store에서 사용자 정보 불러오기 
 
           isAudio: false,
           isVideo: false,
@@ -72,7 +73,7 @@ export default {
 
         // created 
         state.mySessionId = route.params.roomId  
-        shoppingMallUrl = route.params.mallId  
+        shoppingMallUrl.value = route.params.mallUrl 
         
         
         // methods        
@@ -100,13 +101,13 @@ export default {
 
         // openvidu method
         function filter() {
-          this.publisher.stream.applyFilter("GStreamerFilter", { command: "textoverlay text='Embedded text' valignment=top halignment=right" })
-            .then(() => {
-                console.log("Video rotated!");
-            })
-            .catch(error => {
-                console.error(error);
-            });
+          // this.publisher.stream.applyFilter("GStreamerFilter", { command: "textoverlay text='Embedded text' valignment=top halignment=right" })
+          //   .then(() => {
+          //       console.log("Video rotated!");
+          //   })
+          //   .catch(error => {
+          //       console.error(error);
+          //   });
         }
 
         function removeFilter() {
@@ -140,25 +141,28 @@ export default {
             console.warn(exception);
           });
           
+          console.log('토큰 전달 전')
           // ------------- token 관련 method -----------------
           state.session.connect(route.params.token, { clientData: state.myUserName })
             .then(() => {
+              console.log('토큰 전달 후')
               let publisher = state.OV.initPublisher(undefined, {
-                  audioSource: undefined, 
-                  videoSource: undefined,
-                  publishAudio: true,  	
-                  publishVideo: true,  	
-                  resolution: '640x480',  
-                  frameRate: 30,			
-                  insertMode: 'APPEND',	
-                  mirror: false,
-                });
+                audioSource: undefined, 
+                videoSource: undefined,
+                publishAudio: true,  	
+                publishVideo: true,  	
+                resolution: '640x480',  
+                frameRate: 30,			
+                insertMode: 'APPEND',	
+                mirror: false,
+              });
                 
-                state.mainStreamManager = publisher;
-                state.publisher = publisher;
-
-                // --- Publish your stream ---
-                state.session.publish(state.publisher);
+              state.mainStreamManager = publisher;
+              state.publisher = publisher;
+              console.log('publisher data저장 후')
+              // --- Publish your stream ---
+              state.session.publish(state.publisher);
+              console.log('세션 publish 후')
             })
             .catch(error => {
                 console.log('There was an error connecting to the session:', error.code, error.message);
@@ -177,7 +181,17 @@ export default {
           state.OV = undefined;
 
           window.removeEventListener('beforeunload', leaveSession);
-          goToMain()
+
+          axios({
+            method : 'get',
+            url: `http://i6a405.p.ssafy.io:8081/api/v1/shopping-rooms/${state.mySessionId}`,
+            headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` }
+          })
+            .then(() => {
+              console.log('나가기 성공')
+              goToMain()
+            })
+            .catch(err => console.log(err))
         }
 
         const updateMainVideoStreamManager = (stream) => {  // 화상화면 클릭시 해당 화면이 메인으로 이동 

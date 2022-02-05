@@ -171,7 +171,7 @@ export default {
     // 바깥영역 클릭으로 dropdown 닫기
     document.addEventListener('click', function(e){
       if (isMallVisible.value == false ) {
-        console.log('')
+        // console.log('')
       } else {
         if (e.target.className !== 'dropdown-popover' && e.target.className !== 'selected-item form-select' && e.target.className !== '' && e.target.className !== 'search-mall-input' ) {
           isMallVisible.value = false
@@ -223,7 +223,7 @@ export default {
         shoppingMallName: state.mallName, 
         shoppingMallUrl: state.mallUrl,  
       }
-      console.log(roomData)
+      // console.log(roomData)
 
       axios({
         method : 'post',
@@ -232,6 +232,7 @@ export default {
         headers: { Authorization : `Bearer ${token.value}` }
       })
         .then(res => {
+          console.log(res.data.data)
           const data = res.data.data
           router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.ShoppingRoomUrl }}) 
         })
