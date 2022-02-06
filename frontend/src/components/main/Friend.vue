@@ -14,15 +14,17 @@
       <friend-make-tab class="tab_content" id="friendmake_content"></friend-make-tab>
       <!-- 친구요청확인 component -->
       <friend-check-tab class="tab_content" id="friendcheck_content"></friend-check-tab>
+
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import FriendListTab from '@/components/main/FriendListTab.vue'
 import FriendMakeTab from '@/components/main/FriendMakeTab.vue'
 import FriendCheckTab from '@/components/main/FriendCheckTab.vue'
+// import axios from 'axios'
 // import { useStore } from 'vuex'
 
 
@@ -36,13 +38,31 @@ export default {
   setup() {
     const status = ref(true)
 
+    const state = reactive({
+      friends: [],
+    })
+
     const CloseTab = () => {
       status.value = false
     }
 
+    // const CheckFriendRequest = () => {
+    //   axios({
+    //     method: 'GET',
+    //     url: 'http://i6a405.p.ssafy.io:8081/api/v1/friends/requests',
+    //     headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` }
+    //   })
+    //     .then(res => {
+    //       console.log(res)
+    //       state.friends = res.data.data
+    //     })
+    // }
+
     return {
       status,
-      CloseTab
+      CloseTab,
+      state,
+      // CheckFriendRequest
     }
   }
 }
