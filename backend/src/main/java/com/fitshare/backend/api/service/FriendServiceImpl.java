@@ -6,7 +6,7 @@ import com.fitshare.backend.common.auth.JwtUtil;
 import com.fitshare.backend.common.exception.*;
 import com.fitshare.backend.db.entity.*;
 import com.fitshare.backend.db.repository.*;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,13 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Transactional
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class FriendServiceImpl implements FriendService {
 
-    private MemberRepository memberRepository;
-    private FriendRepository friendRepository;
-    private FriendRequestRepository friendRequestRepository;
+    private final MemberRepository memberRepository;
+    private final FriendRepository friendRepository;
+    private final FriendRequestRepository friendRequestRepository;
 
     @Override
     public void addFriend(FriendReq friendReq) {
