@@ -19,6 +19,7 @@
 
 <script>
 import { reactive, toRefs, } from 'vue';
+import { useStore } from 'vuex'
 import axios from 'axios'
 
 export default {
@@ -27,6 +28,7 @@ export default {
     emits: ['first-host-closet', 'change-host-closet'],
 
     setup(props, { emit }) {
+      const store = useStore()
 
       const state = reactive({
         shoppingRoomList: [],  //뒤에 
@@ -42,7 +44,7 @@ export default {
       function getShoppingRoomList () {
         axios({
           method: 'get',
-          url: 'http://i6a405.p.ssafy.io:8081/api/v1/shopping-rooms/',
+          url: `${store.state.url}/api/v1/shopping-rooms/`,
           headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` }
         })
           .then(res => {
