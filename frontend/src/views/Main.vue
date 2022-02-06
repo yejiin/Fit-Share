@@ -106,14 +106,14 @@ export default {
       
       axios({
         method : 'get',
-        url: 'http://i6a405.p.ssafy.io:8081/api/v1/shopping-rooms/61',
+        url: 'http://i6a405.p.ssafy.io:8081/api/v1/shopping-rooms/75',
         // url: `http://i6a405.p.ssafy.io:8081/api/v1/shopping-rooms/${selectedShoppingRoom.shoppingRoomId}`,
         headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` }
       })
         .then(res => {
           const data = res.data.data 
           console.log(data)
-          router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.ShoppingRoomUrl }}) 
+          router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl }}) 
 
           // isPrivate 여부 => F: token, roomId, mallurl (username 필요X) / T: isPrivate, password
           // if (!data.isPrivate) {  // public
