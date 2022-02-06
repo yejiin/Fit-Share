@@ -175,7 +175,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
         try {
             Session session = null;
             // 쇼핑룸 호스트인 경우 openvidu 세션 생성
-            if (role.equals(OpenViduRole.PUBLISHER)) {
+            if (this.mapSessions.get(shoppingRoomId) == null) {
 
                 session = this.openVidu.createSession();
 
