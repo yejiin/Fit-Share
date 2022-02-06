@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class AddClothRes {
+public class ClothRes {
 
     @ApiModelProperty(name = "옷 Id", example = "1")
     private Long clothId;

@@ -1,7 +1,6 @@
 package com.fitshare.backend.api.controller;
 
 import com.fitshare.backend.api.request.AddClothReq;
-import com.fitshare.backend.api.request.GetClothesByIdReq;
 import com.fitshare.backend.api.service.ClothService;
 import com.fitshare.backend.common.model.BaseResponseBody;
 import io.swagger.annotations.Api;
@@ -11,11 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import static com.fitshare.backend.common.model.ResponseMessage.ADD_CLOTH;
+import static com.fitshare.backend.common.model.ResponseMessage.GET_CLOTHES_LIST;
 
 @Api(value = "옷장 API", tags = {""})
 @RequiredArgsConstructor
@@ -32,4 +28,11 @@ public class ClothController {
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED, ADD_CLOTH,clothService.addCloth(req)));
     }
 
+//    // 쇼핑룸 아이디, 멤버 아이디
+//    @PostMapping("/list")
+//    @ApiOperation(value = "옷 리스트", notes = "참가자 별 옷 목록을 반환하는 API입니다.")
+//    public ResponseEntity<BaseResponseBody> listClothes(@RequestParam Long memberId) {
+//
+//        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK,GET_CLOTHES_LIST,clothService.listClothes(memberId)));
+//    }
 }

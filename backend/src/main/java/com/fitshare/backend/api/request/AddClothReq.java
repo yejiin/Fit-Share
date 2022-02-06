@@ -15,8 +15,6 @@ public class AddClothReq {
     @ApiModelProperty(name = "쇼핑룸 Id", example = "1")
     private Long ShoppingRoomId;
 
-    @ApiModelProperty(name = "멤버 Id", example = "1")
-    private Long memberId;
 
     @ApiModelProperty(name = "옷 이미지 url", example = "https://xxx.jpg")
     private String imageUrl;

@@ -1,7 +1,8 @@
 package com.fitshare.backend.api.service;
 
 import com.fitshare.backend.api.request.AddClothReq;
-import com.fitshare.backend.api.response.AddClothRes;
+import com.fitshare.backend.api.response.ClothRes;
+import com.fitshare.backend.common.auth.JwtUtil;
 import com.fitshare.backend.db.entity.Cloth;
 import com.fitshare.backend.db.entity.RoomParticipant;
 import com.fitshare.backend.db.repository.ClothRepository;
@@ -14,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -29,9 +31,9 @@ public class ClothServiceImpl implements ClothService {
      * 옷 추가
      **/
     @Override
-    public AddClothRes addCloth(AddClothReq req) {
+    public ClothRes addCloth(AddClothReq req) {
 
-        Long memberId = req.getMemberId();
+        Long memberId = JwtUtil.getCurrentId().get();
         Long shoppingRoomId = req.getShoppingRoomId();
         String imageUrl = req.getImageUrl();
 
@@ -73,6 +75,8 @@ public class ClothServiceImpl implements ClothService {
         // 옷 정보 DB 저장
         clothRepository.save(cloth);
 
-        return new AddClothRes(cloth.getId(),cloth.getClothUrl());
+        return new ClothRes(cloth.getId(),cloth.getClothUrl());
     }
+
+
 }

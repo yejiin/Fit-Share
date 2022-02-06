@@ -1,10 +1,12 @@
 package com.fitshare.backend.api.service;
 
 import com.fitshare.backend.api.request.AddClothReq;
-import com.fitshare.backend.api.response.AddClothRes;
+import com.fitshare.backend.api.response.ClothRes;
+
+import java.util.List;
 
 public interface ClothService {
 
-    AddClothRes addCloth(AddClothReq req);
+    ClothRes addCloth(AddClothReq req);
 
 }
