@@ -11,13 +11,13 @@ import com.fitshare.backend.db.entity.Member;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+import static com.fitshare.backend.common.model.ResponseMessage.GET_ACCESS_TOKEN;
 import static com.fitshare.backend.common.model.ResponseMessage.LOGIN;
 import static org.springframework.security.config.Elements.LOGOUT;
 
@@ -32,15 +32,21 @@ public class KakaoController {
 
     private final MemberService memberService;
 
+
+    @GetMapping(value="/auth")
+    @ApiOperation(value = "카카오 토큰 요청", notes = "카카오 인가 코드로 액세스 토큰을 요청하는 api입니다.")
+    public ResponseEntity<BaseResponseBody> requestToken(@RequestParam String code){
+
+        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK,GET_ACCESS_TOKEN,kakaoApiService.requestToken(code)));
+    }
+
+
     @GetMapping(value = "/login")
-    @ApiOperation(value = "카카오 로그인", notes = "카카오 액세스 토큰으로 유저 정보를 받아 jwt토큰을 발급하고 전송하는 api입니다.")
+    @ApiOperation(value = "카카오 로그인", notes = "카카오 액세스 토큰으로 유저 정보를 받아 jwt 토큰을 발급하고 전송하는 api입니다.")
     public ResponseEntity<BaseResponseBody> login(@RequestParam String accessToken){
         String jwt = null;
 
-        // 1. 인가 코드로 카카오 access 토큰, refresh 토큰 받아오기
-        //OAuthToken oAuthToken = kakaoApiService.requestToken(code);
-
-        // 1. access token으로 유저 정보 받아오기
+//         1. access token으로 유저 정보 받아오기
         KakaoProfile kakaoProfile = kakaoApiService.requestUserInfo(accessToken);
         System.out.println(kakaoProfile.toString());
 
