@@ -23,6 +23,8 @@ import { ref } from 'vue'
 import FriendListTab from '@/components/main/FriendListTab.vue'
 import FriendMakeTab from '@/components/main/FriendMakeTab.vue'
 import FriendCheckTab from '@/components/main/FriendCheckTab.vue'
+// import { useStore } from 'vuex'
+
 
 export default {
   name: 'Friend',
@@ -32,7 +34,6 @@ export default {
     FriendCheckTab,
   },
   setup() {
-
     const status = ref(true)
 
     const CloseTab = () => {
