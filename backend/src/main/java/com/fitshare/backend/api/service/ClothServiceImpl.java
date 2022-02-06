@@ -1,6 +1,7 @@
 package com.fitshare.backend.api.service;
 
 import com.fitshare.backend.api.request.AddClothReq;
+import com.fitshare.backend.api.request.ListClothesReq;
 import com.fitshare.backend.api.response.ClothRes;
 import com.fitshare.backend.common.auth.JwtUtil;
 import com.fitshare.backend.db.entity.Cloth;
@@ -76,6 +77,18 @@ public class ClothServiceImpl implements ClothService {
         clothRepository.save(cloth);
 
         return new ClothRes(cloth.getId(),cloth.getClothUrl());
+    }
+
+
+    /**
+     * 멤버별 옷 리스트
+     **/
+    @Override
+    public List<ClothRes> listClothes(ListClothesReq req) {
+        Long memberId = req.getMemberId();
+        Long shoppingRoomId = req.getShoppingRoomId();
+
+        return clothRepository.getClothByMemberId(memberId,shoppingRoomId).orElse(null);
     }
 
 

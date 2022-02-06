@@ -13,12 +13,13 @@ import java.util.Optional;
 @Repository
 public interface ClothRepository extends JpaRepository<Cloth, Long> {
 
-//    @Query("select new com.fitshare.backend.api.response.ClothRes(" +
-//            "c.id, c.clothUrl) " +
-//            "from Cloth c ")
-////            "join c.roomParticipant r " +
-////            "where r.member.id = :memberId " +
-////            "order by c.createdTime desc")
-//    Optional<List<ClothRes>> getClothByMemberId(@Param("memberId") Long memberId);
-//     Optional<List<ClothRes>> findAll
+    @Query(value = "select new com.fitshare.backend.api.response.ClothRes" +
+            "( c.id, c.clothUrl ) " +
+            "from Cloth c " +
+            "join c.roomParticipant r " +
+            "where r.member.id = :memberId " +
+            "and r.shoppingRoom.id = :shoppingRoomId " +
+            "order by c.createdTime desc")
+    Optional<List<ClothRes>> getClothByMemberId(@Param("memberId") Long memberId,@Param("shoppingRoomId") Long shoppingRoomId);
+
 }
