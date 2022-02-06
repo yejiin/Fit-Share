@@ -23,8 +23,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ClothServiceImpl implements ClothService {
 
-    private ClothRepository clothRepository;
-    private RoomParticipantRepository roomParticipantRepository;
+    private final ClothRepository clothRepository;
+    private final RoomParticipantRepository roomParticipantRepository;
 
     private static final String PYTHON_PATH = "";
 
@@ -79,7 +79,6 @@ public class ClothServiceImpl implements ClothService {
         return new ClothRes(cloth.getId(),cloth.getClothUrl());
     }
 
-
     /**
      * 멤버별 옷 리스트
      **/
@@ -89,6 +88,14 @@ public class ClothServiceImpl implements ClothService {
         Long shoppingRoomId = req.getShoppingRoomId();
 
         return clothRepository.getClothByMemberId(memberId,shoppingRoomId).orElse(null);
+    }
+
+    /**
+     * 옷 삭제
+     **/
+    @Override
+    public void deleteCloth(Long clothId) {
+        clothRepository.deleteById(clothId);
     }
 
 

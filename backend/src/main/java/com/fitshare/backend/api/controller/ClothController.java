@@ -11,8 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.fitshare.backend.common.model.ResponseMessage.ADD_CLOTH;
-import static com.fitshare.backend.common.model.ResponseMessage.GET_CLOTHES_LIST;
+import static com.fitshare.backend.common.model.ResponseMessage.*;
 
 @Api(value = "옷장 API", tags = {"Cloth"})
 @RequiredArgsConstructor
@@ -34,6 +33,13 @@ public class ClothController {
     public ResponseEntity<BaseResponseBody> listClothes(@RequestBody ListClothesReq req) {
 
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK,GET_CLOTHES_LIST,clothService.listClothes(req)));
+    }
+
+    @DeleteMapping("/{clothId}")
+    @ApiOperation(value = "옷 삭제",notes = "옷을 삭제하는 API입니다.")
+    public ResponseEntity<BaseResponseBody> deleteCloth(@PathVariable Long clothId) {
+        clothService.deleteCloth(clothId);
+        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK,DELETE_CLOTH));
     }
 
 

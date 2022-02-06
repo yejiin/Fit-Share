@@ -9,6 +9,9 @@ import java.util.List;
 public interface ClothService {
 
     ClothRes addCloth(AddClothReq req);
+
     List<ClothRes> listClothes(ListClothesReq req);
+
+    void deleteCloth(Long clothId);
 
 }
