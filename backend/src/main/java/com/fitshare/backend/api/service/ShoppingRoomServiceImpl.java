@@ -115,7 +115,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
             throw new ExceedParticipantCountException();
         }
 
-        String sessionToken = getSessionToken(OpenViduRole.SUBSCRIBER, shoppingRoomId, member);
+        String sessionToken = getSessionToken(OpenViduRole.PUBLISHER, shoppingRoomId, member);
 
         // 참여자 DB 저장
         roomParticipantRepository.save(new RoomParticipant(shoppingRoom, member));
@@ -175,7 +175,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
         try {
             Session session = null;
             // 쇼핑룸 호스트인 경우 openvidu 세션 생성
-            if (role.equals(OpenViduRole.PUBLISHER)) {
+            if (this.mapSessions.get(shoppingRoomId) == null) {
 
                 session = this.openVidu.createSession();
 
