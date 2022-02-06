@@ -115,7 +115,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
             throw new ExceedParticipantCountException();
         }
 
-        String sessionToken = getSessionToken(OpenViduRole.SUBSCRIBER, shoppingRoomId, member);
+        String sessionToken = getSessionToken(OpenViduRole.PUBLISHER, shoppingRoomId, member);
 
         // 참여자 DB 저장
         roomParticipantRepository.save(new RoomParticipant(shoppingRoom, member));
