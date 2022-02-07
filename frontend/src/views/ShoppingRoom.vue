@@ -6,17 +6,24 @@
         <room-video :stream-manager="publisher" @click="updateMainVideoStreamManager(publisher)"/>
         <room-video v-for="sub in subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click="updateMainVideoStreamManager(sub)"/>
       </div>
-      <!-- <div id="main-video" class="col-md-6">  
-				<user-video :stream-manager="mainStreamManager"/>
-			</div> -->
 
       <!-- 나머지 컴포넌트 -->
       <div class="components-container d-flex flex-row">
         <group-chat class="group-chat"></group-chat>
-        <div>
+        <div class="center">
+          <div id="main-video" v-if="isFitting">  
+            <main-video :stream-manager="mainStreamManager"/>
+          </div>
           <shopping-site :shopping-mall-url="shoppingMallUrl" class="shopping-site"></shopping-site>
+          
           <!-- 화상회의 버튼 -->
           <div class="buttons">
+            <!-- 쇼핑사이트, 가상피팅화면 전환 -->
+            <button v-if="isFitting" class="btn shadow-none stop-fitting-btn" @click="stopFitting">
+              <i class="fas fa-arrow-left"></i><p>쇼핑으로 돌아가기</p>
+            </button>
+
+            <!-- 기본기능 -->
             <button v-if="isAudio" class="btn shadow-none" @click="offAudio()"><i class="bi bi-mic-mute-fill"></i></button>
             <button v-if="!isAudio" class="btn shadow-none" @click="onAudio()"><i class="bi bi-mic-fill"></i></button>
             <button v-if="isVideo" class="btn shadow-none" @click="offVideo()"><i class="bi bi-camera-video-off-fill"></i></button>
@@ -24,8 +31,9 @@
             <input class="btn shadow-none" type="button" id="buttonLeaveSession" @click="leaveSession" value="나가기">
             
             <!-- overlay 테스트 -->
-            <button @click="filter()">filter</button>
-            <button @click="removeFilter()">remove</button>
+            <button class="btn" @click="filter()">filter</button>
+            <!-- <button @click="removeFilter()">remove</button> -->
+            
           </div>
         </div>
         <closet :subscribers="subscribers" class="closet"></closet>
@@ -39,6 +47,7 @@ import { reactive, toRefs, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { OpenVidu } from 'openvidu-browser';
 import RoomVideo from '@/components/room/RoomVideo.vue';
+import MainVideo from '@/components/room/MainVideo.vue';
 import ShoppingSite from '@/components/room/ShoppingSite.vue';
 import Closet from '@/components/room/Closet.vue';
 import GroupChat from '@/components/room/GroupChat.vue';
@@ -48,7 +57,7 @@ export default {
     name: 'ShoppingRoom',
 
     components: {
-      RoomVideo, ShoppingSite, Closet, GroupChat
+      RoomVideo, MainVideo, ShoppingSite, Closet, GroupChat
     },
 
     setup () {
@@ -56,6 +65,7 @@ export default {
         const route = useRoute()
         
         let shoppingMallUrl = ref('')
+        let isFitting = ref(false)
 
         const state = reactive({
           OV: undefined,
@@ -109,11 +119,15 @@ export default {
                         // aws 이미지 주소 사용 예정
                         "uri": "https://image.msscdn.net/images/goods_img/20200407/1388147/1388147_3_500.jpg",
                         "offsetXPercent":"-1.5F",
-                        "offsetYPercent":"1.0F",  // 하의 : 3.0F
+                        "offsetYPercent":"0.8F",  // 하의 : 3.0F
                         "widthPercent":"4.0F",
                         "heightPercent":"4.0F"
                     });
-            });
+            })
+            .then(() => {
+              isFitting.value = true
+            })
+            .catch(err => console.log(err))
 
           // faceoverlay 모자 
           // state.publisher.stream.applyFilter("FaceOverlayFilter")
@@ -132,7 +146,7 @@ export default {
         }
 
         function removeFilter() {
-          this.publisher.stream.removeFilter()
+          state.publisher.stream.removeFilter()
             .then(() => {
                 console.log("Filter removed");
             })
@@ -141,6 +155,13 @@ export default {
             });
         }
 
+        // 쇼핑사이트로 전환
+        function stopFitting() {
+          removeFilter()
+          isFitting.value = false
+        }
+
+        // openvidu session 생성 method
         const joinSession = () => {
           state.OV = new OpenVidu();
 
@@ -217,6 +238,7 @@ export default {
         const updateMainVideoStreamManager = (stream) => {  // 화상화면 클릭시 해당 화면이 메인으로 이동 
           if (state.mainStreamManager === stream) return;
           state.mainStreamManager = stream;
+          isFitting.value = true
         }
 
         // created
@@ -224,9 +246,8 @@ export default {
 
         return { 
           goToMain, offAudio, offVideo, onAudio, onVideo,
-          joinSession, 
-          leaveSession, updateMainVideoStreamManager,
-          ...toRefs(state), shoppingMallUrl, filter, removeFilter,
+          joinSession, leaveSession, updateMainVideoStreamManager, stopFitting,
+          ...toRefs(state), shoppingMallUrl, isFitting, filter, removeFilter,
         }
     }
 
@@ -242,6 +263,8 @@ export default {
   justify-content: center;
   background-color: #D3E2E7;
   height: 185px;
+  /* 임시 */
+  border-bottom: 1px solid white;  
 }
 
 .video-row {
@@ -260,6 +283,14 @@ export default {
   background-color: white;
 }
 
+.center {
+  position: relative;
+}
+
+.center #main-video {
+  position: absolute;
+}
+
 .shopping-site {
   height: 780px
 }
@@ -268,6 +299,29 @@ export default {
   height: 70px;
   line-height: 70px;
   text-align: center;
+  position: relative;
+}
+
+.buttons .stop-fitting-btn {
+  position: absolute;
+  left: -10px;
+  top: 20%;
+  font-size: 16px;
+  font-weight: bold;
+  height: 52px;
+  line-height: 26px;
+  display: flex;
+  flex-direction: row;
+}
+
+.stop-fitting-btn i {
+  font-size: 20px;
+  margin: 5px 5px 0;
+}
+
+p {
+  margin-bottom: 0;
+  margin-top: 3px;
 }
 
 /* 확인! */
@@ -283,6 +337,6 @@ export default {
 }
 
 i {
-  font-size: 26px;
+  font-size: 30px;
 }
 </style>
