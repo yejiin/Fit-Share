@@ -56,10 +56,6 @@ public class ClothServiceImpl implements ClothService {
             int exitval = process.waitFor(); // 파이썬 프로세스가 종료 될 때 까지 기다린다.
 
             BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(),"euc-kr"));
-            String line;
-            while ((line = br.readLine()) != null) {
-                System.out.println(">>>  " + line); // 표준출력에 쓴다
-            }
             if(exitval != 0) {
                 // 비정상 종료
                 log.debug("{} 이미지 프로세스가 비정상적으로 종료되었습니다.",imageTitle);
@@ -83,9 +79,7 @@ public class ClothServiceImpl implements ClothService {
      * 멤버별 옷 리스트
      **/
     @Override
-    public List<ClothRes> listClothes(ListClothesReq req) {
-        Long memberId = req.getMemberId();
-        Long shoppingRoomId = req.getShoppingRoomId();
+    public List<ClothRes> listClothes(Long memberId, Long shoppingRoomId) {
 
         return clothRepository.getClothByMemberId(memberId,shoppingRoomId).orElse(null);
     }
