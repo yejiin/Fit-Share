@@ -100,7 +100,7 @@ export default {
 
         // openvidu method
         function filter() {
-          this.publisher.stream.applyFilter("GStreamerFilter", { command: "textoverlay text='Embedded text' valignment=top halignment=right" })
+          this.publisher.stream.applyFilter("GStreamerFilter", { command: "gdkpixbufoverlay location=https://cdn.pixabay.com/photo/2019/08/09/15/10/flowers-4395240_960_720.jpg offset-x=10 offset-y=10 overlay-height=200 overlay-width=200" })
             .then(() => {
                 console.log("Video rotated!");
             })
@@ -154,7 +154,9 @@ export default {
                 insertMode: 'APPEND',	
                 mirror: false,
               });
-                
+              
+              publisher.subscribeToRemote();
+
               state.mainStreamManager = publisher;
               state.publisher = publisher;
               // --- Publish your stream ---
