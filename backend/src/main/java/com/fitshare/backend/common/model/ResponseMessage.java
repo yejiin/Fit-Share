@@ -12,6 +12,9 @@ public class ResponseMessage {
     public static final String MATCH_SHOPPING_ROOM_PASSWORD = "쇼핑룸 비밀번호가 일치합니다.";
     public static final String NOT_MATCH_SHOPPING_ROOM_PASSWORD = "쇼핑물 비밀번호가 일치하지 않습니다.";
 
+    // Shopping Mall
+    public static final String SEARCH_SHOPPING_MALL = "쇼핑몰 검색 성공입니다.";
+
     // Login
     public static final String GET_ACCESS_TOKEN = "카카오 토큰 생성 성공입니다.";
     public static final String LOGIN = "로그인 성공입니다.";
