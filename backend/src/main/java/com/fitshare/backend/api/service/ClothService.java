@@ -10,7 +10,7 @@ public interface ClothService {
 
     ClothRes addCloth(Long memberId,ClothReq req);
 
-    List<ClothRes> listClothes(ListClothesReq req);
+    List<ClothRes> listClothes(Long memberId, Long shoppingRoomId);
 
     void deleteCloth(Long clothId);
 

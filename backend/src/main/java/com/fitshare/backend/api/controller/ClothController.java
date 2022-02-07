@@ -1,7 +1,6 @@
 package com.fitshare.backend.api.controller;
 
 import com.fitshare.backend.api.request.ClothReq;
-import com.fitshare.backend.api.request.ListClothesReq;
 import com.fitshare.backend.api.service.ClothService;
 import com.fitshare.backend.common.auth.JwtUtil;
 import com.fitshare.backend.common.model.BaseResponseBody;
@@ -29,11 +28,11 @@ public class ClothController {
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED, ADD_CLOTH,clothService.addCloth(memberId,req)));
     }
 
-    @PostMapping("/list")
+    @GetMapping("/{shoppingRoomId}/{memberId}")
     @ApiOperation(value = "옷 리스트", notes = "참가자 별 옷 목록을 반환하는 API입니다.")
-    public ResponseEntity<BaseResponseBody> listClothes(@RequestBody ListClothesReq req) {
+    public ResponseEntity<BaseResponseBody> listClothes(@PathVariable Long shoppingRoomId, @PathVariable Long memberId) {
 
-        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK,GET_CLOTHES_LIST,clothService.listClothes(req)));
+        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK,GET_CLOTHES_LIST,clothService.listClothes(memberId, shoppingRoomId)));
     }
 
     @DeleteMapping("/{clothId}")
