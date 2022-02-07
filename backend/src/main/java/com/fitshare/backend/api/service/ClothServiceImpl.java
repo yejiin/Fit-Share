@@ -26,7 +26,7 @@ public class ClothServiceImpl implements ClothService {
     private final ClothRepository clothRepository;
     private final RoomParticipantRepository roomParticipantRepository;
 
-    private static final String PYTHON_PATH = "";
+    private static final String PYTHON_PATH = "img_trans.py";
 
     /**
      * 옷 추가
@@ -45,7 +45,7 @@ public class ClothServiceImpl implements ClothService {
         // 이미지 저장 경로, 제목 지정
         SimpleDateFormat time = new SimpleDateFormat("yyyyMMdd_HHmmss");
 
-        String imagePath = "/백엔드기준경로/"+shoppingRoomId;
+        String imagePath = "/data/"+shoppingRoomId;
         String imageTitle = shoppingRoomId+"_"+memberId+"_"+time.format(System.currentTimeMillis());
 
         ProcessBuilder builder = new ProcessBuilder("python3", PYTHON_PATH, imageUrl, imagePath, imageTitle);
