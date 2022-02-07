@@ -45,6 +45,7 @@
 <script>
 import { reactive, toRefs, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useStore } from 'vuex'
 import { OpenVidu } from 'openvidu-browser';
 import RoomVideo from '@/components/room/RoomVideo.vue';
 import MainVideo from '@/components/room/MainVideo.vue';
@@ -63,6 +64,7 @@ export default {
     setup () {
         const router = useRouter()
         const route = useRoute()
+        const store = useStore()
         
         let shoppingMallUrl = ref('')
         let isFitting = ref(false)
@@ -225,7 +227,7 @@ export default {
 
           axios({
             method : 'post',
-            url: `http://i6a405.p.ssafy.io:8081/api/v1/shopping-rooms/${state.mySessionId}`,
+            url: `${store.state.url}/v1/shopping-rooms/${state.mySessionId}`,
             headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` }
           })
             .then(() => {
