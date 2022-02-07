@@ -108,7 +108,6 @@ export default {
                     {
                         // aws 이미지 주소 사용 예정
                         "uri": "https://image.msscdn.net/images/goods_img/20200407/1388147/1388147_3_500.jpg",
-                        // "uri": "http://files.openvidu.io/img/mario-wings.png",
                         "offsetXPercent":"-1.5F",
                         "offsetYPercent":"1.0F",  // 하의 : 3.0F
                         "widthPercent":"4.0F",
@@ -204,7 +203,7 @@ export default {
           window.removeEventListener('beforeunload', leaveSession);
 
           axios({
-            method : 'get',
+            method : 'post',
             url: `http://i6a405.p.ssafy.io:8081/api/v1/shopping-rooms/${state.mySessionId}`,
             headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` }
           })
