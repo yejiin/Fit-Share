@@ -1,7 +1,6 @@
 package com.fitshare.backend.api.service;
 
 import com.fitshare.backend.api.request.ClothReq;
-import com.fitshare.backend.api.request.ListClothesReq;
 import com.fitshare.backend.api.response.ClothRes;
 import com.fitshare.backend.db.entity.Cloth;
 import com.fitshare.backend.db.entity.RoomParticipant;
@@ -55,7 +54,6 @@ public class ClothServiceImpl implements ClothService {
 
             int exitval = process.waitFor(); // 파이썬 프로세스가 종료 될 때 까지 기다린다.
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(),"euc-kr"));
             if(exitval != 0) {
                 // 비정상 종료
                 log.debug("{} 이미지 프로세스가 비정상적으로 종료되었습니다.",imageTitle);

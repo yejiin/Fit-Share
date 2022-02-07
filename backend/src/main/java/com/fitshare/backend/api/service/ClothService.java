@@ -1,7 +1,6 @@
 package com.fitshare.backend.api.service;
 
 import com.fitshare.backend.api.request.ClothReq;
-import com.fitshare.backend.api.request.ListClothesReq;
 import com.fitshare.backend.api.response.ClothRes;
 
 import java.util.List;
