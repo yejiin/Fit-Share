@@ -1,19 +1,22 @@
 package com.fitshare.backend.api.service;
 
+import com.fitshare.backend.api.response.BaseMemberRes;
 import com.fitshare.backend.common.model.KakaoProfile;
-import com.fitshare.backend.common.model.OAuthToken;
 import com.fitshare.backend.db.entity.Member;
 import com.fitshare.backend.db.repository.MemberRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class MemberServiceImpl implements MemberService  {
 
-    @Autowired
-    MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public Member createMember(KakaoProfile kakaoProfile) {
@@ -26,9 +29,7 @@ public class MemberServiceImpl implements MemberService  {
         member.setEmail(kakaoProfile.getKakao_account().getEmail());
         member.setProfileImg(kakaoProfile.getKakao_account().getProfile().getProfile_image_url());
 
-        memberRepository.save(member);
-
-        return member;
+        return memberRepository.save(member);
     }
 
     @Override
@@ -37,8 +38,23 @@ public class MemberServiceImpl implements MemberService  {
         Optional<Member> member = memberRepository.findByUid(uid);
 
         if(member.isPresent())
-            return Optional.empty();
+            return member;
 
         return null;
+    }
+
+    @Override
+    public Optional<Member> findMemberById(Long id) {
+
+        Optional<Member> member = memberRepository.findById(id);
+
+        if (member.isPresent()) return member;
+
+        return null;
+    }
+
+    @Override
+    public List<BaseMemberRes> searchMembersByEmail(String email) {
+        return memberRepository.findByEmailLike(email);
     }
 }

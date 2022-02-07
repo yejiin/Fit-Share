@@ -1,7 +1,7 @@
 <template>
   <div class="create-container">
     <div id="new-room"> 
-			<div id="dialog" class="jumbotron vertical-center">
+			<div id="dialog" class="vertical-center">
         <div class="d-flex flex-row title">
           <i class="bi bi-house-door me-4"></i>
           <h1>New Room</h1>
@@ -67,7 +67,7 @@
             <label>공개범위</label>
             <span class="form-radio">
               <span @click="clickPublic()" class="radio-containers">
-                <input class="form-check-input" type="radio" name="flexRadioDefault" id="public">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" checked="checked" id="public">
                 <label class="form-check-label" for="public">공개</label>
               </span>
               <span @click="clickPrivate()" class="radio-containers">
@@ -83,7 +83,7 @@
 					</div>
 
           <!-- openvidu -->
-          ------------ 임시 -------------
+          <!-- ------------ 임시 -------------
 					<div>
 						<label>Participant</label>
 						<input v-model="myUserName" class="form-control" type="text" required>
@@ -91,10 +91,10 @@
 					<div>
 						<label>Session</label>
 						<input v-model="mySessionId" class="form-control" type="text" required>
-					</div>
+					</div> -->
 
 					<div class="text-center">
-            <button class="btn create-btn shadow-none" @click="goToRoom()">생성하기</button>
+            <button class="btn create-btn shadow-none" @click="makeRoom()">생성하기</button>
             <button class="btn shadow-none" @click="goToMain()">취소</button>
 					</div>        
 				</div>
@@ -106,13 +106,15 @@
 <script>
 import { reactive, ref, toRefs, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
-// import axios from 'axios'
+import { useStore } from 'vuex'
+import axios from 'axios'
 
 export default {
   name: 'CreateRoom',
   
   setup() {
     const router = useRouter()
+    const store = useStore()
 
     let counts = ref([1, 2, 3, 4, 5, 6])
     let selectedCnt = ref(null);
@@ -125,11 +127,11 @@ export default {
     let isPrivate = ref(false);
     let password = ref(null);
 
-    const state = reactive({
-      mySessionId: 'sessionA',
-      myUserName: 'participant12', 
+    // 테스트용 토큰
+    let token = ref('eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw')
 
-      mallOptions: [  // 서버 적용시 store에서 불러오는 방식으로 진행
+    const state = reactive({
+      shoppingMallList: [  // 서버 적용시 store에서 불러오는 방식으로 진행
         { id: 1, name: 'Nike', url: 'https://www.nike.com'},
         { id: 2, name: '무신사', url: 'https://www.musinsa.com'},
         { id: 3, name: '지그재그', url: 'https://www.zigzag.com'},
@@ -138,7 +140,7 @@ export default {
         { id: 6, name: 'ABC', url: 'https://www.abc.com'},
         { id: 7, name: '지마켓', url: 'https://www.gmarket.com'},
       ], 
-      isMall: true,  // 찾고자 하는 쇼핑몰이 리스트에 있는지 없는지 
+      isMall: true,  // 찾고자 하는 쇼핑몰이 리스트 존재여부
       mallName: null,
       mallUrl: null,
     })
@@ -158,9 +160,9 @@ export default {
     const filteredMalls = computed(() => {
       const query = searchQuery.value.toLowerCase();
       if (searchQuery.value === '') {
-        return state.mallOptions
+        return state.shoppingMallList
       }
-      return state.mallOptions.filter((mall) => {
+      return state.shoppingMallList.filter((mall) => {
         return Object.values(mall).some((word => String(word).toLowerCase().includes(query)))
       })
     })
@@ -168,7 +170,7 @@ export default {
     // 바깥영역 클릭으로 dropdown 닫기
     document.addEventListener('click', function(e){
       if (isMallVisible.value == false ) {
-        console.log('')
+        // console.log('')
       } else {
         if (e.target.className !== 'dropdown-popover' && e.target.className !== 'selected-item form-select' && e.target.className !== '' && e.target.className !== 'search-mall-input' ) {
           isMallVisible.value = false
@@ -187,7 +189,7 @@ export default {
     watch(filteredMalls, (filteredMalls) => {
       if (filteredMalls.length === 0) {
         state.isMall = false;
-        selectedItem.value = null
+        selectedItem.value = null;
       } else {
         state.isMall = true;
       }
@@ -203,34 +205,38 @@ export default {
     }
 
     // 쇼핑룸 생성
-    const goToRoom = async () => {
-      // if (selectedItem) {
-      //   const mallId = selectedItem.id
-      // } else {
-      //   const mallId = null
-      // }
-      // const roomData = {  
-      //   userId: ''  // username(or id) 필요 => DB host_id 저장 
-      //   mallId: mallId,  // null
-      //   mallName: state.mallName, // null
-      //   mallUrl: state.mallUrl,  // null
-      //   count: selectedCnt,
-      //   isPrivate: isPrivate,  // T/F
-      //   password: password,  // null
-      // }
-      // axios({
-      //   method : 'post',
-      //   url: 'room-api 추가',
-      //   data: roomData,
-      // })
-      //   .then(res => {
-      //     console.log(res.data)  // sessionId(=roomId), mall url 
-      //     router.push({ name: 'ShoppingRoom', params: { roomId: res.data.sessionId, mallUrl: res.data.mall_url }})
-      //   })
-      //   .catch(err => console.log(err))
+    function makeRoom () {
+      let mallId = null
+      if (selectedItem.value) {
+        mallId = selectedItem.value.id
+        state.mallName = null
+        state.mallUrl = null
+      } 
 
+      const roomData = {  
+        customShoppingMall: true,
+        participantCount: selectedCnt.value,
+        password: password.value,  // null
+        private: isPrivate.value,  
+        shoppingMallId: mallId,  // null 
+        shoppingMallName: state.mallName, 
+        shoppingMallUrl: state.mallUrl,  
+      }
+      // console.log(roomData)
 
-      router.push({ name: 'ShoppingRoom', params: { roomId: state.mySessionId, myUserName: state.myUserName } })
+      axios({
+        method : 'post',
+        url: `${store.state.url}/api/v1/shopping-rooms/`,
+        // url: 'http://i6a405.p.ssafy.io:8081/api/v1/shopping-rooms/',
+        data: roomData,
+        headers: { Authorization : `Bearer ${token.value}` }
+      })
+        .then(res => {
+          console.log(res.data.data)
+          const data = res.data.data
+          router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl }}) 
+        })
+        .catch(err => console.log(err))
     }
 
     const goToMain = () => {
@@ -238,15 +244,27 @@ export default {
     }
 
     return { 
-      clickPrivate, goToRoom, goToMain, clickPublic, ...toRefs(state), counts,
-      searchQuery, selectedCnt ,selectedItem, isMallVisible, isCntVisible, filteredMalls,
-      selectItem, selectCnt, isPrivate, password,
+      clickPrivate, makeRoom, goToMain, clickPublic, token,
+      ...toRefs(state), counts, searchQuery, selectedCnt ,selectedItem, isMallVisible, 
+      isCntVisible, filteredMalls, selectItem, selectCnt, isPrivate, password,
     }
   }
 }
 </script>
 
 <style scoped>
+.create-container {
+  margin: 0px 142px 0;
+  display: flex;
+  justify-content: center;
+}
+
+#new-room {
+  margin: 0px 187px 100px;
+  width: 782px;
+  height: 951px;
+}
+
 .dropdown-wrapper {
   width: 454px;
   height: 35px;
@@ -360,14 +378,6 @@ input:focus {
 .title {
   font-size: 36px;
   margin-bottom: 60px;
-}
-
-.create-container {
-  margin: 0px 142px 0;
-}
-
-#new-room {
-  margin: 0px 187px 100px;
 }
 
 #dialog {

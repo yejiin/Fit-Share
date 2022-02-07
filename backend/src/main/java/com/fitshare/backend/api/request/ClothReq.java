@@ -1,4 +1,4 @@
-package com.fitshare.backend.api.response;
+package com.fitshare.backend.api.request;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -6,15 +6,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@ApiModel("MakeRoomResponse")
+@ApiModel("ClothRequest")
 @Getter
 @Setter
 @AllArgsConstructor
-public class MakeShoppingRoomRes {
+public class ClothReq {
 
     @ApiModelProperty(name = "쇼핑룸 Id", example = "1")
-    private Long roomId;
+    private Long shoppingRoomId;
 
-    @ApiModelProperty(name = "쇼핑룸 입장 토큰", example = "token")
-    private String token;
+
+    @ApiModelProperty(name = "옷 이미지 url", example = "https://xxx.jpg")
+    private String imageUrl;
+    
 }

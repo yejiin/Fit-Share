@@ -14,7 +14,7 @@
       <div class="components-container d-flex flex-row">
         <group-chat class="group-chat"></group-chat>
         <div>
-          <shopping-site class="shopping-site"></shopping-site>
+          <shopping-site :shopping-mall-url="shoppingMallUrl" class="shopping-site"></shopping-site>
           <!-- 화상회의 버튼 -->
           <div class="buttons">
             <button v-if="isAudio" class="btn shadow-none" @click="offAudio()"><i class="bi bi-mic-mute-fill"></i></button>
@@ -22,29 +22,27 @@
             <button v-if="isVideo" class="btn shadow-none" @click="offVideo()"><i class="bi bi-camera-video-off-fill"></i></button>
             <button v-if="!isVideo" class="btn shadow-none" @click="onVideo()"><i class="bi bi-camera-video-fill"></i></button>
             <input class="btn shadow-none" type="button" id="buttonLeaveSession" @click="leaveSession" value="나가기">
+            
+            <!-- overlay 테스트 -->
+            <button @click="filter()">filter</button>
+            <button @click="removeFilter()">remove</button>
           </div>
         </div>
-        <closet class="closet"></closet>
+        <closet :subscribers="subscribers" class="closet"></closet>
       </div>
 		</div>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue';
+import { reactive, toRefs, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import axios from 'axios';
 import { OpenVidu } from 'openvidu-browser';
 import RoomVideo from '@/components/room/RoomVideo.vue';
 import ShoppingSite from '@/components/room/ShoppingSite.vue';
 import Closet from '@/components/room/Closet.vue';
 import GroupChat from '@/components/room/GroupChat.vue';
-
-axios.defaults.headers.post['Content-Type'] = 'application/json';   
-
-const OPENVIDU_SERVER_URL = "https://" + location.hostname + ":4443";
-const OPENVIDU_SERVER_SECRET = "MY_SECRET";
-
+import axios from 'axios'
 
 export default {
     name: 'ShoppingRoom',
@@ -56,6 +54,8 @@ export default {
     setup () {
         const router = useRouter()
         const route = useRoute()
+        
+        let shoppingMallUrl = ref('')
 
         const state = reactive({
           OV: undefined,
@@ -65,7 +65,7 @@ export default {
           subscribers: [], 
 
           mySessionId: '',
-          myUserName: '',
+          myUserName: '김싸피 12',  // 임시 => store에서 사용자 정보 불러오기 
 
           isAudio: false,
           isVideo: false,
@@ -73,7 +73,7 @@ export default {
 
         // created 
         state.mySessionId = route.params.roomId  
-        state.myUserName = route.params.myUserName  // store에서 가져오기 
+        shoppingMallUrl.value = route.params.mallUrl 
         
         // methods        
         const goToMain = () => {
@@ -99,6 +99,26 @@ export default {
         }
 
         // openvidu method
+        function filter() {
+          this.publisher.stream.applyFilter("GStreamerFilter", { command: "gdkpixbufoverlay location=https://cdn.pixabay.com/photo/2019/08/09/15/10/flowers-4395240_960_720.jpg offset-x=10 offset-y=10 overlay-height=200 overlay-width=200" })
+            .then(() => {
+                console.log("Video rotated!");
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+
+        function removeFilter() {
+          this.publisher.stream.removeFilter()
+            .then(() => {
+                console.log("Filter removed");
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+
         const joinSession = () => {
           state.OV = new OpenVidu();
 
@@ -121,94 +141,33 @@ export default {
           });
           
           // ------------- token 관련 method -----------------
-          getToken(state.mySessionId).then(token => {
-            state.session.connect(token, { clientData: state.myUserName })
-              .then(() => {
-                let publisher = state.OV.initPublisher(undefined, {
-                  audioSource: undefined, 
-                  videoSource: undefined,
-                  publishAudio: true,  	
-                  publishVideo: true,  	
-                  resolution: '640x480',  
-                  frameRate: 30,			
-                  insertMode: 'APPEND',	
-                  mirror: false       	
-                });
-                
-                state.mainStreamManager = publisher;
-                state.publisher = publisher;
-
-                // --- Publish your stream ---
-                state.session.publish(state.publisher);
-              })
-              .catch(error => {
-                console.log('There was an error connecting to the session:', error.code, error.message);
+          state.session.connect(route.params.token, { clientData: state.myUserName })
+            .then(() => {
+              console.log('토큰 전달 후')
+              let publisher = state.OV.initPublisher(undefined, {
+                audioSource: undefined, 
+                videoSource: undefined,
+                publishAudio: true,  	
+                publishVideo: true,  	
+                resolution: '640x480',  
+                frameRate: 30,			
+                insertMode: 'APPEND',	
+                mirror: false,
               });
-          });
+              
+              publisher.subscribeToRemote();
+
+              state.mainStreamManager = publisher;
+              state.publisher = publisher;
+              // --- Publish your stream ---
+              state.session.publish(publisher);
+            })
+            .catch(error => {
+                console.log('There was an error connecting to the session:', error.code, error.message);
+            });
 
           window.addEventListener('beforeunload', leaveSession)
         }
-
-
-        // token method => 서버에서 진행 
-        // function getToken (sessionId) {
-        //   axios({
-        //     method: 'get',
-        //     url: 'get-api',
-        //     data: { roomId: sessionId }
-        //   })
-        //     .then(res => res.data.token)
-        //     .catch(err => console.log(err))
-        // }
-        
-        const getToken = (mySessionId) => {  // sessionId가 data.id 해당
-          return createSession(mySessionId).then(sessionId => createToken(sessionId));  // 토큰 반환
-        }
-
-        const createSession = (sessionId) => {
-          return new Promise((resolve, reject) => {
-            axios
-              .post(`${OPENVIDU_SERVER_URL}/openvidu/api/sessions`, JSON.stringify({
-                customSessionId: sessionId, 
-              }), {
-                auth: {  
-                  username: 'OPENVIDUAPP',
-                  password: OPENVIDU_SERVER_SECRET,
-                },
-              })
-              .then(response => response.data)
-              .then(data => resolve(data.id))  // 'data.id = 회의실 이름(state의 mySessionID와 같음)'을 반환
-              .catch(error => {
-                if (error.response.status === 409) {
-                  resolve(sessionId);
-                } else {
-                  console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
-                  if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
-                    location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
-                  }
-                  reject(error.response);
-                }
-              });
-          });
-        }
-
-        const createToken = (sessionId) => {
-          return new Promise((resolve, reject) => {
-            axios
-              .post(`${OPENVIDU_SERVER_URL}/openvidu/api/sessions/${sessionId}/connection`, {}, {
-                auth: {
-                  username: 'OPENVIDUAPP',
-                  password: OPENVIDU_SERVER_SECRET,
-                },
-              })
-              .then(response => response.data)
-              .then(data => resolve(data.token))
-              .catch(error => reject(error.response));
-          });
-        }
-
-        // created
-        joinSession() 
 
         const leaveSession = () => {
           if (state.session) state.session.disconnect();
@@ -220,8 +179,17 @@ export default {
           state.OV = undefined;
 
           window.removeEventListener('beforeunload', leaveSession);
-          goToMain()
 
+          axios({
+            method : 'get',
+            url: `http://i6a405.p.ssafy.io:8081/api/v1/shopping-rooms/${state.mySessionId}`,
+            headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` }
+          })
+            .then(() => {
+              console.log('나가기 성공')
+              goToMain()
+            })
+            .catch(err => console.log(err))
         }
 
         const updateMainVideoStreamManager = (stream) => {  // 화상화면 클릭시 해당 화면이 메인으로 이동 
@@ -229,12 +197,14 @@ export default {
           state.mainStreamManager = stream;
         }
 
+        // created
+        joinSession() 
+
         return { 
-          // goToCreate,
           goToMain, offAudio, offVideo, onAudio, onVideo,
-          joinSession, getToken, createSession, createToken, 
+          joinSession, 
           leaveSession, updateMainVideoStreamManager,
-          ...toRefs(state)
+          ...toRefs(state), shoppingMallUrl, filter, removeFilter,
         }
     }
 
@@ -265,6 +235,7 @@ export default {
 .group-chat, .closet {
   width: 290px;
   height: 839px;
+  background-color: white;
 }
 
 .shopping-site {
@@ -277,12 +248,13 @@ export default {
   text-align: center;
 }
 
-.btn {
+/* 확인! */
+.buttons .btn {  
   margin: 0 5px 0;
   cursor: pointer;
 }
 
-#buttonLeaveSession {
+.buttons #buttonLeaveSession {
   background-color: red;
   color: white;
   margin-left: 15px;
