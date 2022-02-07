@@ -100,13 +100,36 @@ export default {
 
         // openvidu method
         function filter() {
-          this.publisher.stream.applyFilter("GStreamerFilter", { command: "gdkpixbufoverlay location=https://cdn.pixabay.com/photo/2019/08/09/15/10/flowers-4395240_960_720.jpg offset-x=10 offset-y=10 overlay-height=200 overlay-width=200" })
-            .then(() => {
-                console.log("Video rotated!");
-            })
-            .catch(error => {
-                console.error(error);
+          // faceoverlay (상의)
+          state.publisher.stream.applyFilter("FaceOverlayFilter")
+            .then(filter => {
+                filter.execMethod(
+                    "setOverlayedImage",
+                    {
+                        // aws 이미지 주소 사용 예정
+                        "uri": "https://image.msscdn.net/images/goods_img/20200407/1388147/1388147_3_500.jpg",
+                        // "uri": "http://files.openvidu.io/img/mario-wings.png",
+                        "offsetXPercent":"-1.5F",
+                        "offsetYPercent":"1.0F",  // 하의 : 3.0F
+                        "widthPercent":"4.0F",
+                        "heightPercent":"4.0F"
+                    });
             });
+
+          // faceoverlay 모자 
+          // state.publisher.stream.applyFilter("FaceOverlayFilter")
+          //   .then(filter => {
+          //       filter.execMethod(
+          //           "setOverlayedImage",
+          //           {
+          //               // aws 이미지 주소 사용 예정
+          //               "uri": "http://files.openvidu.io/img/mario-wings.png",
+          //               "offsetXPercent":"-0.2F",
+          //               "offsetYPercent":"-0.8F",
+          //               "widthPercent":"1.3F",
+          //               "heightPercent":"1.0F"
+          //            });
+          //   });
         }
 
         function removeFilter() {
