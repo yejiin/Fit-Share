@@ -1,8 +1,9 @@
 package com.fitshare.backend.api.controller;
 
-import com.fitshare.backend.api.request.AddClothReq;
+import com.fitshare.backend.api.request.ClothReq;
 import com.fitshare.backend.api.request.ListClothesReq;
 import com.fitshare.backend.api.service.ClothService;
+import com.fitshare.backend.common.auth.JwtUtil;
 import com.fitshare.backend.common.model.BaseResponseBody;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,9 +24,9 @@ public class ClothController {
 
     @PostMapping("")
     @ApiOperation(value = "옷 추가",notes = "입력받은 옷 정보를 DB에 추가하는 API입니다.")
-    public ResponseEntity<BaseResponseBody> addCloth(@RequestBody AddClothReq req) {
-
-        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED, ADD_CLOTH,clothService.addCloth(req)));
+    public ResponseEntity<BaseResponseBody> addCloth(@RequestBody ClothReq req) {
+        Long memberId = JwtUtil.getCurrentId().get();
+        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED, ADD_CLOTH,clothService.addCloth(memberId,req)));
     }
 
     @PostMapping("/list")

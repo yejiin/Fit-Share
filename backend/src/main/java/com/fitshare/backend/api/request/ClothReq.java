@@ -6,11 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@ApiModel("AddClothRequest")
+@ApiModel("ClothRequest")
 @Getter
 @Setter
 @AllArgsConstructor
-public class AddClothReq {
+public class ClothReq {
 
     @ApiModelProperty(name = "쇼핑룸 Id", example = "1")
     private Long shoppingRoomId;

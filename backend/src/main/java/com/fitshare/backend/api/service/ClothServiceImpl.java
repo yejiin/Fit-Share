@@ -1,9 +1,8 @@
 package com.fitshare.backend.api.service;
 
-import com.fitshare.backend.api.request.AddClothReq;
+import com.fitshare.backend.api.request.ClothReq;
 import com.fitshare.backend.api.request.ListClothesReq;
 import com.fitshare.backend.api.response.ClothRes;
-import com.fitshare.backend.common.auth.JwtUtil;
 import com.fitshare.backend.db.entity.Cloth;
 import com.fitshare.backend.db.entity.RoomParticipant;
 import com.fitshare.backend.db.repository.ClothRepository;
@@ -12,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,6 +20,7 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ClothServiceImpl implements ClothService {
 
@@ -32,15 +33,14 @@ public class ClothServiceImpl implements ClothService {
      * 옷 추가
      **/
     @Override
-    public ClothRes addCloth(AddClothReq req) {
+    public ClothRes addCloth(Long memberId, ClothReq req) {
 
-        Long memberId = JwtUtil.getCurrentId().get();
         Long shoppingRoomId = req.getShoppingRoomId();
         String imageUrl = req.getImageUrl();
 
         // python backend/img_trans.py "imagUrl" "저장할 경로" "이미지 타이틀"
         // 이미지타이틀 : 쇼핑룸id_멤버id_생성시간.png
-        RoomParticipant roomParticipant = roomParticipantRepository.findByMember_Id(memberId).orElse(null);
+        RoomParticipant roomParticipant = roomParticipantRepository.findByMemberId(memberId).orElse(null);
 
         // 이미지 저장 경로, 제목 지정
         SimpleDateFormat time = new SimpleDateFormat("yyyyMMdd_HHmmss");
