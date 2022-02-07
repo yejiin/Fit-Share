@@ -1,10 +1,7 @@
 package com.fitshare.backend.config;
 
-import com.fitshare.backend.common.auth.JwtAccessDeniedHandler;
-import com.fitshare.backend.common.auth.JwtAuthenticationEntryPoint;
-import com.fitshare.backend.common.auth.JwtTokenProvider;
+import com.fitshare.backend.common.auth.*;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -13,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.*;
 
 @EnableWebSecurity(debug = true)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -50,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .cors().and()
+                .cors().configurationSource(corsConfigurationSource()).and()
                 .csrf().disable()
                 // 에러 처리 핸들러 등록
                 .exceptionHandling()
@@ -63,11 +61,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/v1/kakao/login").permitAll()
+                .antMatchers("/api/v1/kakao/**").permitAll()
                 .antMatchers("/v2/api-docs").permitAll()
                 .anyRequest().authenticated() // Security 설정을 풀고 싶으면 이 코드를 주석처리하고
 //                .anyRequest().permitAll() // 이 코드를 주석을 푸세요
                 .and()
                 .apply(new JwtSecurityConfig(tokenProvider));
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://localhost:8080");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
