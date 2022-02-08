@@ -43,6 +43,8 @@ export default {
       friendEmail: [],
     })
 
+    const SearchFriend = ref('')
+
     // store test
     const store = useStore()
 
@@ -50,17 +52,6 @@ export default {
     const stateFriends = computed(() => {
       return store.state.friends
     })
-
-    // front에서 검색 필터링
-    const SearchFriend = ref('');
-    const FilteredFriends = computed(() => {
-      if (SearchFriend.value) {
-        return state.friendLists.filter(friend => {
-          return friend.name.includes(SearchFriend.value)
-        })
-      }
-      return state.friends.name
-    });
 
     // 친구 삭제
     const DeleteFriend = (stateFriends, index) => {
@@ -124,7 +115,6 @@ export default {
       state,
       SearchFriend,
       GetFriendList,
-      FilteredFriends,
       DeleteFriend,
       stateFriends,
       SearchFriendEmail,

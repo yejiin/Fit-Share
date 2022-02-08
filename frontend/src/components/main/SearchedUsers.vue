@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="friends" class="text-center result-box mt-3">
+    <div v-if="friends.length > 0" class="text-center result-box mt-3">
       검색 결과
     </div>
     <div v-for="(friend, index) in friends" :key="friend.id" class="d-flex mt-3">
