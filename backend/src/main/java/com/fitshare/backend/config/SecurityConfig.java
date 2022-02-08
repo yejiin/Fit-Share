@@ -40,7 +40,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/h2-console/**",
                         "/error",
                         "/swagger-resources/**",
-                        "/swagger-ui/**"
+                        "/swagger-ui/**",
+                        "/api/v1/shopping-rooms/*/validate",
+                        "/api/v1/shopping-malls"
                 );
     }
 
@@ -60,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/v1/kakao/**").permitAll()
+                .antMatchers("/api/v1/auth/**").permitAll()
                 .antMatchers("/v2/api-docs").permitAll()
                 .anyRequest().authenticated() // Security 설정을 풀고 싶으면 이 코드를 주석처리하고
 //                .anyRequest().permitAll() // 이 코드를 주석을 푸세요
