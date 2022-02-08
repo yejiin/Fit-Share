@@ -1,21 +1,19 @@
 <template>
   <div class="video-container" v-if="streamManager">
-    <ov-video :stream-manager="streamManager"/>
+    <ov-publisher-video :stream-manager="streamManager"/>
     <div><p>{{ state.clientData }}</p></div>
   </div>
 </template>
 
 <script>
 import { reactive, computed } from 'vue'
-import OvVideo from './OvVideo.vue';
+import OvPublisherVideo from './OvPublisherVideo.vue';
 
 export default {
-    name: 'RoomVideo',
-
+    name: 'PublisherVideo',
     components: {
-      OvVideo,
+      OvPublisherVideo,
     },
-
     props: {
       streamManager: Object,
     },

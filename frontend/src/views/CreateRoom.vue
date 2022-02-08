@@ -144,6 +144,7 @@ export default {
       axios.get(`${store.state.url}/v1/shopping-malls`, { params: { keyword: searchQuery.value } })
         .then(res => {
           searchedMalls.value = res.data.data
+          console.log(searchedMalls.value)
         })
     }
 
@@ -190,7 +191,7 @@ export default {
       } 
 
       const roomData = {  
-        customShoppingMall: true,
+        customShoppingMall: !state.isMall,
         participantCount: selectedCnt.value,
         password: password.value,  // null
         private: isPrivate.value,  
@@ -198,7 +199,7 @@ export default {
         shoppingMallName: state.inputMallName, 
         shoppingMallUrl: state.inputMallUrl,  
       }
-      // console.log(roomData)
+      console.log(roomData)
 
       axios({
         method : 'post',
