@@ -11,8 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -56,10 +58,6 @@ public class ClothServiceImpl implements ClothService {
             // 파이썬 프로세스가 종료 될 때 까지 기다린다.
             int exitval = process.waitFor();
 
-            File transImage = new File("/data/" + imageTitle);
-
-            clothUrl = s3Service.upload(transImage, "images");
-
             if (exitval != 0) {
                 // 비정상 종료
                 log.debug("{} 이미지 프로세스가 비정상적으로 종료되었습니다.", imageTitle);
@@ -67,6 +65,11 @@ public class ClothServiceImpl implements ClothService {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+
+        File transImage = new File("/data/" + imageTitle);
+
+        // S3 서버에 업로드
+        clothUrl = s3Service.upload(transImage, "images");
 
         Cloth cloth = Cloth.builder()
                 .roomParticipant(roomParticipant)
