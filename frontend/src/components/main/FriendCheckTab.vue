@@ -1,14 +1,14 @@
 <template>
   <div>
-    <div v-for="(friend, index) in state.friends" :key="friend.id" class="d-flex mt-3">
-      <img :src="friend.profileImg" alt="profile-img">
+    <div v-for="(checkRequest, index) in checkRequests" :key="checkRequest.id" class="d-flex mt-3">
+      <img :src="checkRequest.profileImg" alt="profile-img">
       <div class="ms-3 d-flex flex-column">
         <div>
-          {{ friend.id }}
+          {{ checkRequest.name }}
         </div>
         <div class="d-flex mt-2 button-box">
-          <button class="" @click="AcceptFriend(friend, index)">수락</button>
-          <button class="ms-3" @click="DeclineFriend(friend, index)">거절</button>
+          <button class="" @click="AcceptFriend(checkRequests, index)">수락</button>
+          <button class="ms-3" @click="DeclineFriend(checkRequests, index)">거절</button>
         </div>
       </div>
     </div>
@@ -21,67 +21,49 @@ import axios from 'axios'
 
 export default {
   name: 'FriendCheckTab',
+  props: ['checkRequests'],
   setup() {
     const state = reactive({
       friends: [],
     })
 
-
-    function CheckFriendRequest() {
-      axios({
-        method: 'GET',
-        url: 'http://i6a405.p.ssafy.io:8081/api/v1/friends/requests',
-        headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` }
-      })
-        .then(res => {
-          console.log(res)
-          state.friends = res.data.data
-        })
-    }
-
-    CheckFriendRequest()
-    
-    const AcceptFriend = async (friend, index) => {
+    const AcceptFriend = async (checkRequests, index) => {
       const res = await axios({
         method: 'POST',
         url: 'http://i6a405.p.ssafy.io:8081/api/v1/friends',
         headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` },
-        data: {"friendId": friend.id}
+        data: {"friendId": checkRequests[index].id}
       })
       console.log(res)
-      state.friends.splice(index, 1)
-        // .then(res => {
-        //   console.log(res)
-        //   state.friends.splice(index, 1)
-        // })
-   
       
       const res1 = await axios({
         method: 'DELETE',
-        url: `http://i6a405.p.ssafy.io:8081/api/v1/friends/requests/${friend.id}`,
+        url: `http://i6a405.p.ssafy.io:8081/api/v1/friends/requests/${checkRequests[index].id}`,
         headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` },
       })
-
       console.log(res1)
 
+      checkRequests.splice(index, 1)
     
     }
     
-    const DeclineFriend = (friend, index) => {
+    const DeclineFriend = (checkRequests, index) => {
       axios({
         method: 'DELETE',
-        url: `http://i6a405.p.ssafy.io:8081/api/v1/friends/requests/${friend.id}`,
+        url: `http://i6a405.p.ssafy.io:8081/api/v1/friends/requests/${checkRequests[index].id}`,
         headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` }
-      })
+        })
         .then(res => {
+          console.log(checkRequests[index].id)
           console.log(res)
-          state.friends.splice(index, 1)
+          checkRequests.splice(index, 1)
+          console.log(checkRequests)
         })
     }
 
+
     return {
       state,
-      CheckFriendRequest,
       AcceptFriend,
       DeclineFriend
     }
@@ -99,5 +81,11 @@ export default {
   font-size: 12px;
   border-radius: 15px;
   width: 90px;
+}
+
+img {
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
 }
 </style>
