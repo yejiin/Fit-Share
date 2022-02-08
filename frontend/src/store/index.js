@@ -1,8 +1,10 @@
 import { createStore } from 'vuex';
+import room from '@/store/modules/room';
 
 export default createStore({
 	state: {
 		friends: [],
+		url: 'http://i6a405.p.ssafy.io:8081/api'
 	},
 	getters: {
 	},
@@ -34,5 +36,10 @@ export default createStore({
 			console.log(context, friendbyname)
 			context.commit('GET_FRIEND_BY_NAME', friendbyname)
 		}
-	}
+	},
+	modules: {
+		room
+	},
 });
+
+
