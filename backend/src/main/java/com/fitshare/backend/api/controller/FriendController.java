@@ -40,12 +40,12 @@ public class FriendController {
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED, GET_FRIEND_LIST, friendService.getFriendList(memberId)));
     }
 
-    @ApiOperation(value = "친구 검색", notes = "친구 리스트에서 이메일로 친구를 검색합니다.")
-    @GetMapping("/{friendEmail}")
-    public ResponseEntity<BaseResponseBody> getFriendListByEmail(@PathVariable String friendEmail) {
+    @ApiOperation(value = "친구 검색", notes = "친구 리스트에서 이름으로 친구를 검색합니다.")
+    @GetMapping("/{friendName}")
+    public ResponseEntity<BaseResponseBody> getFriendListByName(@PathVariable String friendName) {
         Long memberId = JwtUtil.getCurrentId().orElseThrow(() -> new AccessDeniedException("Access denied"));
 
-        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED, GET_FRIEND_LIST_BY_EMAIL, friendService.getFriendListByEmail(memberId, friendEmail)));
+        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED, GET_FRIEND_LIST_BY_EMAIL, friendService.getFriendListByName(memberId, friendName)));
     }
 
     @ApiOperation(value = "친구 삭제", notes = "사용자 고유 ID와 삭제할 친구 고유 ID로 친구를 삭제합니다.")

@@ -11,7 +11,7 @@ public interface FriendService {
 
     List<FriendRes> getFriendList(Long memberId);
 
-    List<FriendRes> getFriendListByEmail(Long memberId, String friendEmail);
+    List<FriendRes> getFriendListByName(Long memberId, String friendName);
 
     void deleteFriend(Long memberId, Long friendId);
 

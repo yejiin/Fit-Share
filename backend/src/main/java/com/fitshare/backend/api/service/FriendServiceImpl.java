@@ -47,8 +47,8 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    public List<FriendRes> getFriendListByEmail(Long memberId, String friendEmail) {
-        return friendRepository.findByMemberIdAndFriendEmailLike(memberId, friendEmail);
+    public List<FriendRes> getFriendListByName(Long memberId, String friendName) {
+        return friendRepository.findByMemberIdAndFriendNameLike(memberId, friendName);
     }
 
     @Override
