@@ -7,7 +7,9 @@
         <shopping-room-list @change-host-closet="changeHostCloset" @first-host-closet="firstHostCloset"></shopping-room-list>
         <div class="host-container">
           <host-closet class="host-closet" :selected-shopping-room="selectedShoppingRoom"></host-closet>
-          <button class="btn shadow-none" @click="goToRoom()">입장하기</button>
+          <!-- <button class="btn shadow-none" @click="goToRoom()">입장하기</button> -->
+          <button class="btn shadow-none" @click="isPrivate=true">입장하기</button>
+          <!-- <button class="btn shadow-none" @click="selectedShoppingRoom.isPrivate ? isPrivate=true : goToRoom()">입장하기</button> -->
         </div>
       </div>
 
@@ -37,7 +39,7 @@
           <i class="fas fa-lock text-center my-3"></i>
           <div class="modal-body">
             <input type="password" v-model="inputPassword" placeholder="비밀번호를 입력해주세요">
-            <p v-if="errorMessage" class="error-message">비밀번호가 일치하지 않습니다!</p>
+            <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
             <span class="d-flex justify-content-center">
               <button class="btn shadow-none" @click="checkPassword">입장하기</button>              
               <button class="btn shadow-none" @click="closeModal" data-bs-dismiss="modal">취 소</button>
@@ -71,22 +73,22 @@ export default {
   },
 
   setup() {
-    const router = useRouter()
-    const store = useStore()
+    const router = useRouter();
+    const store = useStore();
     
-    const status = ref(false)
-    const selectedShoppingRoom = ref({})
+    const status = ref(false);
+    const selectedShoppingRoom = ref({});
     
-    let isPrivate = ref(false)
-    let inputPassword = ref(null)  
-    let errorMessage = ref(false)
+    let isPrivate = ref(false);
+    let inputPassword = ref(null);  
+    let errorMessage = ref('');
 
     const state = reactive({
       confirmPassword: null,  // 비밀번호 api 사용시 X
       roomId: null,
       token: null, 
       mallUrl: null,
-    })
+    });
 
     // methods
     const OpenTab = () => {
@@ -98,71 +100,56 @@ export default {
     };
     
     // host 옷장 변경
-    function changeHostCloset(roomInfo) {
+    const changeHostCloset = (roomInfo) => {
       selectedShoppingRoom.value = roomInfo
     }
 
-    function firstHostCloset(firstRoomInfo) {
+    const firstHostCloset = (firstRoomInfo) => {
       selectedShoppingRoom.value = firstRoomInfo
     }
-    
+
     // 입장하기
-    function goToRoom() {
-      isPrivate.value = true  // 임시 
-      
+    const goToRoom = () => {
       axios({
         method : 'get',
-        url: `${store.state.url}/v1/shopping-rooms/193`,
-        // url: `${store.state.url}/v1/shopping-rooms/${selectedShoppingRoom.shoppingRoomId}`,
+        // url: `${store.state.url}/v1/shopping-rooms/56`,
+        url: `${store.state.url}/v1/shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}`,
         headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3OTA5NTI5fQ.l1TfGZtQarYUWrLy6uI-6gFLX5CVQn62t28USVkJe0_kazLFL824YCDLrGbxx1hAhBWe5lxbtK5SArTgOP77uA` }
       })
         .then(res => {
           const data = res.data.data 
           console.log(data)
           router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl }}) 
-
-          // isPrivate 여부 => F: token, roomId, mallurl (username 필요X) / T: isPrivate, password
-          // if (!data.isPrivate) {  // public
-          //   router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl }})
-          // } else { 
-          //   isPrivate.value = true
-          //   confirmPassword.value = data.password  // 안쓰는 방식으로..
-          // }
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+          console.log(err.response)
+        })
     }
 
-    function checkPassword() {
-      // password를 goToRoom에서 받는 경우 
-      if (inputPassword.value == state.confirmPassword) {
-        isPrivate.value = false
-        router.push({ name: 'ShoppingRoom', params: { roomId: state.roomId, token: state.token, mallUrl: state.mall_url }})
-      } else {
-        errorMessage.value = true
-        inputPassword.value = null
-      }
-
-      // API 사용시 
-      // axios({
-      //   method: 'post',
-      //   url: '',
-      //   data: { password: inputPassword.value },
-      //   headers: { Authorization: `Bearer 토큰`}
-      // })
-      //   .then(res => {
-      //     const data = res.data.data
-      //     router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.ShoppingRoomUrl }}) 
-      //   })
-      //   .catch(err => {
-      //     console.log(err.response)
-          
-      //   })
+    const checkPassword = () => {
+      axios({
+        method: 'post',
+        // url: `${store.state.url}/v1/shopping-rooms/56/validate`,
+        url: `${store.state.url}/v1/shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}/validate`,
+        data: { password: inputPassword.value },
+      })
+        .then(res => {
+          const data = res.data.data;
+          if (data) { 
+            goToRoom()
+          } else {
+            errorMessage.value = '비밀번호가 일치하지 않습니다.'
+            console.log(errorMessage.value)
+          }
+        })
+        .catch(err => console.log(err.response));
 
     }
 
-    function closeModal() {
-      isPrivate.value = false
-      inputPassword.value = null
+    const closeModal = () => {
+      isPrivate.value = false;
+      inputPassword.value = null;
+      if (errorMessage.value) errorMessage.value = '';
     }
 
 
