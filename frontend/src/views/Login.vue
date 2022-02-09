@@ -13,6 +13,7 @@
 
     <div id="login">
       <h1>로그인</h1>
+
       <div id="loginform">
         <span id="span">간편 로그인</span><br />
         <div id="imageButton">
@@ -47,6 +48,7 @@
 </template>
 
 <script>
+
 import { onMounted } from 'vue';
 // import NaverLogin from 'vue-naver-login'
 export default {
@@ -60,16 +62,18 @@ export default {
       const state = naver_id_login.getUniqState();
       naver_id_login.setState(state);
       naver_id_login.init_naver_id_login();
-    })
 
     return {
-      
-    };
-  },
-};
+    }
+    
+    });
+  }
+}
 </script>
 
+
 <style scoped>
+
 #container {
 }
 .common_bg {
@@ -97,9 +101,6 @@ export default {
 #loginform {
   padding-top: 60%;
   padding-left: 10%;
-}
-#imageButton{
-  margin-bottom: 10px;
 }
 #span {
   font-size: 24px;
