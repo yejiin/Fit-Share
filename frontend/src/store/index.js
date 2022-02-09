@@ -1,16 +1,11 @@
 import { createStore } from 'vuex';
-import mall from '@/store/modules/mall.js';
+import { room } from '@/store/modules/room';
+import { login } from '@/store/modules/login'
+
 
 export default createStore({
-	state: {
-	},
-	getters: {
-	},
-	mutations: {
-	},
-	actions: {
-	},
 	modules: {
-		mall,
-	},
+		room,
+		login,
+	}
 });
