@@ -37,7 +37,8 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
+import axios from 'axios'
 
 export default {
   name: 'Closet',
@@ -61,13 +62,27 @@ export default {
     
     const Urls = ref('')
 
+    const state = reactive({
+      clothes: [],
+    })
+
     const AddUrl = () => {
       if(ImgUrl.value.length < 1) {
         alert('이미지 주소를 입력하세요')
       }
       else {
         alert('옷장에 추가되었습니다.')
-
+        axios({
+          method: 'POST',
+          url: `http://i6a405.p.ssafy.io:8081/api/v1/clothes`,
+          headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3OTA5NTI5fQ.l1TfGZtQarYUWrLy6uI-6gFLX5CVQn62t28USVkJe0_kazLFL824YCDLrGbxx1hAhBWe5lxbtK5SArTgOP77uA` },
+          data: {"imageUrl": ImgUrl.value, "shoppingRoomId": 1}
+          })
+          .then(res => {
+            console.log('hi')
+            console.log(res)
+            state.clothes = res.data.data
+          })
         ImgUrl.value = ''
       }
     }
