@@ -17,6 +17,7 @@ public class ResponseMessage {
 
     // Login
     public static final String GET_ACCESS_TOKEN = "카카오 토큰 생성 성공입니다.";
+    public static final String REFRESH_TOKEN = "토큰 재발급 성공입니다";
     public static final String LOGIN = "로그인 성공입니다.";
     public static final String LOGOUT = "로그아웃 성공입니다.";
 
