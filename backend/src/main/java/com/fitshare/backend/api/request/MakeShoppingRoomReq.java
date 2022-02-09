@@ -21,7 +21,7 @@ public class MakeShoppingRoomReq {
     private String shoppingMallName;
 
     @ApiModelProperty(name = "쇼핑몰 url", example = "www.xxx.com")
-    @Pattern(regexp = "^((http|https)://)?(www.)?([a-zA-Z0-9]+)\\.[a-z]+([a-zA-z0-9.?#]+)?",
+    @Pattern(regexp = "[(http(s)?):\\/\\/(www\\.)?a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)",
             message = "url 형식만 가능합니다.")
     private String shoppingMallUrl;
 

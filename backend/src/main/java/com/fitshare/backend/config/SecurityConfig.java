@@ -62,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/v1/kakao/**").permitAll()
+                .antMatchers("/api/v1/auth/**").permitAll()
                 .antMatchers("/v2/api-docs").permitAll()
                 .anyRequest().authenticated() // Security 설정을 풀고 싶으면 이 코드를 주석처리하고
 //                .anyRequest().permitAll() // 이 코드를 주석을 푸세요
@@ -73,7 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:8080");
+        configuration.addAllowedOrigin("http://localhost:80");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
