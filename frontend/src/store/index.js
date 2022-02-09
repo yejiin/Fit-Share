@@ -41,6 +41,7 @@ export default createStore({
 			context.commit('GET_FRIEND_BY_NAME', friendbyname)
 		}
 	},
+
 	modules: {
 		room,
 		login,
