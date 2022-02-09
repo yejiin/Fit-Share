@@ -1,12 +1,14 @@
 package com.fitshare.backend.db.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "cloth")
 public class Cloth extends CreatedTimeEntity {
@@ -24,4 +26,8 @@ public class Cloth extends CreatedTimeEntity {
 
     @Column
     private String clothUrl;
+
+    @Column
+    private String clothPath;
+
 }

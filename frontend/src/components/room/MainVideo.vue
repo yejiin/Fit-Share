@@ -1,19 +1,19 @@
 <template>
   <div class="video-container" v-if="streamManager">
-    <ov-video :stream-manager="streamManager"/>
+    <ov-main-video :stream-manager="streamManager"/>
     <!-- <div><p>{{ state.clientData }}</p></div> -->
   </div>
 </template>
 
 <script>
 import { reactive, computed } from 'vue'
-import OvVideo from './OvVideo.vue';
+import OvMainVideo from './OvMainVideo.vue';
 
 export default {
-    name: 'RoomVideo',
+    name: 'MainVideo',
 
     components: {
-      OvVideo,
+      OvMainVideo,
     },
 
     props: {
@@ -24,7 +24,7 @@ export default {
       const state = reactive({
         clientData: computed(() => {
           const { clientData } = getConnectionData();
-          return clientData
+          return clientData.split(' ')[0]
         })
       })
 
@@ -42,22 +42,8 @@ export default {
 </script>
 
 <style scoped>
-/* .video-container {
+.video-container {
   position: relative;
 }
 
-p {
-  display: inline-block;
-	background: #f8f8f8;
-	padding-left: 5px;
-	padding-right: 5px;
-	color: #777777;
-	font-weight: bold;
-	border-bottom-right-radius: 4px;
-  position: absolute;
-  font-size: 12px;
-  top: 32px;
-  left: 50%;
-  transform: translate(-50%, -50%);  
-} */
 </style>
