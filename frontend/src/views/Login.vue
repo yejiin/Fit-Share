@@ -16,50 +16,64 @@
 
       <div id="loginform">
         <span id="span">간편 로그인</span><br />
-        <a
-          id="kakako_login"
-          href="https://kauth.kakao.com/oauth/authorize?client_id=9596c9c79f92bc2d9fbdeacfee238961&redirect_uri=http://localhost:8080/callback&response_type=code"
-        >
-          <img
-            src="//k.kakaocdn.net/14/dn/btqCn0WEmI3/nijroPfbpCa4at5EIsjyf0/o.jpg"
-            width="350"
-            alt="kakao_login_image"
-          />
-        </a>
-        <a id="naver_login" @click="naverLogin()">
-          <img
-            src="https://static.nid.naver.com/oauth/big_g.PNG?version=js-2.0.0"
-            width="350"
-            alt="naver_login_image"
-          />
-        </a>
+        <div id="imageButton">
+          <a
+            id="kakako_login"
+            href="https://kauth.kakao.com/oauth/authorize?client_id=9596c9c79f92bc2d9fbdeacfee238961&redirect_uri=http://localhost:8080/callback&response_type=code"
+          >
+            <img
+              id="naver_id_login"
+              src="//k.kakaocdn.net/14/dn/btqCn0WEmI3/nijroPfbpCa4at5EIsjyf0/o.jpg"
+              alt="kakao_login_image"
+            />
+          </a>
+          </div>
+          
+          <!-- <NaverLogin
+            client-id="skkqxLCLHDQrwOlhytTS"
+            callback-url="http://localhoust:8080/main"
+            is-popup="false"
+            :callbackFunction=callbackFunction
+          /> -->
+          <div id="naver_login">
+            <img
+              src="https://static.nid.naver.com/oauth/big_g.PNG?version=js-2.0.0"
+              alt="naver_login_image"
+            />
+
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+
+import { onMounted } from 'vue';
+// import NaverLogin from 'vue-naver-login'
 export default {
   name: "Login",
   setup() {
-    const naverLogin = () => {
+    onMounted(() => {
       const naver_id_login = new window.naver_id_login(
-        "Client Id",
-        "callback URL"
+        "skkqxLCLHDQrwOlhytTS",
+        "http://localhost:8080/main"
       );
       const state = naver_id_login.getUniqState();
       naver_id_login.setState(state);
       naver_id_login.init_naver_id_login();
-    };
 
     return {
-      naverLogin,
-    };
-  },
-};
+    }
+    
+    });
+  }
+}
 </script>
 
-<style>
+
+<style scoped>
+
 #container {
 }
 .common_bg {
@@ -109,6 +123,7 @@ export default {
   text-align: left;
 }
 img {
+  width: 350px;
   cursor: pointer;
 }
 </style>
