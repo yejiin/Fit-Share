@@ -18,9 +18,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query(value = "SELECT NEW com.fitshare.backend.api.response.BaseMemberRes" +
             "( m.id, m.name, m.profileImg, m.email )" +
             "  FROM Member m" +
-            " WHERE m.email LIKE %:email%" +
-            "   AND m.isActive = true" +
+            " WHERE m.isActive = true" +
+            "   AND m.email LIKE %:emailId%" +
+            "   AND m.id <> :memberId" +
             " ORDER BY m.name")
-    List<BaseMemberRes> findByEmailLike(@Param("email") String email);
+    List<BaseMemberRes> findByEmailLike(@Param("memberId") Long memberId, @Param("emailId") String emailId);
 
 }

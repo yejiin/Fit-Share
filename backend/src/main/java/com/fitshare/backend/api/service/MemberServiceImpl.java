@@ -72,7 +72,7 @@ public class MemberServiceImpl implements MemberService  {
     }
 
     @Override
-    public List<BaseMemberRes> searchMembersByEmail(String email) {
-        return memberRepository.findByEmailLike(email);
+    public List<BaseMemberRes> findMembersByEmailId(Long memberId, String emailId) {
+        return memberRepository.findByEmailLike(memberId, emailId);
     }
 }

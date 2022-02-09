@@ -17,7 +17,7 @@ public interface MemberService {
 
     Optional<Member> findMemberById(Long id);
 
-    List<BaseMemberRes> searchMembersByEmail(String email);
+    List<BaseMemberRes> findMembersByEmailId(Long memberId, String emailId);
 
     Member createKakaoMember(KakaoProfile kakaoProfile);
 
