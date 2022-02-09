@@ -57,6 +57,7 @@ export default {
         .get(path)
         .then((res) => {
           if (res.data.statusCode === 200) {
+            console.log(res.data.data)
             console.log("카카오 Access 토큰 생성 성공");
             // Cookie에 'accessToken' 설정
             getKakaoAccount(res.data.data);
