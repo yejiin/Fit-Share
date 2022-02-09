@@ -2,7 +2,6 @@ import axios from 'axios';
 
 export const room = {
     namespaced: true,
-
     state: () => ({
       shoppingRoomList: [],
       selectedShoppingRoom: {},
@@ -18,14 +17,13 @@ export const room = {
       }
     },
     actions: {
-      loadShoppingRoomList({commit}) {
+      loadShoppingRoomList({commit}, config) {
         axios({
           method: 'get',
           url: 'http://i6a405.p.ssafy.io:8081/api/v1/shopping-rooms/',
-          headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3OTA5NTI5fQ.l1TfGZtQarYUWrLy6uI-6gFLX5CVQn62t28USVkJe0_kazLFL824YCDLrGbxx1hAhBWe5lxbtK5SArTgOP77uA` }
+          headers: config,
         })
           .then(res => {
-            console.log(res.data)
             commit('LOAD_SHOPPING_ROOM_LIST', res.data.data)
           })
           .catch(err => console.log(err));

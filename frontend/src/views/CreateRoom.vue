@@ -136,6 +136,7 @@ import { reactive, ref, toRefs, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex'
 import axios from 'axios'
+import { useCookies } from "vue3-cookies";
 
 export default {
   name: 'CreateRoom',
@@ -143,6 +144,7 @@ export default {
   setup() {
     const router = useRouter();
     const store = useStore();
+    const { cookies } = useCookies();
     
     let counts = ref([1, 2, 3, 4, 5, 6]);
     let selectedCnt = ref(null);
@@ -220,6 +222,12 @@ export default {
       isPrivate.value = false
     };
 
+    const setToken = () => {
+      const token = cookies.get('accessToken');
+      const config = { Authorization: `Bearer ${token}`};
+      return config
+    };
+
     // 유효성 검사 
     const validationCheck = () => {
       let isValid = true
@@ -275,16 +283,15 @@ export default {
         method : 'post',
         url: `${store.state.url}/v1/shopping-rooms/`,
         data: roomData,
-        headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3OTA5NTI5fQ.l1TfGZtQarYUWrLy6uI-6gFLX5CVQn62t28USVkJe0_kazLFL824YCDLrGbxx1hAhBWe5lxbtK5SArTgOP77uA` }
+        headers: setToken(),
       })
         .then(res => {
-          // console.log(res.data.data)
           const data = res.data.data
           router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl }}) 
         })
         .catch(err => {
           console.log(err.response)
-          if (err.response.data.message == ' Invalid Input Value' ) {
+          if (err.response.data.statusCode == 400) {
             error.mallError = '유효하지 않은 쇼핑몰입니다. 다시 입력해주세요.'
           } 
         })
