@@ -120,7 +120,6 @@
             <p class="password-error" v-if="passwordError">{{ passwordError }}</p>
 					</div>
           
-
 					<div class="text-center">
             <button class="btn create-btn shadow-none" @click="validationCheck()">생성하기</button>
             <button class="btn shadow-none" @click="goToMain()">취소</button>
@@ -142,10 +141,10 @@ export default {
   name: 'CreateRoom',
   
   setup() {
-    const router = useRouter()
-    const store = useStore()
-    // data
-    let counts = ref([1, 2, 3, 4, 5, 6])
+    const router = useRouter();
+    const store = useStore();
+    
+    let counts = ref([1, 2, 3, 4, 5, 6]);
     let selectedCnt = ref(null);
     let isCntVisible = ref(false);
 
@@ -164,8 +163,8 @@ export default {
     });
 
     const state = reactive({
-      shoppingMallList: [],  // 임시!!!!!
-      isMall: false,  // ----------------찾고자 하는 쇼핑몰의 리스트 내 존재여부
+      // shoppingMallList: [],  // 임시!!!!
+      isMall: true,
       inputMallName: null,
       inputMallUrl: null,
     });
@@ -180,27 +179,26 @@ export default {
       }
     });
 
-    // select dropdown method
-    function selectCnt(cnt) {
+    // select dropdown 
+    const selectCnt = (cnt) => {
       selectedCnt.value = cnt;
       isCntVisible.value = false;
-    }
+    };
 
-    function selectItem(mall) {
+    const selectItem = (mall) => {
       selectedItem.value = mall;
       isMallListVisible.value = false;
     }
     
     // 쇼핑몰 검색
-    function searchMall() {
+   const searchMall = () => {
       axios.get(`${store.state.url}/v1/shopping-malls?keyword=${searchQuery.value}`)
         .then(res => {
           searchedMalls.value = res.data.data
-          // console.log(searchedMalls.value)
         })
     }
 
-    // 바깥영역 클릭으로 dropdown 닫기
+    // dropdown 닫기
     document.addEventListener('click', function(e){
       if (isMallListVisible.value == true) {
         if (e.target.className !== 'dropdown-popover' && e.target.className !== 'form-select' && e.target.className !== '' && e.target.className !== 'search-mall-input' ) {
@@ -223,13 +221,14 @@ export default {
     };
 
     // 유효성 검사 
-    function validationCheck () {
+    const validationCheck = () => {
       let isValid = true
       // 인원수 
       if (!selectedCnt.value) {
         error.cntError = '인원수를 선택해주세요!';
         isValid = false;
       } else error.cntError = '';
+      
       // 쇼핑몰 확인
       if (!selectedItem.value) {
         if (!state.inputMallName || !state.inputMallUrl) {
@@ -237,6 +236,7 @@ export default {
           isValid = false;
         } else error.mallError = ''; 
       } else error.mallError = '';
+      
       // 비밀번호 확인
       if (isPrivate.value) {
         if (!password.value) {
@@ -247,23 +247,25 @@ export default {
           return;
         } else error.passwordError = '';
       }
-      if (isValid) makeShoppingRoom();  // axios통신
+      if (isValid) makeShoppingRoom();
     }
 
+    // 쇼핑룸 생성
     const makeShoppingRoom = () => {
-      let mallId = null
+      let mallId = null;
       if (selectedItem.value) {
         mallId = selectedItem.value.id
         state.inputMallName = null
         state.inputMallUrl = null
       }
       if (!isPrivate.value) password.value = null;
+      
       const roomData = {  
         customShoppingMall: !state.isMall,
         participantCount: selectedCnt.value,
-        password: password.value,  // null
+        password: password.value,
         private: isPrivate.value,  
-        shoppingMallId: mallId,  // null 
+        shoppingMallId: mallId, 
         shoppingMallName: state.inputMallName, 
         shoppingMallUrl: state.inputMallUrl,  
       };
@@ -281,17 +283,16 @@ export default {
           router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl }}) 
         })
         .catch(err => {
-          // error.mallError = '유효하지 않은 쇼핑몰입니다. 다시 입력해주세요!'
           console.log(err.response)
           if (err.response.data.message == ' Invalid Input Value' ) {
-            error.mallError = '유효하지 않은 쇼핑몰입니다. 다시 입력해주세요!'
+            error.mallError = '유효하지 않은 쇼핑몰입니다. 다시 입력해주세요.'
           } 
         })
-    }
+    };
 
     const goToMain = () => {
       router.push({ name: 'Main' })
-    }
+    };
 
     return { 
       selectPrivate, makeShoppingRoom, goToMain, selectPublic,
@@ -304,22 +305,6 @@ export default {
 </script>
 
 <style scoped>
-/* error */
-.cnt-error {
-  color: red;
-  margin: 5px 0 0 285px;
-}
-
-.mall-error {
-  color: red;
-  margin: 5px 0 0 285px;
-}
-
-.password-error {
-  color: red;
-  margin-left: 285px;
-}
-
 .create-container {
   margin: 0px 142px 0;
   display: flex;
@@ -481,7 +466,6 @@ label {
   width: 530px;
   display: flex;
   flex-direction: column;
-  /* margin-top: 50px;   */
   margin-top: 44px;
 }
 
@@ -525,6 +509,21 @@ button {
   margin: 0 34px 0 0;
 }
 
+/* error */
+.cnt-error {
+  color: red;
+  margin: 5px 0 0 285px;
+}
+.mall-error {
+  color: red;
+  margin: 5px 0 0 285px;
+}
+.password-error {
+  color: red;
+  margin-left: 285px;
+}
+
+/* scroll */
 .scroll::-webkit-scrollbar {
   width: 7px;
 }

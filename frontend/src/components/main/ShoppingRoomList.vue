@@ -31,7 +31,7 @@ export default {
       const store = useStore()
 
       const state = reactive({
-        shoppingRoomList: [],  //뒤에 
+        shoppingRoomList: [], 
         
         // shoppingRoomList : [
         //   { shoppingRoomId: 1, hostName: '김싸피', maxParticipantCount: 2, participantCount: 1, isPrivate: true, shoppingMallName: 'nike', shoppingMallUrl: '..' },  // 이 외에 추가적으로
@@ -48,12 +48,13 @@ export default {
           headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3OTA5NTI5fQ.l1TfGZtQarYUWrLy6uI-6gFLX5CVQn62t28USVkJe0_kazLFL824YCDLrGbxx1hAhBWe5lxbtK5SArTgOP77uA` }
         })
           .then(res => {
-            // console.log(res.data.data)
+            console.log(res.data.data)
             state.shoppingRoomList = res.data.data
           })
           .then(() => {
             emit('first-host-closet', state.shoppingRoomList[0])
           })
+          .catch(err => console.log(err))
       }
       
       // created
