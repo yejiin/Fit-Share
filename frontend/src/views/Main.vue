@@ -4,12 +4,11 @@
     <div class="container">
       <!-- 쇼핑룸, host옷장 -->
       <div class="row">
-        <shopping-room-list @change-host-closet="changeHostCloset" @first-host-closet="firstHostCloset"></shopping-room-list>
+        <shopping-room-list></shopping-room-list>
         <div class="host-container">
-          <host-closet class="host-closet" :selected-shopping-room="selectedShoppingRoom"></host-closet>
-          <!-- <button class="btn shadow-none" @click="goToRoom()">입장하기</button> -->
-          <button class="btn shadow-none" @click="isPrivate=true">입장하기</button>
-          <!-- <button class="btn shadow-none" @click="selectedShoppingRoom.isPrivate ? isPrivate=true : goToRoom()">입장하기</button> -->
+          <host-closet class="host-closet"></host-closet>
+          <!-- <button class="btn shadow-none" @click="isPrivate=true">입장하기</button> -->
+          <button class="btn shadow-none" @click="selectedShoppingRoom.isPrivate ? isPrivate=true : goToRoom()">입장하기</button>
         </div>
       </div>
 
@@ -57,7 +56,7 @@ import Navbar from '@/components/Navbar.vue'
 import Friend from '@/components/main/Friend.vue'
 import ShoppingRoomList from '@/components/main/ShoppingRoomList.vue'
 import HostCloset from '../components/main/HostCloset.vue'
-import { reactive, ref, toRefs } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex'
 import axios from 'axios'
@@ -77,20 +76,10 @@ export default {
     const store = useStore();
     
     const status = ref(false);
-    const selectedShoppingRoom = ref({});
-    
     let isPrivate = ref(false);
     let inputPassword = ref(null);  
     let errorMessage = ref('');
 
-    const state = reactive({
-      confirmPassword: null,  // 비밀번호 api 사용시 X
-      roomId: null,
-      token: null, 
-      mallUrl: null,
-    });
-
-    // methods
     const OpenTab = () => {
       status.value = true
     };
@@ -98,21 +87,17 @@ export default {
     const CloseTab = () => {
       status.value = false
     };
-    
-    // host 옷장 변경
-    const changeHostCloset = (roomInfo) => {
-      selectedShoppingRoom.value = roomInfo
-    }
 
-    const firstHostCloset = (firstRoomInfo) => {
-      selectedShoppingRoom.value = firstRoomInfo
-    }
+    // host 옷장
+     const selectedShoppingRoom = computed(() => {
+        return store.state.room.selectedShoppingRoom
+    });
 
     // 입장하기
     const goToRoom = () => {
       axios({
         method : 'get',
-        // url: `${store.state.url}/v1/shopping-rooms/56`,
+        // url: `${store.state.url}/v1/shopping-rooms/77`,
         url: `${store.state.url}/v1/shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}`,
         headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3OTA5NTI5fQ.l1TfGZtQarYUWrLy6uI-6gFLX5CVQn62t28USVkJe0_kazLFL824YCDLrGbxx1hAhBWe5lxbtK5SArTgOP77uA` }
       })
@@ -129,7 +114,7 @@ export default {
     const checkPassword = () => {
       axios({
         method: 'post',
-        // url: `${store.state.url}/v1/shopping-rooms/56/validate`,
+        // url: `${store.state.url}/v1/shopping-rooms/77/validate`,
         url: `${store.state.url}/v1/shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}/validate`,
         data: { password: inputPassword.value },
       })
@@ -152,11 +137,9 @@ export default {
       if (errorMessage.value) errorMessage.value = '';
     }
 
-
     return {
-      status, selectedShoppingRoom, isPrivate, inputPassword, errorMessage, ...toRefs(state),
+      status, selectedShoppingRoom, isPrivate, inputPassword, errorMessage,
       OpenTab,CloseTab,
-      changeHostCloset,firstHostCloset,
       goToRoom, checkPassword, closeModal,
     }
   }

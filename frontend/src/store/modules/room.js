@@ -4,18 +4,21 @@ export const room = {
     namespaced: true,
 
     state: () => ({
-      shoppingMallList: [],
+      shoppingRoomList: [],
+      selectedShoppingRoom: {},
     }),
 
     mutations: {
-      LOAD_SHOPPING_MALL_LIST: function (state, results) {
-        state.shoppingMallList = results
+      LOAD_SHOPPING_ROOM_LIST(state, roomList) {
+        state.shoppingRoomList = roomList
+        state.selectedShoppingRoom = roomList[0]
+      },
+      SELECTED_ROOM(state, room) {
+        state.selectedShoppingRoom = room
       }
     },
-
     actions: {
-      loadShoppingMallList( {commit} ) {
-        console.log('action!')
+      loadShoppingRoomList({commit}) {
         axios({
           method: 'get',
           url: 'http://i6a405.p.ssafy.io:8081/api/v1/shopping-rooms/',
@@ -23,13 +26,13 @@ export const room = {
         })
           .then(res => {
             console.log(res.data)
-            commit('LOAD_SHOPPING_MALL_LIST', res.data.data)
+            commit('LOAD_SHOPPING_ROOM_LIST', res.data.data)
           })
-      //     .then(() => {
-      //       emit('first-host-closet', state.shoppingRoomList[0])
-      //     })
+          .catch(err => console.log(err));
       },
-
+      selectedRoom({commit}, room) {
+        commit('SELECTED_ROOM', room)
+      }
     },
     getters: {
     },

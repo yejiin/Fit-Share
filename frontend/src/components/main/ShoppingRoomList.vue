@@ -2,11 +2,10 @@
   <div class="room-container">
    <h2>Live</h2>
    <div class="row">
-     <!-- emit event room 정보 -->
-     <div id="room" class="room col-6" :class="index % 2 ? 'room-right' : 'room-left'" 
-      :style="{ 'background-image': `url(${require(`../../assets/shopping_${index % 5 + 1}.png`)})` }"
-      v-for="(room, index) in shoppingRoomList" :key="index" 
-      @click="$emit('change-host-closet', room)"
+      <div id="room" class="room col-6" :class="index % 2 ? 'room-right' : 'room-left'" 
+        :style="{ 'background-image': `url(${require(`@/assets/shopping_${index % 5 + 1}.png`)})` }"
+        v-for="(room, index) in shoppingRoomList" :key="index" 
+        @click="selectShoppingRoom(room)"
       >
        <div class="room-info">
         <p class="mall-name">{{ room.shoppingMallName }}</p>
@@ -18,50 +17,36 @@
 </template>
 
 <script>
-import { reactive, toRefs, } from 'vue';
+import { computed } from 'vue';
 import { useStore } from 'vuex'
-import axios from 'axios'
 
 export default {
     name: 'ShoppingRoomList',
     
-    emits: ['first-host-closet', 'change-host-closet'],
+    setup() {
+      const store = useStore();
 
-    setup(props, { emit }) {
-      const store = useStore()
+      // shoppingRoomList : [
+      //   { shoppingRoomId: 1, hostName: '김싸피', maxParticipantCount: 2, participantCount: 1, isPrivate: true, shoppingMallName: 'nike', shoppingMallUrl: '..' },  // 이 외에 추가적으로
+      // ],
 
-      const state = reactive({
-        shoppingRoomList: [], 
-        
-        // shoppingRoomList : [
-        //   { shoppingRoomId: 1, hostName: '김싸피', maxParticipantCount: 2, participantCount: 1, isPrivate: true, shoppingMallName: 'nike', shoppingMallUrl: '..' },  // 이 외에 추가적으로
-        // ],
+      const shoppingRoomList = computed(() => {
+        return store.state.room.shoppingRoomList
+      });
 
-      })
-
-      // methods
-      // 쇼핑룸 목록 불러오기 
-      function getShoppingRoomList () {
-        axios({
-          method: 'get',
-          url: `${store.state.url}/v1/shopping-rooms/`,
-          headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3OTA5NTI5fQ.l1TfGZtQarYUWrLy6uI-6gFLX5CVQn62t28USVkJe0_kazLFL824YCDLrGbxx1hAhBWe5lxbtK5SArTgOP77uA` }
-        })
-          .then(res => {
-            console.log(res.data.data)
-            state.shoppingRoomList = res.data.data
-          })
-          .then(() => {
-            emit('first-host-closet', state.shoppingRoomList[0])
-          })
-          .catch(err => console.log(err))
-      }
+      const loadShoppingRoomList = () => {
+        store.dispatch('room/loadShoppingRoomList')
+      };
       
+      const selectShoppingRoom = (room) => {
+        store.dispatch('room/selectedRoom', room)
+      };
+
       // created
-      getShoppingRoomList()
+      loadShoppingRoomList()
 
       return {
-        ...toRefs(state), getShoppingRoomList, 
+        shoppingRoomList, selectShoppingRoom,
       }
     }
 }
@@ -91,7 +76,7 @@ h2 {
   margin: 0;
 }
 
-/* 스크롤바 */
+/* 스크롤 */
 .row::-webkit-scrollbar {
   width: 7px;
 }
