@@ -1,5 +1,5 @@
 import { createStore } from 'vuex';
-import room from '@/store/modules/room';
+import { room } from '@/store/modules/room';
 
 export default createStore({
 	state: {

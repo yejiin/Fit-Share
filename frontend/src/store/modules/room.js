@@ -1,7 +1,6 @@
 import axios from 'axios';
-// import { createStore } from "vuex" ;
 
-const room = {
+export const room = {
     namespaced: true,
 
     state: () => ({
@@ -10,9 +9,7 @@ const room = {
 
     mutations: {
       LOAD_SHOPPING_MALL_LIST: function (state, results) {
-        console.log(results)
         state.shoppingMallList = results
-        
       }
     },
 
@@ -37,5 +34,3 @@ const room = {
     getters: {
     },
 }
-
-export default room;
