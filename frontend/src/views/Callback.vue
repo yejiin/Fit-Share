@@ -26,7 +26,7 @@ export default {
     });
 
     const getKakaoAccount = async (kakaoToken) => {
-      let path = "http://localhost:8081/api/v1/kakao/login";
+      let path = "http://i6a405.p.ssafy.io:8081/api/v1/auth/kakao/login";
       await axios
         .get(path, {
           params: {
@@ -51,7 +51,7 @@ export default {
     };
 
     const getKakakoToken = async (code) => {
-      let path = `http://localhost:8081/api/v1/kakao/auth?code=${code}`;
+      let path = `http://i6a405.p.ssafy.io:8081/api/v1/auth/kakao/token?code=${code}`;
       await axios
         .get(path)
         .then((res) => {
