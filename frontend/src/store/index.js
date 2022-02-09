@@ -1,5 +1,7 @@
 import { createStore } from 'vuex';
+
 import { room } from '@/store/modules/room';
+import { login } from '@/store/modules/login'
 
 export default createStore({
 	state: {
@@ -37,9 +39,11 @@ export default createStore({
 			context.commit('GET_FRIEND_BY_NAME', friendbyname)
 		}
 	},
+
 	modules: {
-		room
-	},
+		room,
+		login,
+	}
 });
 
 
