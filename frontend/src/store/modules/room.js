@@ -1,7 +1,7 @@
 import axios from 'axios';
 // import { createStore } from "vuex" ;
 
-const room = {
+export const room = {
     namespaced: true,
 
     state: () => ({
@@ -37,5 +37,3 @@ const room = {
     getters: {
     },
 }
-
-export default room;
