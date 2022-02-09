@@ -7,7 +7,8 @@
         <shopping-room-list @change-host-closet="changeHostCloset" @first-host-closet="firstHostCloset"></shopping-room-list>
         <div class="host-container">
           <host-closet class="host-closet" :selected-shopping-room="selectedShoppingRoom"></host-closet>
-          <button class="btn shadow-none" @click="goToRoom()">입장하기</button>
+          <!-- <button class="btn shadow-none" @click="goToRoom()">입장하기</button> -->
+          <button class="btn shadow-none" @click="selectedShoppingRoom.isPrivate ? isPrivate=true : goToRoom()">입장하기</button>
         </div>
       </div>
 
@@ -58,6 +59,7 @@ import HostCloset from '../components/main/HostCloset.vue'
 import { reactive, ref, toRefs } from 'vue'
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex'
+import { useCookies } from 'vue3-cookies'
 import axios from 'axios'
 
 export default {
@@ -73,9 +75,19 @@ export default {
   setup() {
     const router = useRouter()
     const store = useStore()
+    const { cookies } = useCookies() 
     
     const status = ref(false)
     const selectedShoppingRoom = ref({})
+
+
+    const setToken = () => {
+      const token = cookies.get('accessToken')
+      const config = {
+        Authorization: `Bearer ${token}`
+      }
+      return config
+    }
     
     let isPrivate = ref(false)
     let inputPassword = ref(null)  
@@ -112,9 +124,8 @@ export default {
       
       axios({
         method : 'get',
-        url: `${store.state.url}/v1/shopping-rooms/193`,
-        // url: `${store.state.url}/v1/shopping-rooms/${selectedShoppingRoom.shoppingRoomId}`,
-        headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3OTA5NTI5fQ.l1TfGZtQarYUWrLy6uI-6gFLX5CVQn62t28USVkJe0_kazLFL824YCDLrGbxx1hAhBWe5lxbtK5SArTgOP77uA` }
+        url: `${store.state.url}/v1/shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}`,
+        headers: setToken()
       })
         .then(res => {
           const data = res.data.data 
@@ -133,31 +144,22 @@ export default {
     }
 
     function checkPassword() {
-      // password를 goToRoom에서 받는 경우 
-      if (inputPassword.value == state.confirmPassword) {
-        isPrivate.value = false
-        router.push({ name: 'ShoppingRoom', params: { roomId: state.roomId, token: state.token, mallUrl: state.mall_url }})
-      } else {
-        errorMessage.value = true
-        inputPassword.value = null
-      }
-
-      // API 사용시 
-      // axios({
-      //   method: 'post',
-      //   url: '',
-      //   data: { password: inputPassword.value },
-      //   headers: { Authorization: `Bearer 토큰`}
-      // })
-      //   .then(res => {
-      //     const data = res.data.data
-      //     router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.ShoppingRoomUrl }}) 
-      //   })
-      //   .catch(err => {
-      //     console.log(err.response)
-          
-      //   })
-
+      axios({
+        method: 'post',
+        // url: ${store.state.url}/v1/shopping-rooms/77/validate,
+        url: `${store.state.url}/v1/shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}/validate`,
+        data: { password: inputPassword.value },
+      })
+        .then(res => {
+          const data = res.data.data;
+          if (data) { 
+            goToRoom()
+          } else {
+            errorMessage.value = '비밀번호가 일치하지 않습니다.'
+            console.log(errorMessage.value)
+          }
+        })
+        .catch(err => console.log(err.response));
     }
 
     function closeModal() {
@@ -171,6 +173,7 @@ export default {
       OpenTab,CloseTab,
       changeHostCloset,firstHostCloset,
       goToRoom, checkPassword, closeModal,
+      setToken,
     }
   }
 }
