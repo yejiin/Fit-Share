@@ -4,10 +4,10 @@
     <div class="accordion" id="accordionExample">
       <div class="accordion-item" v-for="(friend, index) in friends" :key="friend.id">
         <h2 class="accordion-header" :id="'heading'+friend.id">
-          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+friend.id" aria-expanded="true" :aria-controls="'collapse'+friend.id" v-if="friend.id === 1">
+          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+friend.id" aria-expanded="true" :aria-controls="'collapse'+friend.id" v-if="friend.id === 1" @click="publisher">
             내 옷장
           </button>
-          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+friend.id" aria-expanded="true" :aria-controls="'collapse'+friend.id" v-if="friend.id != 1" @click="getClothes">
+          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+friend.id" aria-expanded="true" :aria-controls="'collapse'+friend.id" v-if="friend.id != 1">
             {{ friend.name }}
           </button>
         </h2>
@@ -32,6 +32,10 @@
 
     </div>
 
+    <button @click="getClothes">클릭</button>
+    <div v-for="cloth in state.clothes" :key="cloth.id">
+      <img :src="cloth.imagePath" alt="" class="clth-style">
+    </div>
 
   </div>
 </template>
@@ -56,7 +60,7 @@ export default {
     const friends = ref([
       // {id:1, name: '김싸피', src: require('@/assets/shirt.jpg')},
       {id:1, name: '김싸피', src: 'https://image.msscdn.net/images/goods_img/20200407/1388147/1388147_3_500.jpg'},
- 
+      {id:2, name: '최싸피', src: 'https://image.msscdn.net/images/goods_img/20200407/1388147/1388147_3_500.jpg'},
     ])
 
     console.log(props.mySessionId)
@@ -71,6 +75,7 @@ export default {
 
     const state = reactive({
       clothes: [],
+      subscribers: [],
     })
 
     const { cookies } = useCookies() 
@@ -83,7 +88,7 @@ export default {
       return config
     }
 
-
+    // 옷 이미지 주소 입력 후 등록
     const AddUrl = () => {
       if(ImgUrl.value.length < 1) {
         alert('이미지 주소를 입력하세요')
@@ -100,12 +105,13 @@ export default {
             console.log('hi')
             console.log(res)
             // state.clothes = res.data.data
-            // friends.value = res.data.data
+            friends.value = res.data.data
           })
         ImgUrl.value = ''
       }
     }
 
+    // mySessionId 번 방의 memberId 의 옷 리스트 GET 요청
     const getClothes = () => {
       axios({
         method: 'GET',
@@ -114,13 +120,25 @@ export default {
       })
       .then(res => {
         console.log(res)
-        friends.value = res.data.data
+        // friends.value = res.data.data
+        state.clothes = res.data.data
+        console.log(state.clothes)
       })
     }
 
     const fitting = () => {
 
     }
+
+    // test
+    const publisher = () =>{
+      console.log(props.mainStreamManager.stream.connection.data)
+    }
+
+    // watch(props.subscribers, () => {
+    //   console.log(props.subscribers)
+    //   console.log(1)
+    // })
 
     return {
       friends,
@@ -130,7 +148,8 @@ export default {
       fitting,
       setToken,
       getClothes,
-      state
+      state,
+      publisher,
     }
   }
 }
@@ -202,5 +221,10 @@ export default {
   background-color: #FDFAF3;
   border-radius: 10px;
   box-shadow: inset 0px 0px 5px white;
+}
+
+.clth-style {
+  width: 300px;
+  height: 300px;;
 }
 </style>
