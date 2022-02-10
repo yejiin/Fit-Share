@@ -93,7 +93,7 @@ h2 {
 }
 .row::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: #D3E2E7;
+  background-color: #2f3542;
 }
 
 .room {
@@ -104,6 +104,7 @@ h2 {
   height: 297px;  
   border-radius: 10px;
   border: 3px solid #D3E2E7;
+  /* background-color: white; */
   cursor: pointer;
 
   background-repeat : no-repeat;

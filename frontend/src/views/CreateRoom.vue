@@ -27,26 +27,6 @@
           <p class="cnt-error" v-if="cntError">{{ cntError }}</p>
 
           <!-- 쇼핑몰 사이트 검색 -->
-          <!-- <div class="row mall-container" :class="isMall ? '' : 'mall-margin-change'">
-            <label><i class="bi bi-asterisk"></i>쇼핑몰 사이트</label>
-            <div class="dropdown-wrapper">
-              <div class="form-select" @click="isMallListVisible = !isMallListVisible">
-                <p v-if="selectedItem">{{ selectedItem.name }}</p>
-                <p v-else>쇼핑몰을 선택하세요</p>
-              </div>
-              <div v-if="isMallListVisible" class="dropdown-popover">
-                <input @keyup="searchMall()" v-model="searchQuery" class="search-mall-input" type="text" placeholder="검색하세요">
-                <span v-if="searchedMalls.length === 0"><p class="text-center">검색결과 없음</p></span>
-                <div class="options">
-                  <ul class="scroll">
-                    <li v-for="mall in searchedMalls" :key="mall.id" :value="mall.name" @click="selectItem(mall)">
-                      {{ mall.name }}
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div> -->
           <div class="row mall-container">
             <label><i class="bi bi-asterisk"></i>쇼핑몰 사이트</label>
             <div class="dropdown-wrapper">
@@ -99,33 +79,17 @@
               </span>
             </span>
           </div>
-          <!-- <div class="row private-container" :class="isPrivate ? 'private-margin-change' : ''" >
-            <label>공개범위</label>
-            <span class="form-radio">
-              <span @click="selectPublic()" class="radio-box">
-                <input class="form-check-input" type="radio" name="flexRadioDefault" checked="checked" id="public">
-                <label class="form-check-label" for="public">공개</label>
-              </span>
-              <span @click="selectPrivate()" class="radio-box">
-                <input class="form-check-input" type="radio" name="flexRadioDefault" id="private">
-                <label class="form-check-label" for="private" >비공개</label>
-              </span>
-            </span>
-          </div> -->
-
           <!-- 비밀번호 입력 -->
           <div class="row password-container" v-show="isPrivate">  
 						<label>비밀번호</label>
 						<input v-model="password" class="form-control shadow-none" type="password" placeholder="6자리 이하로 작성해주세요">
             <p class="password-error" v-if="passwordError">{{ passwordError }}</p>
 					</div>
-          
 					<div class="text-center">
             <button class="btn create-btn shadow-none" @click="validationCheck()">생성하기</button>
             <button class="btn shadow-none" @click="goToMain()">취소</button>
 					</div>        
 				</div>
-
 			</div>
 		</div>
   </div>
@@ -316,6 +280,7 @@ export default {
   margin: 0px 142px 0;
   display: flex;
   justify-content: center;
+  background-color: white;
 }
 
 #new-room {

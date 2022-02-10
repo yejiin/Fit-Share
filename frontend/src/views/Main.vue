@@ -32,11 +32,12 @@
             <p class="modal-title fw-bold">비공개 쇼핑룸</p>
             <button type="button" class="btn-close shadow-none ms-2 me-1" data-bs-dismiss="modal" @click="closeModal"></button>
           </div> -->
-          <div class="modal-header pt-4 pb-0">
+          <div class="modal-header pt-3 pb-0">
             <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" @click="closeModal"></button>
           </div>
           <i class="fas fa-lock text-center my-3"></i>
           <div class="modal-body">
+            <!-- <p class="title ms-6 fw-bold fs-5">비공개 쇼핑룸</p> -->
             <input type="password" v-model="inputPassword" placeholder="비밀번호를 입력해주세요">
             <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
             <span class="d-flex justify-content-center">
@@ -47,7 +48,10 @@
         </div>
       </div>
     </div>
-
+    <!-- Alert 알람 -->
+    <div v-if="alert" class="alert alert-warning" role="alert">
+      <i class="bi bi-exclamation-triangle-fill"></i>인원수가 초과된 쇼핑룸입니다. 다른 쇼핑룸을 이용해주세요!
+    </div>
   </div>
 </template>
 
@@ -56,9 +60,10 @@ import Navbar from '@/components/Navbar.vue'
 import Friend from '@/components/main/Friend.vue'
 import ShoppingRoomList from '@/components/main/ShoppingRoomList.vue'
 import HostCloset from '../components/main/HostCloset.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex'
+import { useCookies } from "vue3-cookies";
 import axios from 'axios'
 
 export default {
@@ -74,11 +79,14 @@ export default {
   setup() {
     const router = useRouter();
     const store = useStore();
+    const { cookies } = useCookies();
     
     const status = ref(false);
     let isPrivate = ref(false);
     let inputPassword = ref(null);  
     let errorMessage = ref('');
+    // -------------------
+    let alert = ref(false)
 
     const OpenTab = () => {
       status.value = true
@@ -93,24 +101,40 @@ export default {
         return store.state.room.selectedShoppingRoom
     });
 
+    const setToken = () => {
+      const token = cookies.get('accessToken');
+      const config = { Authorization: `Bearer ${token}`};
+      return config
+    };
+    
     // 입장하기
     const goToRoom = () => {
       axios({
         method : 'get',
         // url: `${store.state.url}/v1/shopping-rooms/77`,
         url: `${store.state.url}/v1/shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}`,
-        headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3OTA5NTI5fQ.l1TfGZtQarYUWrLy6uI-6gFLX5CVQn62t28USVkJe0_kazLFL824YCDLrGbxx1hAhBWe5lxbtK5SArTgOP77uA` }
+        headers: setToken(),
       })
         .then(res => {
           const data = res.data.data 
-          console.log(data)
+          // console.log(data)
           router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl }}) 
         })
         .catch(err => {
           console.log(err.response)
+          if (err.response.status == 403) {
+            alert.value = true
+          }
         })
     }
-
+    
+    watch(alert, () => {
+      if (alert.value) {
+        console.log('시작')
+        setTimeout(() => alert.value = false, 3000)
+      }
+    });
+    
     const checkPassword = () => {
       axios({
         method: 'post',
@@ -124,11 +148,9 @@ export default {
             goToRoom()
           } else {
             errorMessage.value = '비밀번호가 일치하지 않습니다.'
-            console.log(errorMessage.value)
           }
         })
-        .catch(err => console.log(err.response));
-
+        .catch(err => console.log(err.response))
     }
 
     const closeModal = () => {
@@ -138,7 +160,7 @@ export default {
     }
 
     return {
-      status, selectedShoppingRoom, isPrivate, inputPassword, errorMessage,
+      status, selectedShoppingRoom, isPrivate, inputPassword, errorMessage, alert,
       OpenTab,CloseTab,
       goToRoom, checkPassword, closeModal,
     }
@@ -147,6 +169,29 @@ export default {
 </script>
 
 <style scoped>
+.alert {
+  position: absolute;
+  top: 80px;
+  right: 5px;
+  padding: 16px 20px;
+  animation: slide 0.3s;
+}
+
+@keyframes slide {
+  from{
+    right: -200px;
+  }
+  to{
+    right: 5px;
+  }
+}
+
+
+.alert i {
+  font-size: 16px;
+  margin-right: 20px;
+}
+
 .container {
   width: 1156px;
   height: 775px;
@@ -191,6 +236,7 @@ export default {
 .show-modal {
   display: block;
 }
+
 .hide-modal {
   display: none;
 }
@@ -212,14 +258,18 @@ export default {
 }
 
 i {
-  font-size: 65px;
+  font-size: 70px;
   color: #1B4D50;
-  margin-top: 0
+  margin-top: 0;
   /*  */
   /* width: 400px;
   margin-left: 43px;
   margin-top: 15px; */
 }
+/* 
+.title {
+  text-align: center;
+} */
 
 .modal-body {
   display: flex;
@@ -240,19 +290,24 @@ i {
 }
 
 .modal-body button {
-  width: 100px;
-  margin: 25px 10px 10px;
+  /* width: 100px;
+  margin: 25px 10px 15px;
   border: 3px solid #FDFAF3;
   border-radius: 10px;
   font-weight: bold;
+  color: #FDFAF3; */
+  /*  */
+  width: 100px;
+  margin: 25px 10px 20px;
+  border-radius: 10px;
   color: #FDFAF3;
-  /* #589B9A */
+  background-color: #696b6e;
 }
 
 .modal-body button:hover {
-  /* rgb(250, 216, 154) */
-  color: #1B4D50;
-  border: 3px solid #1B4D50;
+  color: white;
+  background-color: #898b8f;
+  /* border: 3px solid #1B4D50; */
 }
 
 .error-message {
