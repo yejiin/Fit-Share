@@ -46,6 +46,7 @@ public class MemberServiceImpl implements MemberService  {
         member.setName(naverProfile.getResponse().getName());
         member.setEmail(naverProfile.getResponse().getEmail());
         member.setProfileImg(naverProfile.getResponse().getMobile());
+        member.setPhone(naverProfile.getResponse().getMobile());
 
         return createMember(member);
     }
