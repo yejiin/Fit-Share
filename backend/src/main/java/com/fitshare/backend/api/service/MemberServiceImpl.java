@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -72,7 +71,7 @@ public class MemberServiceImpl implements MemberService  {
     }
 
     @Override
-    public List<BaseMemberRes> findMembersByEmailId(Long memberId, String emailId) {
-        return memberRepository.findByEmailLike(memberId, emailId);
+    public BaseMemberRes findMemberByEmail(String email) {
+        return memberRepository.findByEmail(email);
     }
 }

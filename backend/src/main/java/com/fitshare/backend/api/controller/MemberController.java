@@ -2,14 +2,12 @@ package com.fitshare.backend.api.controller;
 
 
 import com.fitshare.backend.api.service.MemberService;
-import com.fitshare.backend.common.auth.JwtUtil;
 import com.fitshare.backend.common.model.BaseResponseBody;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import static com.fitshare.backend.common.model.ResponseMessage.SEARCH_MEMBERS_BY_EMAIL;
@@ -22,12 +20,10 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @ApiOperation(value = "사용자 검색", notes = "가입한 사용자 전체 리스트에서 이메일 아이디로 사용자를 검색합니다.")
-    @GetMapping("/{emailId}")
-    public ResponseEntity<BaseResponseBody> findMembersByEmailId(@PathVariable String emailId) {
-        Long memberId = JwtUtil.getCurrentId().orElseThrow(() -> new AccessDeniedException("Access denied"));
-
-        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK, SEARCH_MEMBERS_BY_EMAIL, memberService.findMembersByEmailId(memberId, emailId)));
+    @ApiOperation(value = "사용자 검색", notes = "가입한 사용자 전체 리스트에서 이메일로 사용자를 검색합니다.")
+    @GetMapping("/{email}")
+    public ResponseEntity<BaseResponseBody> findMemberByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK, SEARCH_MEMBERS_BY_EMAIL, memberService.findMemberByEmail(email)));
     }
 
 }

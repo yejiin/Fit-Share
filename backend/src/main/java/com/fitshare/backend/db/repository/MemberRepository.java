@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,9 +18,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "( m.id, m.name, m.profileImg, m.email )" +
             "  FROM Member m" +
             " WHERE m.isActive = true" +
-            "   AND m.email LIKE %:emailId%" +
-            "   AND m.id <> :memberId" +
+            "   AND m.email = :email" +
             " ORDER BY m.name")
-    List<BaseMemberRes> findByEmailLike(@Param("memberId") Long memberId, @Param("emailId") String emailId);
+    BaseMemberRes findByEmail(@Param("email") String email);
 
 }
