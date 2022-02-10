@@ -76,15 +76,7 @@ public class AuthController {
 
     @GetMapping(value="/naver/token")
     @ApiOperation(value = "네이버 토큰 요청", notes = "네이버 인가 코드로 액세스 토큰을 요청하는 api입니다.")
-    public ResponseEntity<BaseResponseBody> requestNaverToken(
-            @RequestParam(required = false) String code,
-            @RequestParam(required = false) String state,
-            @RequestParam(required = false) String error,
-            @RequestParam(required = false) String error_description){
-
-        if (error != null)
-            throw new RuntimeException(error_description);
-
+    public ResponseEntity<BaseResponseBody> requestNaverToken(@RequestParam String code, @RequestParam String state){
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK,GET_ACCESS_TOKEN, authService.getNaverAccessToken(code, state)));
     }
 
