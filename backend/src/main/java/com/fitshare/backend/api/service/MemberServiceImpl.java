@@ -41,7 +41,7 @@ public class MemberServiceImpl implements MemberService  {
     public Member createNaverMember(NaverProfile naverProfile) {
         Member member = new Member();
 
-        //카카오에서 받은 정보들로 회원 생성
+        //네이버에서 받은 정보들로 회원 생성
         member.setUid(naverProfile.getResponse().getId());
         member.setName(naverProfile.getResponse().getName());
         member.setEmail(naverProfile.getResponse().getEmail());
