@@ -90,7 +90,7 @@ public class AuthController {
 
     @ApiOperation(value = "네이버 토큰 요청", notes = "네이버 인가 코드로 액세스 토큰을 요청하는 api입니다.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = GET_KAKAO_ACCESS_TOKEN),
+            @ApiResponse(code = 200, message = GET_NAVER_ACCESS_TOKEN),
             @ApiResponse(code = 500, message = "서버 에러", response = ErrorResponse.class)
     })
     @GetMapping(value="/naver/token")
