@@ -10,9 +10,7 @@
     >
     
     <!-- 이름, 이메일로 검색 시 나오는 users들 components -->
-    <searched-users :friends="state.friends"></searched-users>
-    <!-- <searched-users :friends="state.unique"></searched-users> -->
-
+    <searched-users :friend="state.friend"></searched-users>
 
   </div>
 </template>
@@ -31,9 +29,7 @@ export default {
   setup() {
     const state = reactive({
       searchedUsers: [],
-      exitsfriends: [],
-      unique: [],
-      friends: [],
+      friend: {},
     })
 
     const { cookies } = useCookies() 
@@ -58,53 +54,17 @@ export default {
           headers: setToken()
           })
           .then(res => {
-            console.log('응답')
             console.log(res)
-            console.log('응답11')
-
-            state.friends = res.data.data
+            state.friend = res.data.data
           })
           .catch(res => {
             console.log(res)
           })
       }
       else{
-        state.friends = []
+        state.friend = {}
       }
     }
-
-    // test
-    // const SearchUserEmail = async () => {
-    //   const friendList = await axios({
-    //     method: 'GET',
-    //     url: 'http://i6a405.p.ssafy.io:8081/api/v1/friends',
-    //     headers: setToken()
-    //   })
-    //     .then(res => {
-    //       console.log(res)
-    //       state.exitsfriends = res.data.data
-    //     })
-    //     console.log(friendList)
-
-    //   if (SearchUser.value) {
-    //     const Users = await axios({
-    //       method: 'GET',
-    //       url: `http://i6a405.p.ssafy.io:8081/api/v1/members/${SearchUser.value}`,
-    //       headers: setToken()
-    //       })
-    //       .then(res => {
-    //         console.log(res)
-    //         state.searchedUsers = res.data.data
-    //         const ids = state.exitsfriends.map(e => e.id)
-    //         state.unique = state.searchedUsers.filter(e => !ids.includes(e.id))
-    //         console.log(JSON.stringify(state.unique))
-    //       })
-    //       console.log(Users)
-    //   }
-    //   else{
-    //     state.unique = []
-    //   }
-    // }
 
     return {
       state,
