@@ -7,7 +7,7 @@
           <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+friend.id" aria-expanded="true" :aria-controls="'collapse'+friend.id" v-if="friend.id === 1">
             내 옷장
           </button>
-          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+friend.id" aria-expanded="true" :aria-controls="'collapse'+friend.id" v-if="friend.id != 1">
+          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+friend.id" aria-expanded="true" :aria-controls="'collapse'+friend.id" v-if="friend.id != 1" @click="getClothes">
             {{ friend.name }}
           </button>
         </h2>
@@ -39,6 +39,7 @@
 <script>
 import { ref, reactive } from 'vue'
 import axios from 'axios'
+import { useCookies } from 'vue3-cookies'
 
 export default {
   name: 'Closet',
@@ -47,18 +48,22 @@ export default {
   },
   props: {
     subscribers: Object,
+    mySessionId: String,
+    mainStreamManager: Object,
   },
   emits: ['fitting'],
-  setup() {
+  setup(props) {
     const friends = ref([
       // {id:1, name: '김싸피', src: require('@/assets/shirt.jpg')},
       {id:1, name: '김싸피', src: 'https://image.msscdn.net/images/goods_img/20200407/1388147/1388147_3_500.jpg'},
-      {id:2, name: '이싸피', src: require('@/assets/shirt.jpg')},
-      {id:3, name: '박싸피', src: require('@/assets/shirt.jpg')},
-      {id:4, name: '최싸피', src: require('@/assets/shirt.jpg')},
-      {id:5, name: '안싸피', src: require('@/assets/shirt.jpg')},
-      {id:6, name: '배싸피', src: require('@/assets/shirt.jpg')},
+ 
     ])
+
+    console.log(props.mySessionId)
+    console.log('publisher')
+    console.log(props.mainStreamManager)
+    console.log('publisher')
+
 
     const ImgUrl = ref('')
     
@@ -67,6 +72,17 @@ export default {
     const state = reactive({
       clothes: [],
     })
+
+    const { cookies } = useCookies() 
+
+    const setToken = () => {
+      const token = cookies.get('accessToken')
+      const config = {
+        Authorization: `Bearer ${token}`
+      }
+      return config
+    }
+
 
     const AddUrl = () => {
       if(ImgUrl.value.length < 1) {
@@ -77,16 +93,29 @@ export default {
         axios({
           method: 'POST',
           url: `http://i6a405.p.ssafy.io:8081/api/v1/clothes`,
-          headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3OTA5NTI5fQ.l1TfGZtQarYUWrLy6uI-6gFLX5CVQn62t28USVkJe0_kazLFL824YCDLrGbxx1hAhBWe5lxbtK5SArTgOP77uA` },
-          data: {"imageUrl": ImgUrl.value, "shoppingRoomId": 1}
+          headers: setToken(),
+          data: {"imageUrl": ImgUrl.value, "shoppingRoomId": props.mySessionId}
           })
           .then(res => {
             console.log('hi')
             console.log(res)
-            state.clothes = res.data.data
+            // state.clothes = res.data.data
+            // friends.value = res.data.data
           })
         ImgUrl.value = ''
       }
+    }
+
+    const getClothes = () => {
+      axios({
+        method: 'GET',
+        url: `http://i6a405.p.ssafy.io:8081/api/v1/clothes/${props.mySessionId}/8`,
+        headers: setToken(),
+      })
+      .then(res => {
+        console.log(res)
+        friends.value = res.data.data
+      })
     }
 
     const fitting = () => {
@@ -99,6 +128,9 @@ export default {
       AddUrl,
       Urls,
       fitting,
+      setToken,
+      getClothes,
+      state
     }
   }
 }
