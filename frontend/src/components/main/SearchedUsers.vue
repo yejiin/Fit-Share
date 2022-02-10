@@ -7,11 +7,11 @@
       <img :src="friend.profileImg" alt="profile-img">
       <div class="ms-3 d-flex flex-column profile-box">
         <div class="d-flex justify-content-between name-box">
-          {{ friend.name }}
+          {{ friend.id }}
         </div>
-        <div class="d-flex mt-2 email-box">
+        <!-- <div class="d-flex mt-2 email-box">
           {{ friend.email }}
-        </div>
+        </div> -->
       </div>
       <div class="d-flex align-self-center btn-box justify-content-center">
         <button class="plus-btn" @click="RequestFriend(friends, index)">
