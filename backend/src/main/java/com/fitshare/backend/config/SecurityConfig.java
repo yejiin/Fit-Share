@@ -78,6 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.addAllowedOrigin("http://localhost:8080");
         configuration.addAllowedOrigin("http://localhost");
         configuration.addAllowedOrigin("http://i6a405.p.ssafy.io");
+        configuration.addAllowedOrigin("https://i6a405.p.ssafy.io:3000");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
