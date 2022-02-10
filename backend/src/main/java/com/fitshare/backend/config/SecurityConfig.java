@@ -46,6 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/v1/auth/kakao/**",
                         "/api/v1/auth/naver/**",
                         "/api/v1/auth/refresh",
+                        "/api/v1/chat/**",
                         "/v2/api-docs"
                 );
     }
