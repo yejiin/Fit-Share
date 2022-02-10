@@ -9,4 +9,6 @@ public interface RedisService {
     void delData(String token);
 
     void setDataExpire(String token,String id,long duration);
+
+    Long getExpire(String token);
 }

@@ -38,7 +38,7 @@ public class JwtTokenProvider implements InitializingBean {
     public JwtTokenProvider(@org.springframework.beans.factory.annotation.Value("${jwt.secret}") String secret,
                             @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds, RedisTemplate<String,String> redisTemplate) {
         this.secret = secret;
-        this.tokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+        this.tokenValidityInMilliseconds = tokenValidityInSeconds * 100;
         this.redisTemplate = redisTemplate;
     }
 

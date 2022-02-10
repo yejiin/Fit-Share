@@ -68,7 +68,7 @@ public class AuthController {
 
     @GetMapping(value = "/logout")
     @ApiOperation(value = "로그아웃",notes = "토큰을 만료 시킨 후 로그아웃한다.")
-    public ResponseEntity<BaseResponseBody> logout(@RequestHeader("Authorization") String accessToken, @RequestParam String refreshToken) {
+    public ResponseEntity<BaseResponseBody> logout(@RequestParam String refreshToken) {
         // 레디스에서 해당 아이디 refreshToken 삭제
         redisService.delData(refreshToken);
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.OK,LOGOUT));
