@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { reactive, computed, onBeforeMount, } from 'vue'
+import { reactive, computed } from 'vue'
 import OvPublisherVideo from './OvPublisherVideo.vue';
 
 export default {
@@ -36,10 +36,6 @@ export default {
         const { connection } = props.streamManager.stream;
         return JSON.parse(connection.data);
       }
-
-      onBeforeMount(() => {
-        console.log('mount before')
-      })
 
       return {
         getConnectionData,
