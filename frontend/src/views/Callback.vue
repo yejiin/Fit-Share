@@ -53,7 +53,8 @@ export default {
             console.log("카카오 계정 정보");
             console.log(res);
             // Cookie에 'accessToken' 설정
-            cookies.set("accessToken", res.data.data);
+            cookies.set("accessToken", res.data.data.token);
+
             store.dispatch("login/getId", res.data.data.id, { root: true });
             store.dispatch("login/getName", res.data.data.name, { root: true });
             store.dispatch("login/getProfileURI", res.data.data.profileURI, {
