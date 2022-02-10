@@ -93,6 +93,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public NaverProfile getNaverUserInfo(String accessToken){
 
+        String apiURL = "https://openapi.naver.com/v1/nid/me";
+
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 
@@ -105,8 +107,8 @@ public class AuthServiceImpl implements AuthService {
         HttpEntity<MultiValueMap<String,String>> naverProfileRequest = new HttpEntity<>(headers);
 
         return restTemplate.exchange(
-                "https://openapi.naver.com/v1/nid/me",
-                HttpMethod.POST,
+                apiURL,
+                HttpMethod.GET,
                 naverProfileRequest,
                 NaverProfile.class).getBody();
     }
