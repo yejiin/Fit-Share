@@ -32,7 +32,7 @@ public class ShoppingMallController {
 
     @ApiOperation(value = "쇼핑몰 검색", notes = "keyword 에 입력된 값이 포함된 쇼핑몰 이름 또는 쇼핑몰 url 을 검색하여 쇼핑몰 목록을 반환한다.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "쇼핑몰 검색 성공입니다.", response = ShoppingMallRes.class),
+            @ApiResponse(code = 200, message = SEARCH_SHOPPING_MALL, response = ShoppingMallRes.class),
             @ApiResponse(code = 500, message = "서버 에러", response = ErrorResponse.class)
     })
     @GetMapping("")
