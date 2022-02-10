@@ -14,6 +14,7 @@ public class NaverProfile {
         public String id;
         public String name;
         public String email;
+        public String profile_image;
         public String mobile;
     }
 }

@@ -1,53 +1,151 @@
 <template>
-  <div></div>
+  <div class="container">
+    <div class="loading">
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
 </template>
 
 <script>
 import { reactive } from "vue";
 import axios from "axios";
-import { useRoute } from "vue-router";
-
+import { useRoute, useRouter } from "vue-router";
+import { useStore } from "vuex";
+import { useCookies } from "vue3-cookies";
 export default {
   setup() {
     const route = useRoute();
+    const router = useRouter();
+    const store = useStore();
+    const { cookies } = useCookies();
 
     const state = reactive({
-      code: String,
-      kakaoToken: String,
+      code: "",
     });
 
-    const login = (token) => {
-      let path2 = "http://localhost:8081/api/v1/kakao/login";
-      axios
-        .get(path2, {
+    const getKakaoAccount = async (kakaoToken) => {
+      let path = "http://i6a405.p.ssafy.io:8081/api/v1/auth/kakao/login";
+      await axios
+        .get(path, {
           params: {
-            accessToken: token,
+            accessToken: kakaoToken,
           },
         })
-        .then((data) => {
-          console.log(data);
-          // 토큰 저장
-          // 이미지, 이름 저장
-          // 메인페이지로 리다이렉트
+        .then((res) => {
+          if (res.data.statusCode === 201) {
+            console.log("카카오 계정 정보");
+            console.log(res);
+            cookies.set("accessToken", res.data.data.token);
+            store.dispatch("login/getId", res.data.data.id, { root: true });
+            store.dispatch("login/getName", res.data.data.name, { root: true });
+            store.dispatch("login/getProfileURI", res.data.data.profileURI, {
+              root: true,
+            });
+            movePage();
+          }
+        })
+        .catch((error) => {
+          console.log(error);
         });
     };
 
-    const getToken = (code) => {
-      let path = `http://localhost:8081/api/v1/kakao/auth?code=${code}`;
-      axios.get(path).then((data) => {
-        state.kakaoToken = data.data.data;
-        login(state.kakaoToken);
-      });
+    const getKakakoToken = async (code) => {
+      let path = `http://i6a405.p.ssafy.io:8081/api/v1/auth/kakao/token?code=${code}`;
+      await axios
+        .get(path)
+        .then((res) => {
+          if (res.data.statusCode === 200) {
+            console.log(res.data.data)
+            console.log("카카오 Access 토큰 생성 성공");
+            // Cookie에 'accessToken' 설정
+            getKakaoAccount(res.data.data);
+          }
+        })
+        .catch((error) => {
+          console.log("카카오 토큰 생성 실패");
+          console.log(error);
+        });
+    };
+
+    const movePage = () => {
+      router.push({ name: "Main" });
     };
 
     state.code = route.query.code;
-    getToken(state.code);
+    getKakakoToken(state.code);
 
     return {
-      getToken,
+      getKakakoToken,
+      getKakaoAccount,
+      cookies,
+      movePage,
     };
   },
 };
 </script>
 
-<style></style>
+<style scoped>
+.container {
+  line-height: 1.5em;
+  margin: 0;
+  font-weight: 300;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+a {
+  text-decoration: none;
+}
+
+.loading {
+  /* border : 1px solid red; */
+  width: 30px;
+  height: 30px;
+  position: relative;
+}
+.loading span {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: gray;
+  top: 0;
+  left: 0;
+  animation: loading 1.5s infinite;
+}
+.loading span:nth-child(1) {
+  background-color: crimson;
+}
+.loading span:nth-child(2) {
+  animation-delay: 0.8s;
+}
+
+@keyframes loading {
+  0% {
+    top: 0;
+    left: 0;
+  }
+  25% {
+    top: 0;
+    left: calc(100% - 10px);
+    background-color: dodgerblue;
+  }
+  50% {
+    top: calc(100% - 10px);
+    left: calc(100% - 10px);
+    background-color: orange;
+  }
+  75% {
+    top: calc(100% - 10px);
+    left: 0;
+    background-color: yellowgreen;
+  }
+  100% {
+    top: 0;
+    left: 0;
+  }
+}
+</style>

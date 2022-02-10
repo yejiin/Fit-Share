@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,8 +19,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query(value = "SELECT NEW com.fitshare.backend.api.response.BaseMemberRes" +
             "( m.id, m.name, m.profileImg, m.email )" +
             "  FROM Member m" +
-            " WHERE m.email LIKE %:email%" +
-            "   AND m.isActive = true" +
+            " WHERE m.isActive = true" +
+            "   AND m.email = :email" +
             " ORDER BY m.name")
-    List<BaseMemberRes> findByEmailLike(@Param("email") String email);
+    BaseMemberRes findActiveMemberByEmail(@Param("email") String email);
 }

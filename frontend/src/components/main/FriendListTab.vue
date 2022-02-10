@@ -30,6 +30,7 @@
 import { ref, reactive, computed } from 'vue'
 import axios from 'axios'
 import { useStore } from "vuex";
+import { useCookies } from 'vue3-cookies'
 
 export default {
   name: 'FriendListTab',
@@ -43,6 +44,17 @@ export default {
       friendEmail: [],
     })
 
+    // accesstoken 받아오기
+    const { cookies } = useCookies() 
+
+    const setToken = () => {
+      const token = cookies.get('accessToken')
+      const config = {
+        Authorization: `Bearer ${token}`
+      }
+      return config
+    }
+
     const SearchFriend = ref('')
 
     // store test
@@ -50,7 +62,7 @@ export default {
 
     // store의 state에서 받아와서 저장해두기
     const stateFriends = computed(() => {
-      return store.state.friends
+      return store.state.friend.friends
     })
 
     // 친구 삭제
@@ -58,7 +70,7 @@ export default {
       axios({
         method: 'DELETE',
         url: `http://i6a405.p.ssafy.io:8081/api/v1/friends/${stateFriends[index].id}`,
-        headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` },
+        headers: setToken(),
         data: {"friendId": stateFriends[index].id}
         })
         .then(res => {
@@ -73,7 +85,7 @@ export default {
       axios({
         method: 'GET',
         url: 'http://i6a405.p.ssafy.io:8081/api/v1/friends',
-        headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` }
+        headers: setToken()
       })
         .then(res => {
           console.log(res)
@@ -85,7 +97,7 @@ export default {
           console.log('성공')
           console.log(state.friendLists)
           console.log(friend)
-          store.dispatch('getfriends', friend)
+          store.dispatch('friend/getfriends', friend)
         })
     }
 
@@ -96,7 +108,7 @@ export default {
       axios({
         method: 'GET',
         url: `http://i6a405.p.ssafy.io:8081/api/v1/friends/${SearchFriend.value}`,
-        headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw` }
+        headers: setToken()
       })
         .then(res => {
           console.log(res)
@@ -106,7 +118,7 @@ export default {
         .then(res => {
           console.log(res)
           const friendbyname = state.friendEmail
-          store.dispatch('getfriendsbyname', friendbyname)
+          store.dispatch('friend/getfriendsbyname', friendbyname)
         })
     }
 
@@ -118,6 +130,7 @@ export default {
       DeleteFriend,
       stateFriends,
       SearchFriendEmail,
+      setToken,
     }
   }
 }

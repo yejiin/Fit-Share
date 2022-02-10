@@ -6,12 +6,12 @@
           <i class="bi bi-house-door me-4"></i>
           <h1>New Room</h1>
         </div>
-				<div class="form-group">
+				<div class="form-group position-relative">
           <!-- 입장가능 인원 -->
           <div class="row">
             <label class="counts"><i class="bi bi-asterisk"></i>입장 가능 인원</label>
             <div class="dropdown-wrapper">
-              <div class="selected-item form-select" @click="isCntVisible = !isCntVisible">  <!-- :class="isFocused ? 'focus-outline': '' " , changeOutline() -->
+              <div class="form-select" @click="isCntVisible = !isCntVisible">  <!-- :class="isFocused ? 'focus-outline': '' " , changeOutline() -->
                 <p v-if="selectedCnt">{{ selectedCnt }}</p>
                 <p v-else>인원수를 선택하세요</p>
               </div>
@@ -24,12 +24,13 @@
               </div>
             </div>
           </div>
+          <p class="cnt-error" v-if="cntError">{{ cntError }}</p>
 
           <!-- 쇼핑몰 사이트 검색 -->
-          <div class="row mall-container" :class="isMall ? '' : 'mall-margin-change'">
+          <div class="row mall-container">
             <label><i class="bi bi-asterisk"></i>쇼핑몰 사이트</label>
             <div class="dropdown-wrapper">
-              <div class="selected-item form-select" @click="isMallListVisible = !isMallListVisible">
+              <div class="form-select" @click="isMallListVisible = !isMallListVisible">
                 <p v-if="selectedItem">{{ selectedItem.name }}</p>
                 <p v-else>쇼핑몰을 선택하세요</p>
               </div>
@@ -46,8 +47,10 @@
               </div>
             </div>
           </div>
+          <p class="mall-error" v-if="mallError">{{ mallError }}</p>
+
           <!-- 사이트 직접 입력 -->
-          <div class="d-flex flex-row-reverse" v-if="!isMall">
+          <div class="d-flex flex-row-reverse" v-if="!isMall"> 
             <div class="mall-input-container">
               <div class="mall-input mb-2">
                 <label><i class="bi bi-asterisk"></i>사이트 이름</label>
@@ -61,14 +64,16 @@
           </div>
 
           <!-- 공개범위 설정 -->
-          <div class="row private-container" :class="isPrivate ? 'private-margin-change' : ''">
+          <div class="row private-container" :class="isPrivate ? 'private-margin-change' : ''" 
+            :style="[isMall ? { 'margin-top': '203px' } : { 'margin-top': '75px' }]"
+          >
             <label>공개범위</label>
             <span class="form-radio">
-              <span @click="selectPublic()" class="radio-containers">
+              <span @click="selectPublic()" class="radio-box">
                 <input class="form-check-input" type="radio" name="flexRadioDefault" checked="checked" id="public">
                 <label class="form-check-label" for="public">공개</label>
               </span>
-              <span @click="selectPrivate()" class="radio-containers">
+              <span @click="selectPrivate()" class="radio-box">
                 <input class="form-check-input" type="radio" name="flexRadioDefault" id="private">
                 <label class="form-check-label" for="private" >비공개</label>
               </span>
@@ -77,11 +82,11 @@
           <!-- 비밀번호 입력 -->
           <div class="row password-container" v-show="isPrivate">  
 						<label>비밀번호</label>
-						<input v-model="password" class="form-control password-input shadow-none" type="password">
+						<input v-model="password" class="form-control shadow-none" type="password" placeholder="6자리 이하로 작성해주세요">
+            <p class="password-error" v-if="passwordError">{{ passwordError }}</p>
 					</div>
-
 					<div class="text-center">
-            <button class="btn create-btn shadow-none" @click="makeRoom()">생성하기</button>
+            <button class="btn create-btn shadow-none" @click="validationCheck()">생성하기</button>
             <button class="btn shadow-none" @click="goToMain()">취소</button>
 					</div>        
 				</div>
@@ -95,58 +100,40 @@ import { reactive, ref, toRefs, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex'
 import axios from 'axios'
+import { useCookies } from "vue3-cookies";
 
 export default {
   name: 'CreateRoom',
   
   setup() {
-    const router = useRouter()
-    const store = useStore()
-
-    let counts = ref([1, 2, 3, 4, 5, 6])
+    const router = useRouter();
+    const store = useStore();
+    const { cookies } = useCookies();
+    
+    let counts = ref([1, 2, 3, 4, 5, 6]);
     let selectedCnt = ref(null);
     let isCntVisible = ref(false);
 
     let searchQuery = ref('');
+    let searchedMalls = ref({})  // 검색 결과 => {id: 2, logo: null, name: '아디다스', url: 'www.xxx.com'}
     let selectedItem = ref(null);  // 선택한 mall
     let isMallListVisible = ref(false);
 
     let isPrivate = ref(false);
     let password = ref(null);
     
-    // 검색된 쇼핑몰 리스트
-    let searchedMalls = ref({})  // {id: 2, logo: null, name: '아디다스', url: 'www.xxx.com'}
-
-    // 테스트용 토큰
-    let token = ref('eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3NDc3NzYyfQ.tRLXFW9wHHIXCrJotone8gsjsi5Vba6zWvIQGCUtZWFrYZw3F9OaHLDeDQ9ZSOpn9E9y2OrLiDuHazuSTd4yAw')
+    const error = reactive({
+      cntError: null,
+      mallError: null,
+      passwordError: null,
+    });
 
     const state = reactive({
-      shoppingMallList: [],  // 
-      isMall: true,  // 찾고자 하는 쇼핑몰의 리스트 내 존재여부
+      // shoppingMallList: [],  // 임시!!!!
+      isMall: true,
       inputMallName: null,
       inputMallUrl: null,
-    })
-
-    // select dropdown method
-    function selectCnt(cnt) {
-      selectedCnt.value = cnt;
-      isCntVisible.value = false;
-    }
-
-    function selectItem(mall) {
-      selectedItem.value = mall;
-      isMallListVisible.value = false;
-    }
-    
-    // 쇼핑몰 검색
-    function searchMall() {
-      // axios.get(`${store.state.url}/v1/shopping-malls?keyword=${searchQuery.value}`)
-      axios.get(`${store.state.url}/v1/shopping-malls`, { params: { keyword: searchQuery.value } })
-        .then(res => {
-          searchedMalls.value = res.data.data
-          console.log(searchedMalls.value)
-        })
-    }
+    });
 
     // 쇼핑몰 입력부분 생성 
     watch(searchedMalls, (searchedMalls) => {
@@ -156,74 +143,133 @@ export default {
       } else {
         state.isMall = true;
       }
-    }) 
+    });
 
-    // 바깥영역 클릭으로 dropdown 닫기
+    // select dropdown 
+    const selectCnt = (cnt) => {
+      selectedCnt.value = cnt;
+      isCntVisible.value = false;
+    };
+
+    const selectItem = (mall) => {
+      selectedItem.value = mall;
+      isMallListVisible.value = false;
+    }
+    
+    // 쇼핑몰 검색
+   const searchMall = () => {
+      axios.get(`${store.state.url}/v1/shopping-malls?keyword=${searchQuery.value}`)
+        .then(res => {
+          searchedMalls.value = res.data.data
+        })
+    }
+
+    // dropdown 닫기
     document.addEventListener('click', function(e){
       if (isMallListVisible.value == true) {
-        if (e.target.className !== 'dropdown-popover' && e.target.className !== 'selected-item form-select' && e.target.className !== '' && e.target.className !== 'search-mall-input' ) {
+        if (e.target.className !== 'dropdown-popover' && e.target.className !== 'form-select' && e.target.className !== '' && e.target.className !== 'search-mall-input' ) {
           isMallListVisible.value = false
         }
       } 
       if (isCntVisible.value == true) {
-        if (e.target.className !== 'dropdown-popover' && e.target.className !== 'selected-item form-select' && e.target.className !== '' && e.target.className !== 'search-mall-input' ) {
+        if (e.target.className !== 'dropdown-popover' && e.target.className !== 'form-select' && e.target.className !== '' && e.target.className !== 'search-mall-input' ) {
           isCntVisible.value = false
         }
       } 
-    })
+    });
     
-    // 기본 method
     const selectPrivate = () => {
       isPrivate.value = true
-    }
+    };
 
     const selectPublic = () => {
       isPrivate.value = false
+    };
+
+    const setToken = () => {
+      const token = cookies.get('accessToken');
+      const config = { Authorization: `Bearer ${token}`};
+      return config
+    };
+
+    // 유효성 검사 
+    const validationCheck = () => {
+      let isValid = true
+      // 인원수 
+      if (!selectedCnt.value) {
+        error.cntError = '인원수를 선택해주세요!';
+        isValid = false;
+      } else error.cntError = '';
+      
+      // 쇼핑몰 확인
+      if (!selectedItem.value) {
+        if (!state.inputMallName || !state.inputMallUrl) {
+          error.mallError = '쇼핑몰을 선택하거나 입력해주세요!';
+          isValid = false;
+        } else error.mallError = ''; 
+      } else error.mallError = '';
+      
+      // 비밀번호 확인
+      if (isPrivate.value) {
+        if (!password.value) {
+          error.passwordError = '비밀번호를 입력해주세요';
+          return;
+        } else if (password.value.length > 6) {
+          error.passwordError = '비밀번호는 6자리 이하로 작성해주세요';
+          return;
+        } else error.passwordError = '';
+      }
+      if (isValid) makeShoppingRoom();
     }
 
     // 쇼핑룸 생성
-    function makeRoom () {
-      let mallId = null
+    const makeShoppingRoom = () => {
+      let mallId = null;
       if (selectedItem.value) {
         mallId = selectedItem.value.id
         state.inputMallName = null
         state.inputMallUrl = null
-      } 
-
+      }
+      if (!isPrivate.value) password.value = null;
+      
       const roomData = {  
         customShoppingMall: !state.isMall,
         participantCount: selectedCnt.value,
-        password: password.value,  // null
+        password: password.value,
         private: isPrivate.value,  
-        shoppingMallId: mallId,  // null 
+        shoppingMallId: mallId, 
         shoppingMallName: state.inputMallName, 
         shoppingMallUrl: state.inputMallUrl,  
-      }
+      };
       console.log(roomData)
 
       axios({
         method : 'post',
         url: `${store.state.url}/v1/shopping-rooms/`,
         data: roomData,
-        headers: { Authorization : `Bearer ${token.value}` }
+        headers: setToken(),
       })
         .then(res => {
-          console.log(res.data.data)
           const data = res.data.data
           router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl }}) 
         })
-        .catch(err => console.log(err))
-    }
+        .catch(err => {
+          console.log(err.response)
+          if (err.response.data.statusCode == 400) {
+            error.mallError = '유효하지 않은 쇼핑몰입니다. 다시 입력해주세요.'
+          } 
+        })
+    };
 
     const goToMain = () => {
       router.push({ name: 'Main' })
-    }
+    };
 
     return { 
-      selectPrivate, makeRoom, goToMain, selectPublic, token,
-      ...toRefs(state), counts, searchQuery, selectedCnt ,selectedItem, isMallListVisible, 
+      selectPrivate, makeShoppingRoom, goToMain, selectPublic,
+      ...toRefs(state), ...toRefs(error), counts, searchQuery, selectedCnt ,selectedItem, isMallListVisible, 
       isCntVisible, selectItem, selectCnt, isPrivate, password,
-      searchedMalls, searchMall,
+      searchedMalls, searchMall, validationCheck
     }
   }
 }
@@ -234,12 +280,20 @@ export default {
   margin: 0px 142px 0;
   display: flex;
   justify-content: center;
+  background-color: white;
 }
 
 #new-room {
   margin: 0px 187px 100px;
   width: 782px;
   height: 951px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  height: 35px;
+  line-height: 35px;
 }
 
 .dropdown-wrapper {
@@ -249,12 +303,21 @@ export default {
   padding: 0;
 }
 
-.form-select {
-  width: 454px;
-  height: 35px;
+.dropdown-popover {
+  position: absolute;
+  border: 1px solid lightgray;
+  top: 35px;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  max-width: 100%;
+  min-height: 40px;
+  padding: 10px;
+  box-shadow: 0 0 6px #D3E2E7;
 }
 
-.selected-item {
+.form-select {
+  width: 454px;
   height: 35px;
   padding: 5px 10px;
   display: flex;
@@ -272,29 +335,9 @@ p {
   color: red;
   margin-right: 4px;
 }
-
-/* 입력X */
+ 
 .mall-container {
   margin-top: 160px;
-  margin-bottom: 197px;
-}
-/* 입력 필요 */
-.mall-margin-change {
-  margin-top: 160px;
-  margin-bottom: 44px;
-}
-
-.dropdown-popover {
-  position: absolute;
-  border: 1px solid lightgray;
-  top: 35px;
-  left: 0;
-  right: 0;
-  background-color: #fff;
-  max-width: 100%;
-  min-height: 40px;
-  padding: 10px;
-  box-shadow: 0 0 6px #D3E2E7;
 }
 
 .search-mall-input {
@@ -319,17 +362,6 @@ ul {
 }
 .cnt-ul {
   max-height: 100px;
-}
-
-.scroll::-webkit-scrollbar {
-  width: 7px;
-}
-.scroll::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-.scroll::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: #D3E2E7;
 }
 
 li {
@@ -361,13 +393,6 @@ input:focus {
   margin: 27px 30px 0;
 }
 
-.row {
-  display: flex;
-  justify-content: space-between;
-  height: 35px;
-  line-height: 35px;
-}
-
 label {
   font-size: 20px;
   width: 170px;
@@ -377,7 +402,7 @@ label {
 
 /* 비번 없음 */
 .private-container {
-  margin-top: 75px;
+  /* margin-top: 75px; */
   margin-bottom: 159px;
 }
 
@@ -394,34 +419,31 @@ label {
   width: 350px;
 }
 
-.radio-containers {
+.radio-box {
   display: flex;
   flex-direction: row;
 }
 
-.form-check-label {
+.form-radio input {
+  margin: 9px 18px 5px 76px;
+}
+
+.form-radio label {
   font-size: 20px;
   width: 60px;
   margin: 0;
-}
-
-.form-check-input {
-  margin: 9px 18px 5px 76px;
 }
 
 .mall-input-container {
   width: 530px;
   display: flex;
   flex-direction: column;
+  margin-top: 44px;
 }
 
 .mall-input {
   display: flex;
   flex-direction: row;
-}
-
-.mall-list-input {
-  width: 454px;
 }
 
 .text-input {
@@ -433,9 +455,18 @@ label {
   margin-bottom: 70px;
 }
 
-.password-input {
+.password-container input {
   width: 454px;
   height: 35px;
+}
+
+.password-container input:focus {
+  border: 2px solid #D3E2E7;
+  box-shadow: 0 0 10px #D3E2E7
+}
+
+.password-container input::placeholder {
+  text-align: start;
 }
 
 button {
@@ -448,5 +479,31 @@ button {
 
 .create-btn {
   margin: 0 34px 0 0;
+}
+
+/* error */
+.cnt-error {
+  color: red;
+  margin: 5px 0 0 285px;
+}
+.mall-error {
+  color: red;
+  margin: 5px 0 0 285px;
+}
+.password-error {
+  color: red;
+  margin-left: 285px;
+}
+
+/* scroll */
+.scroll::-webkit-scrollbar {
+  width: 7px;
+}
+.scroll::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+.scroll::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #D3E2E7;
 }
 </style>
