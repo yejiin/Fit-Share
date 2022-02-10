@@ -2,10 +2,10 @@ package com.fitshare.backend.api.controller;
 
 
 import com.fitshare.backend.api.response.LoginRes;
-import com.fitshare.backend.api.response.TokenRes;
 import com.fitshare.backend.api.service.AuthService;
 import com.fitshare.backend.api.service.MemberService;
 import com.fitshare.backend.api.service.RedisService;
+import com.fitshare.backend.common.auth.JwtTokenProvider;
 import com.fitshare.backend.common.model.BaseResponseBody;
 import com.fitshare.backend.common.model.KakaoProfile;
 import com.fitshare.backend.common.model.NaverProfile;
@@ -13,6 +13,8 @@ import com.fitshare.backend.common.model.RoleType;
 import com.fitshare.backend.db.entity.Member;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 import static com.fitshare.backend.common.model.ResponseMessage.*;
-import static org.springframework.security.config.Elements.LOGOUT;
 
 
 @Api(value = "소셜 로그인 API", tags = "Auth")
@@ -33,6 +34,8 @@ public class AuthController {
     private final AuthService authService;
     private final MemberService memberService;
     private final RedisService redisService;
+    private final JwtTokenProvider tokenProvider;
+
 
     @GetMapping(value="/kakao/token")
     @ApiOperation(value = "카카오 토큰 요청", notes = "카카오 인가 코드로 액세스 토큰을 요청하는 api입니다.")
@@ -100,8 +103,14 @@ public class AuthController {
     }
 
     @PostMapping(value = "/refresh")
-    @ApiOperation(value = "토큰 재발급 요청", notes = "만료된 accessToken을 refreshToken을 통해 재발급하는 API입니다.")
+    @ApiOperation(value = "토큰 재발급 요청", notes = "만료된 accessToken을 refreshToken을 통해 재발급하는 api입니다.")
+    @ApiResponses({
+            @ApiResponse(code = 201, message = REFRESH_TOKEN),
+            @ApiResponse(code = 403, message = INVALID_TOKEN)
+    })
     public ResponseEntity<BaseResponseBody> refreshToken(@RequestParam String refreshToken){
+        if(!tokenProvider.validateToken(refreshToken))
+            return ResponseEntity.ok(BaseResponseBody.of(403,INVALID_TOKEN));
 
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED,REFRESH_TOKEN,authService.refreshAccessToken(refreshToken)));
     }

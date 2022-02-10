@@ -135,9 +135,6 @@ public class AuthServiceImpl implements AuthService {
     // refreshToken으로 accessToken 재발급
     public TokenRes refreshAccessToken(String refreshToken) {
 
-        // refreshToken도 만료되었다면 재발급 할 수 없다.
-        if(!tokenProvider.validateToken(refreshToken)) throw new AccessDeniedException("");
-
         String id = redisService.getData(refreshToken);
 
         return new TokenRes(tokenProvider.createToken(id,RoleType.USER),refreshToken);
