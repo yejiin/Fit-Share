@@ -107,6 +107,13 @@ export default {
     
     // 입장하기
     const goToRoom = () => {
+      const maxCnt = selectedShoppingRoom.value.maxParticipantCount;
+      const cnt = selectedShoppingRoom.value.participantCount;
+      if (maxCnt <= cnt) {
+        alert.value = true
+        return;
+      }
+
       axios({
         method : 'get',
         url: `${store.state.url}/v1/shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}`,
