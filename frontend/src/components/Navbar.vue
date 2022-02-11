@@ -26,7 +26,7 @@ export default {
       let isVisible = ref(false);
 
       const profileImage = computed(() => {
-        return store.state.login.user_profileURI
+        return store.state.user.user_profileURI
       });
 
       const goToMain = () => {
