@@ -41,10 +41,10 @@
 <script>
 import { reactive, toRefs, ref, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { useStore } from 'vuex'
+import { useStore } from 'vuex';
 import { OpenVidu } from 'openvidu-browser';
 import { useCookies } from "vue3-cookies";
-import axios from 'axios'
+import axios from 'axios';
 import PublisherVideo from '@/components/room/PublisherVideo.vue';
 import SubscriberVideo from '@/components/room/SubscriberVideo.vue';
 import MainVideo from '@/components/room/MainVideo.vue';
@@ -313,7 +313,6 @@ export default {
 .components-container {
   display: flex;
   justify-content: space-between;
-  /* position: relative; */
 }
 
 .group-chat, .closet {
@@ -353,7 +352,6 @@ export default {
   background-color: #696b6e;
   color: white;
   padding-top: 2px;
-  /* padding-bottom: 5px; */
 }
 
 .stop-fitting-btn i {

@@ -7,10 +7,12 @@
         v-for="(room, index) in shoppingRoomList" :key="index" 
         @click="selectShoppingRoom(room)"
       >
-       <div class="room-info">
+      <div class="participant"><i class="bi bi-eye"></i> {{room.participantCount}} / {{room.maxParticipantCount}}</div>
+      <div class="room-info">
         <p class="mall-name">{{ room.shoppingMallName }}</p>
-        <p class="host-name">{{ room.hostName }}님의 쇼핑룸</p>
-       </div>
+        <p class="host-name">{{ room.hostName }}<span>님의 쇼핑룸</span></p>
+        <!-- <span class="host-name">{{ room.hostName }}<span>님의 쇼핑룸</span></span> -->
+      </div>
      </div>
    </div>
   </div>
@@ -123,6 +125,18 @@ h2 {
   margin-left: 20px;
 }
 
+.participant {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 60px;
+  background-color: rgba(224, 222, 222, 0.829);
+  border-radius: 3px;
+  padding: 0 5px 0;
+  text-align: center;
+  font-size: 14px;
+}
+
 .room-info {
   position: absolute;
   bottom: 0;
@@ -137,5 +151,12 @@ h2 {
 }
 .host-name {
   margin: 0 23px 18px;
+  /* border-bottom: 2px solid #f2af46; */
+  /* color: #f2af46; */
+}
+
+span {
+  color: black;
+  font-size: 16px;
 }
 </style>
