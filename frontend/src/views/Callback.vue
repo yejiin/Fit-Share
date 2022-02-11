@@ -53,12 +53,12 @@ export default {
           if (res.data.statusCode === 201) {
             // Cookie에 'accessToken' 설정
             cookies.set("accessToken", res.data.data.accessToken);
-
             store.dispatch("user/setId", res.data.data.id, { root: true });
             store.dispatch("user/setName", res.data.data.name, { root: true });
             store.dispatch("user/setProfileURI", res.data.data.profileURI, {
               root: true,
             });
+            store.dispatch("user/setRefreshToken", res.data.data.refreshToken);
             movePage();
           }
         })
@@ -86,6 +86,7 @@ export default {
             store.dispatch("user/setProfileURI", res.data.data.profileURI, {
               root: true,
             });
+            store.dispatch("user/setRefreshToken", res.data.data.refreshToken);
             movePage();
           }
         })

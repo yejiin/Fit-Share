@@ -1,5 +1,6 @@
 import axios from '../../api/axios';
 import { useRouter } from 'vue-router';
+import { useCookies } from 'vue3-cookies';
 
 // 로그인 처리 관련 저장소 모듈
 export const user = {
@@ -56,16 +57,37 @@ export const user = {
       setProfileURI: ({commit}, user_profileURI) => {
           commit("SET_USER_PROFILE_URI", user_profileURI);
       },
+      setRefreshToken: ({commit}, refreshToken) => {
+          commit("SET_REFRESH_TOKEN", refreshToken);
+      },
+      setIsLogin: ({commit}, isLogin) => {
+          commit("SET_IS_LOGIN", isLogin);
+      },
       /* 로그아웃 */
-      // async logout({ commit }) {
-      // },
+      async logout({ commit }, refreshToken) {
+        
+        await axios.get("auth/logout", {
+          params: {
+            refreshToken: refreshToken,
+          },
+        })
+          .then(() => {
+            commit("SET_USER_ID", "");
+            commit("SET_USER_NAME", "");
+            commit("SET_USER_PROFILE_URI", "");
+            commit("SET_REFRESH_TOKEN", "");
+            commit("SET_IS_LOGIN", false);
+            const { cookies } = useCookies();
+            cookies.remove("accessToken");
+          })
+      },
       /* AccessToken 갱신 요청 */
       async refreshToken({ commit }, refreshToken) {
         await axios.post("auth/refresh", refreshToken)
-        .then(function (result) {
+        .then((result) => {
           commit("SET_REFRESH_TOKEN", result.data);
         })
-        .catch(function (error) {
+        .catch((error) => {
           console.log(error);
           const router = useRouter();
           if (error == 403) {

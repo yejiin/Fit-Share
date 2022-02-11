@@ -25,7 +25,7 @@ http.interceptors.response.use((response) => response, async (error) => {
   console.log(error.response.data);
 
   if (error.response.data.status == 401) {
-    const isLogin = store.getter["user/isLogin"];
+    const isLogin = store.getters["user/isLogin"];
 
     if (!isLogin) {
       // alert 추가
