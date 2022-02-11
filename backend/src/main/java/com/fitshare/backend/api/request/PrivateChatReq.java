@@ -1,11 +1,12 @@
 package com.fitshare.backend.api.request;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
 public class PrivateChatReq extends ChatReq {
 
-    private String receiverId;
+    private Long receiverId;
 
 }
