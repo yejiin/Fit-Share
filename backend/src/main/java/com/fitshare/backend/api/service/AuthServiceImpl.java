@@ -1,5 +1,6 @@
 package com.fitshare.backend.api.service;
 
+import com.fitshare.backend.api.response.TokenRes;
 import com.fitshare.backend.common.auth.JwtTokenProvider;
 import com.fitshare.backend.common.model.KakaoProfile;
 import com.fitshare.backend.common.model.NaverProfile;
@@ -18,13 +19,13 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 @Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider tokenProvider;
+    private final RedisService redisService;
 
     // 카카오 client id
     private final String KAKAO_CLIENT_ID;
@@ -34,10 +35,11 @@ public class AuthServiceImpl implements AuthService {
     private final String NAVER_CLIENT_SCECRET;
 
     public AuthServiceImpl(JwtTokenProvider tokenProvider,
-                           @Value("${kakao.client.id}") String kakaoClientId,
+                           RedisService redisService, @Value("${kakao.client.id}") String kakaoClientId,
                            @Value("${naver.client.id}") String naverClientId,
                            @Value("${naver.client.secret}") String naverClientSecret) {
         this.tokenProvider = tokenProvider;
+        this.redisService = redisService;
 
         this.KAKAO_CLIENT_ID = kakaoClientId;
         this.NAVER_CLIENT_ID = naverClientId;
@@ -93,6 +95,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public NaverProfile getNaverUserInfo(String accessToken){
 
+        String apiURL = "https://openapi.naver.com/v1/nid/me";
+
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 
@@ -105,15 +109,35 @@ public class AuthServiceImpl implements AuthService {
         HttpEntity<MultiValueMap<String,String>> naverProfileRequest = new HttpEntity<>(headers);
 
         return restTemplate.exchange(
-                "https://openapi.naver.com/v1/nid/me",
-                HttpMethod.POST,
+                apiURL,
+                HttpMethod.GET,
                 naverProfileRequest,
                 NaverProfile.class).getBody();
     }
 
+    // accessToken 발급
     @Override
     public String createToken(Long id, RoleType roleType){
+
         return tokenProvider.createToken(id.toString(),roleType);
+    }
+
+    // refreshToken 발급
+    @Override
+    public String createRefreshToken(Long id){
+        String refreshToken = tokenProvider.createRefreshToken();
+
+        //Redis에 저장
+        redisService.setData(refreshToken, String.valueOf(id));
+        return refreshToken;
+    }
+
+    // refreshToken으로 accessToken 재발급
+    public TokenRes refreshAccessToken(String refreshToken) {
+
+        String id = redisService.getData(refreshToken);
+
+        return new TokenRes(tokenProvider.createToken(id,RoleType.USER),refreshToken);
     }
 
     private String getAccessToken(String reqURL, String param) {
@@ -144,8 +168,6 @@ public class AuthServiceImpl implements AuthService {
 
             br.close();
             bw.close();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
