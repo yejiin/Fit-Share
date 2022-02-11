@@ -59,13 +59,8 @@ public class MemberServiceImpl implements MemberService  {
 
     @Override
     public Optional<Member> findMemberByUid(String uid) {
-
-        Optional<Member> member = memberRepository.findByUid(uid);
-
-        if(member.isPresent())
-            return member;
-
-        return null;
+        
+        return memberRepository.findByUid(uid);
     }
 
     @Override

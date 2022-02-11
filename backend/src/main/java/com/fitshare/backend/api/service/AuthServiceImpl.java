@@ -83,13 +83,13 @@ public class AuthServiceImpl implements AuthService {
     public String getNaverAccessToken(String code, String state) {
         String reqURL = "https://nid.naver.com/oauth2.0/token";
 
-        String parmam = "grant_type=authorization_code" +
+        String param = "grant_type=authorization_code" +
                 "&client_id=" + NAVER_CLIENT_ID +
                 "&client_secret=" + NAVER_CLIENT_SCECRET +
                 "&code=" + code +
                 "&state=" + state;
 
-        return getAccessToken(reqURL, parmam);
+        return getAccessToken(reqURL, param);
     }
 
     @Override
