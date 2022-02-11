@@ -31,7 +31,7 @@
             <input class="btn shadow-none" type="button" id="buttonLeaveSession" @click="leaveSession" value="나가기">
           </div>
         </div>
-        <closet :subscribers="subscribers" :my-session-id="mySessionId" :mainStreamManager="mainStreamManager" @fitting="overlayFitting" class="closet"></closet>
+        <closet :subscribers="subscribers" :my-session-id="mySessionId" :publisher="publisher" @fitting="overlayFitting" class="closet"></closet>
       </div>
 		</div>
   </div>

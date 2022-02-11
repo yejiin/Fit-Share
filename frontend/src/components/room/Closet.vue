@@ -2,9 +2,9 @@
   <div id="closet">
   
     <div class="accordion" id="accordionExample">
-      <div class="accordion-item" v-for="(friend, index) in friends" :key="friend.id">
+      <!-- <div class="accordion-item" v-for="(friend, index) in friends" :key="friend.id">
         <h2 class="accordion-header" :id="'heading'+friend.id">
-          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+friend.id" aria-expanded="true" :aria-controls="'collapse'+friend.id" v-if="friend.id === 1" @click="publisher">
+          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+friend.id" aria-expanded="true" :aria-controls="'collapse'+friend.id" v-if="friend.id === 1">
             내 옷장
           </button>
           <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+friend.id" aria-expanded="true" :aria-controls="'collapse'+friend.id" v-if="friend.id != 1">
@@ -15,9 +15,6 @@
           <div class="accordion-body" v-if="friend.id === 1">
             <div class="d-flex input-style">
               <input type="text" placeholder="이미지 Url 입력" class="img-url mt-1" v-model="ImgUrl">
-              <!-- <button @click="AddUrl" class="add-button ms-3">
-                  +
-              </button> -->
               <img src="@/assets/plus_icon.png" @click="AddUrl" alt="" class="plus-img ms-3">
             </div>
             <div class="img-box">
@@ -28,10 +25,74 @@
             </div>
           </div>
         </div>
+      </div> -->
+
+      <!-- test -->
+      <!-- <div class="accordion-item" v-for="(subscribe, index) in subscribers" :key="index">
+        <h2 class="accordion-header" :id="'heading'+index">
+          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+index" aria-expanded="true" :aria-controls="'collapse'+index">
+            {{ splitName(subscribe).split(' ')[0] }}
+            {{ splitName(subscribe).split(' ')[1] }}
+          </button>
+        </h2>
+        <div :id="'collapse'+index" class="accordion-collapse collapse" :class="{ 'show': index === 0 }" :aria-labelledby="'heading'+index" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <div class="d-flex input-style">
+              <input type="text" placeholder="이미지 Url 입력" class="img-url mt-1" v-model="ImgUrl">
+              <img src="@/assets/plus_icon.png" @click="AddUrl" alt="" class="plus-img ms-3">
+            </div>
+            <div class="img-box">
+              <div v-for="friend in friends" :key="friend.id">
+                <button class="btn btn-secondary" @click="$emit('fitting', friend.src)">입어보기</button>
+                <img :src="friend.src" alt="img" class="img-style">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- publisher(내 옷장) -->
+      <div class="accordion-item" v-for="(subscribe, index) in subscribers" :key="index">
+        <h2 class="accordion-header" :id="'heading'+index">
+          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+index" aria-expanded="true" :aria-controls="'collapse'+index">
+            {{ splitName(subscribe).split(' ')[0] }} 's 옷장
+          </button>
+        </h2>
+        <div :id="'collapse'+index" class="accordion-collapse collapse" :class="{ 'show': index === 0 }" :aria-labelledby="'heading'+index" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <div class="img-box">
+              <div v-for="friend in friends" :key="friend.id">
+                <button class="btn btn-secondary" @click="$emit('fitting', friend.src)">입어보기</button>
+                <img :src="friend.src" alt="img" class="img-style">
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-    </div>
+      <!-- subscribers(자신 제외 사람 옷장) -->
+      <div class="accordion-item" v-for="(subscribe, index) in subscribers" :key="index">
+        <h2 class="accordion-header" :id="'heading'+index">
+          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+index" aria-expanded="true" :aria-controls="'collapse'+index">
+            {{ splitName(subscribe).split(' ')[0] }} 's 옷장
+          </button>
+        </h2>
+        <div :id="'collapse'+index" class="accordion-collapse collapse" :class="{ 'show': index === 0 }" :aria-labelledby="'heading'+index" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <div class="img-box">
+              <div v-for="friend in friends" :key="friend.id">
+                <button class="btn btn-secondary" @click="$emit('fitting', friend.src)">입어보기</button>
+                <img :src="friend.src" alt="img" class="img-style">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
+
+    </div>
+    
+    <button @click="getPublisher">publisher</button>
     <button @click="getClothes">클릭</button>
     <div v-for="cloth in state.clothes" :key="cloth.id">
       <img :src="cloth.imagePath" alt="" class="clth-style">
@@ -41,9 +102,10 @@
 </template>
 
 <script>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import axios from 'axios'
 import { useCookies } from 'vue3-cookies'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Closet',
@@ -53,7 +115,7 @@ export default {
   props: {
     subscribers: Object,
     mySessionId: String,
-    mainStreamManager: Object,
+    publisher: Object,
   },
   emits: ['fitting'],
   setup(props) {
@@ -64,10 +126,6 @@ export default {
     ])
 
     console.log(props.mySessionId)
-    console.log('publisher')
-    console.log(props.mainStreamManager)
-    console.log('publisher')
-
 
     const ImgUrl = ref('')
     
@@ -76,9 +134,31 @@ export default {
     const state = reactive({
       clothes: [],
       subscribers: [],
+      clientData: computed(() => {
+        const { clientData } = getConnectionData();
+        return clientData.split(' ')[1]
+      }),
     })
 
+    console.log(props.subscribers)
+
+    // publisher data 객체만 추출
+    const getConnectionData = () => {
+      const { connection } = props.publisher.stream
+      return JSON.parse(connection.data);
+    }
+
+    // test
+    const splitName = (subscribe) => {
+      const { connection } = subscribe.stream
+      const parse = JSON.parse(connection.data)
+      const { clientData } =  parse
+      return clientData
+    }
+
     const { cookies } = useCookies() 
+
+    const store = useStore()
 
     const setToken = () => {
       const token = cookies.get('accessToken')
@@ -87,6 +167,12 @@ export default {
       }
       return config
     }
+    
+    // 내 id store/login 에서 가져오기
+    const myId = computed(() => {
+      return store.state.login.user_id
+    })
+    console.log(myId.value)
 
     // 옷 이미지 주소 입력 후 등록
     const AddUrl = () => {
@@ -102,7 +188,6 @@ export default {
           data: {"imageUrl": ImgUrl.value, "shoppingRoomId": props.mySessionId}
           })
           .then(res => {
-            console.log('hi')
             console.log(res)
             // state.clothes = res.data.data
             friends.value = res.data.data
@@ -131,14 +216,9 @@ export default {
     }
 
     // test
-    const publisher = () =>{
-      console.log(props.mainStreamManager.stream.connection.data)
+    const getPublisher = () =>{
+      console.log(state.clientData)
     }
-
-    // watch(props.subscribers, () => {
-    //   console.log(props.subscribers)
-    //   console.log(1)
-    // })
 
     return {
       friends,
@@ -149,7 +229,9 @@ export default {
       setToken,
       getClothes,
       state,
-      publisher,
+      getPublisher,
+      myId,
+      getConnectionData, splitName
     }
   }
 }
