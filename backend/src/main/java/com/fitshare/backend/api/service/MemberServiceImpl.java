@@ -42,7 +42,7 @@ public class MemberServiceImpl implements MemberService  {
 
     @Override
     public Member createNaverMember(NaverProfile naverProfile) {
-
+        
         checkDuplicatedEmail(naverProfile.getResponse().getEmail());
 
         Member member = new Member();
@@ -65,7 +65,7 @@ public class MemberServiceImpl implements MemberService  {
 
     @Override
     public Optional<Member> findMemberByUid(String uid) {
-
+      
         return memberRepository.findByUid(uid);
     }
 
@@ -81,7 +81,10 @@ public class MemberServiceImpl implements MemberService  {
     }
 
     private void checkDuplicatedEmail(String email) {
-        memberRepository.findByEmail(email).orElseThrow(EmailDuplicatedException::new);
+        Optional<Member> member = memberRepository.findByEmail(email);
+
+        if (member.isPresent())
+            throw new EmailDuplicatedException();
     }
 
 }

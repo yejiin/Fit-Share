@@ -27,13 +27,12 @@ export default {
     });
 
     onMounted(() => {
-      if(route.query.state){
+      if (route.query.state) {
         console.log("네이버 로그인");
         state.naverCode = route.query.code;
         state.naverState = route.query.state;
         getNaverToken(state.naverCode, state.naverState);
-      }
-      else{
+      } else {
         console.log("카카오 로그인");
         state.kakaoCode = route.query.code;
         getKakakoToken(state.kakaoCode);
