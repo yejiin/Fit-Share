@@ -52,10 +52,13 @@
       </div> -->
 
       <!-- publisher(내 옷장) -->
-      <div class="accordion-item" v-for="(subscribe, index) in subscribers" :key="index">
+      <!-- <div class="accordion-item">
         <h2 class="accordion-header" :id="'heading'+index">
-          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+index" aria-expanded="true" :aria-controls="'collapse'+index">
-            {{ splitName(subscribe).split(' ')[0] }} 's 옷장
+          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+index" aria-expanded="true" :aria-controls="'collapse'+index" v-if="state.clientData === myId">
+            내 옷장
+          </button>
+          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+index" aria-expanded="true" :aria-controls="'collapse'+index" v-for="friend in friends" :key="friend.id">
+            {{ friend }}
           </button>
         </h2>
         <div :id="'collapse'+index" class="accordion-collapse collapse" :class="{ 'show': index === 0 }" :aria-labelledby="'heading'+index" data-bs-parent="#accordionExample">
@@ -68,36 +71,53 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
 
-      <!-- subscribers(자신 제외 사람 옷장) -->
-      <div class="accordion-item" v-for="(subscribe, index) in subscribers" :key="index">
-        <h2 class="accordion-header" :id="'heading'+index">
-          <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+index" aria-expanded="true" :aria-controls="'collapse'+index">
-            {{ splitName(subscribe).split(' ')[0] }} 's 옷장
-          </button>
-        </h2>
-        <div :id="'collapse'+index" class="accordion-collapse collapse" :class="{ 'show': index === 0 }" :aria-labelledby="'heading'+index" data-bs-parent="#accordionExample">
-          <div class="accordion-body">
-            <div class="img-box">
-              <div v-for="friend in friends" :key="friend.id">
-                <button class="btn btn-secondary" @click="$emit('fitting', friend.src)">입어보기</button>
-                <img :src="friend.src" alt="img" class="img-style">
-              </div>
+    
+    <!-- 내 옷장 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" :id="'heading'+myId">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+myId" aria-expanded="true" :aria-controls="'collapse'+myId" @click="getClothes(myId)">
+          내 옷장
+        </button>
+      </h2>
+      <div :id="'collapse'+myId" class="accordion-collapse collapse show" :aria-labelledby="'heading'+myId" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <div class="d-flex input-style">
+            <input type="text" placeholder="이미지 Url 입력" class="img-url mt-1" v-model="ImgUrl">
+            <img src="@/assets/plus_icon.png" @click="AddUrl" alt="" class="plus-img ms-3">
+          </div>
+          <div class="img-box">
+            <div v-for="cloth in state.clothes" :key="cloth.id">
+              <button class="btn btn-secondary" @click="$emit('fitting', cloth.imageUrl)">입어보기</button>
+              <img :src="cloth.imageUrl" alt="img" class="img-style">
             </div>
           </div>
         </div>
       </div>
+    </div>
+    <!-- subscribers 옷장 -->
+    <div class="accordion-item" v-for="(subscribe, index) in subscribers" :key="index">
+      <h2 class="accordion-header" :id="'heading'+index">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+index" aria-expanded="false" :aria-controls="'collapse'+index">
+          {{ splitName(subscribe).split(' ')[0] }} 's 옷장
+        </button>
+      </h2>
+      <div :id="'collapse'+index" class="accordion-collapse collapse" :aria-labelledby="'heading'+index" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <div class="img-box">
+            <div v-for="cloth in state.clothes" :key="cloth.id">
+              <button class="btn btn-secondary" @click="$emit('fitting', cloth.src)">입어보기</button>
+              <img :src="cloth.imageUrl" alt="img" class="img-style">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
 
     </div>
     
-    <button @click="getPublisher">publisher</button>
-    <button @click="getClothes">클릭</button>
-    <div v-for="cloth in state.clothes" :key="cloth.id">
-      <img :src="cloth.imagePath" alt="" class="clth-style">
-    </div>
-
   </div>
 </template>
 
@@ -125,8 +145,6 @@ export default {
       {id:2, name: '최싸피', src: 'https://image.msscdn.net/images/goods_img/20200407/1388147/1388147_3_500.jpg'},
     ])
 
-    console.log(props.mySessionId)
-
     const ImgUrl = ref('')
     
     const Urls = ref('')
@@ -136,11 +154,10 @@ export default {
       subscribers: [],
       clientData: computed(() => {
         const { clientData } = getConnectionData();
-        return clientData.split(' ')[1]
+        return Number(clientData.split(' ')[1])
       }),
     })
 
-    console.log(props.subscribers)
 
     // publisher data 객체만 추출
     const getConnectionData = () => {
@@ -170,9 +187,8 @@ export default {
     
     // 내 id store/login 에서 가져오기
     const myId = computed(() => {
-      return store.state.login.user_id
+      return Number(store.state.login.user_id)
     })
-    console.log(myId.value)
 
     // 옷 이미지 주소 입력 후 등록
     const AddUrl = () => {
@@ -196,16 +212,15 @@ export default {
       }
     }
 
-    // mySessionId 번 방의 memberId 의 옷 리스트 GET 요청
-    const getClothes = () => {
+    // mySessionId번 방의 내 memberId(myId) 의 옷 리스트 GET 요청
+    const getClothes = (myId) => {
       axios({
         method: 'GET',
-        url: `http://i6a405.p.ssafy.io:8081/api/v1/clothes/${props.mySessionId}/8`,
+        url: `http://i6a405.p.ssafy.io:8081/api/v1/clothes/${props.mySessionId}/${myId}`,
         headers: setToken(),
       })
       .then(res => {
         console.log(res)
-        // friends.value = res.data.data
         state.clothes = res.data.data
         console.log(state.clothes)
       })
@@ -215,10 +230,6 @@ export default {
 
     }
 
-    // test
-    const getPublisher = () =>{
-      console.log(state.clientData)
-    }
 
     return {
       friends,
@@ -229,9 +240,8 @@ export default {
       setToken,
       getClothes,
       state,
-      getPublisher,
       myId,
-      getConnectionData, splitName
+      getConnectionData, splitName,
     }
   }
 }
