@@ -58,8 +58,7 @@ import { reactive, toRefs, ref, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { OpenVidu } from 'openvidu-browser';
-import { useCookies } from "vue3-cookies";
-import axios from 'axios';
+import axios from '../api/axios'
 import PublisherVideo from '@/components/room/PublisherVideo.vue';
 import SubscriberVideo from '@/components/room/SubscriberVideo.vue';
 import MainVideo from '@/components/room/MainVideo.vue';
@@ -77,7 +76,6 @@ export default {
         const router = useRouter();
         const route = useRoute();
         const store = useStore();
-        const { cookies } = useCookies();
         
         let clothesUrl = ref('');
         let isFitting = ref(false);
@@ -213,13 +211,7 @@ export default {
           showMainVideo.value = false;
         };
 
-        const setToken = () => {
-          const token = cookies.get('accessToken');
-          const config = { Authorization: `Bearer ${token}`};
-          return config
-        };
-
-        // openvidu session
+        // openvidu session 생성 method
         const joinSession = () => {
           state.OV = new OpenVidu();
           state.session = state.OV.initSession();
@@ -290,8 +282,7 @@ export default {
 
           axios({
             method : 'post',
-            url: `${store.state.url}/v1/shopping-rooms/${state.mySessionId}`,
-            headers: setToken()
+            url: `shopping-rooms/${state.mySessionId}`,
           })
             .then(() => {
               goToMain()
