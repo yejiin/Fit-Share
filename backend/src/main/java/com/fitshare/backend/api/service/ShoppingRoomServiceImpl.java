@@ -186,7 +186,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
     }
 
     private Session getSession(String sessionId) {
-        String url = "https://" + OPENVIDU_URL + "/openvidu/api/sessions/" + sessionId;
+        String url = OPENVIDU_URL + "openvidu/api/sessions/" + sessionId;
 
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
