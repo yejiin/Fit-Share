@@ -10,8 +10,10 @@
       <div class="participant"><i class="bi bi-eye me-1"></i> {{room.participantCount}} / {{room.maxParticipantCount}}</div>
       <div class="room-info">
         <p class="mall-name">{{ room.shoppingMallName }}</p>
-        <p class="host-name">{{ room.hostName }}<span>님의 쇼핑룸</span></p>
-        <!-- <span class="host-name">{{ room.hostName }}<span>님의 쇼핑룸</span></span> -->
+        <div>
+          <span class="host-name">[ {{ room.hostName }} ]</span><span>님의 쇼핑룸</span>
+        </div>
+        <!-- <p class="host-name">{{ room.hostName }}님의 쇼핑룸</p> -->
       </div>
      </div>
    </div>
@@ -146,17 +148,24 @@ h2 {
   font-size: 16px;
   font-weight: bold;
 }
+
+.room-info div {
+  margin-bottom: 18px;
+}
+
+.room-info span {
+  font-size: 16px;
+  font-weight: bold;
+}
+
 .mall-name {
   margin: 0 23px 11px;
 }
+
 .host-name {
-  margin: 0 23px 18px;
-  /* border-bottom: 2px solid #f2af46; */
+  margin: 0 0 18px 23px;
+  /* border-bottom: 3px solid #f2af46; */
   /* color: #f2af46; */
 }
 
-span {
-  color: black;
-  font-size: 16px;
-}
 </style>
