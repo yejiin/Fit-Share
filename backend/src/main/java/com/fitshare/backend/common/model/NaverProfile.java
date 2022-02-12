@@ -1,14 +1,17 @@
 package com.fitshare.backend.common.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Data
+@Getter
+@NoArgsConstructor
 public class NaverProfile {
-    public String resultcode;
-    public String message;
-    public Profile response;
+    private String resultcode;
+    private String message;
+    private Profile response;
 
-    @Data
+    @Getter
+    @NoArgsConstructor
     public class Profile {
         public String id;
         public String name;
