@@ -1,7 +1,7 @@
 package com.fitshare.backend.api.controller;
 
 import com.fitshare.backend.api.request.MakeShoppingRoomReq;
-import com.fitshare.backend.api.response.ShoppingRoomPasswordReq;
+import com.fitshare.backend.api.request.ShoppingRoomPasswordReq;
 import com.fitshare.backend.api.response.ShoppingRoomRes;
 import com.fitshare.backend.api.response.ShoppingRoomTokenRes;
 import com.fitshare.backend.api.service.ShoppingRoomService;
