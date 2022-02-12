@@ -192,7 +192,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Basic " + Base64.getEncoder().encodeToString(SECRET.getBytes()));
+        headers.add("Authorization", "Basic T1BFTlZJRFVBUFA6TVlfU0VDUkVU");
 
         HttpEntity<Session> entity = new HttpEntity<>(headers);
 
