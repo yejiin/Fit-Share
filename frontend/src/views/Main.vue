@@ -7,7 +7,6 @@
         <shopping-room-list></shopping-room-list>
         <div class="host-container">
           <host-closet class="host-closet"></host-closet>
-          <!-- <button class="btn shadow-none" @click="isPrivate=true">입장하기</button> -->
           <button class="btn shadow-none" @click="selectedShoppingRoom.isPrivate ? isPrivate=true : goToRoom()">입장하기</button>
         </div>
       </div>
@@ -63,8 +62,7 @@ import HostCloset from '../components/main/HostCloset.vue'
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex'
-import { useCookies } from "vue3-cookies";
-import axios from 'axios'
+import axios from '../api/axios'
 
 export default {
   name: 'Main',
@@ -79,13 +77,11 @@ export default {
   setup() {
     const router = useRouter();
     const store = useStore();
-    const { cookies } = useCookies();
     
     const status = ref(false);
     let isPrivate = ref(false);
     let inputPassword = ref(null);  
     let errorMessage = ref('');
-    // -------------------
     let alert = ref(false)
 
     const OpenTab = () => {
@@ -97,27 +93,25 @@ export default {
     };
 
     // host 옷장
-     const selectedShoppingRoom = computed(() => {
+    const selectedShoppingRoom = computed(() => {
         return store.state.room.selectedShoppingRoom
     });
-
-    const setToken = () => {
-      const token = cookies.get('accessToken');
-      const config = { Authorization: `Bearer ${token}`};
-      return config
-    };
     
     // 입장하기
     const goToRoom = () => {
+      const maxCnt = selectedShoppingRoom.value.maxParticipantCount;
+      const cnt = selectedShoppingRoom.value.participantCount;
+      if (maxCnt <= cnt) {
+        alert.value = true
+        return;
+      }
+
       axios({
         method : 'get',
-        // url: `${store.state.url}/v1/shopping-rooms/77`,
-        url: `${store.state.url}/v1/shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}`,
-        headers: setToken(),
+        url: `shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}`,
       })
         .then(res => {
           const data = res.data.data 
-          // console.log(data)
           router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl }}) 
         })
         .catch(err => {
@@ -138,8 +132,7 @@ export default {
     const checkPassword = () => {
       axios({
         method: 'post',
-        // url: `${store.state.url}/v1/shopping-rooms/77/validate`,
-        url: `${store.state.url}/v1/shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}/validate`,
+        url: `shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}/validate`,
         data: { password: inputPassword.value },
       })
         .then(res => {
@@ -174,7 +167,7 @@ export default {
   top: 80px;
   right: 5px;
   padding: 16px 20px;
-  animation: slide 0.3s;
+  animation: slide 0.4s;
 }
 
 @keyframes slide {
@@ -197,12 +190,13 @@ export default {
   height: 775px;
   position: relative;
   padding: 0;
-  margin: 87px 142px 89px;
+  margin: 87px 153px 89px 142px;
 }
 
 .row {
   display: flex;
   justify-content: space-between;
+  width: 1150px;
 }
 
 .host-container {
@@ -219,6 +213,10 @@ export default {
   border-radius: 20px;
   font-weight: bold;
   font-size: 20px;
+}
+
+.host-container button:hover {
+  background-color: #75b3b4;
 }
 
 /* host 옷장 style */
@@ -266,10 +264,6 @@ i {
   margin-left: 43px;
   margin-top: 15px; */
 }
-/* 
-.title {
-  text-align: center;
-} */
 
 .modal-body {
   display: flex;
