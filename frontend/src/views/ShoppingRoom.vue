@@ -48,7 +48,7 @@
           </div>
         </div>
 
-        <closet :subscribers="subscribers" :my-session-id="mySessionId" :publisher="publisher" @fitting="overlayFitting" class="closet"></closet>
+        <closet :subscribers="subscribers" :my-session-id="mySessionId" :publisher="publisher" @fitting="overlayFilter" class="closet"></closet>
 
       </div>
 		</div>
@@ -142,7 +142,7 @@ export default {
                     {
                         "uri": clothesUrl.value,
                         "offsetXPercent":"-1.5F",
-                        "offsetYPercent":"1.0F", 
+                        "offsetYPercent":"0.4F", 
                         "widthPercent":"4.0F",
                         "heightPercent":"4.0F"
                     });
@@ -166,18 +166,18 @@ export default {
                     {
                         "uri": clothesUrl.value,
                         "offsetXPercent":"-1.5F",
-                        "offsetYPercent":"1.0F",
+                        "offsetYPercent":"0.4F",
                         "widthPercent":"4.0F",
-                        "heightPercent":"4.0F"
+                        "heightPercent":"4.2F"
                      });
                 } else if (type == 'bottoms') {
                   filter.execMethod(
                     "setOverlayedImage",
                     {
                         "uri": clothesUrl.value,
-                        "offsetXPercent":"-0.8F",
-                        "offsetYPercent":"3.8F",
-                        "widthPercent":"2.4F",
+                        "offsetXPercent":"-1.6F",
+                        "offsetYPercent":"3.2F",
+                        "widthPercent":"4.3F",
                         "heightPercent":"4.0F"
                      });
                 } else {
@@ -185,10 +185,10 @@ export default {
                     "setOverlayedImage",
                     {
                         "uri": clothesUrl.value,
-                        "offsetXPercent":"-0.1F",
-                        "offsetYPercent":"-0.8F",
-                        "widthPercent":"1.1F",
-                        "heightPercent":"0.9F"
+                        "offsetXPercent":"-0.2F",
+                        "offsetYPercent":"-0.7F",
+                        "widthPercent":"1.3F",
+                        "heightPercent":"1.1F"
                      });
                 } 
             })
