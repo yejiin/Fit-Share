@@ -33,7 +33,7 @@ http.interceptors.response.use((response) => response, async (error) => {
     }
     else {
       const originalRequest = error.config;
-      const refreshToken = store.getter["user/refreshToken"];
+      const refreshToken = store.getters["user/refreshToken"];
       await store.dispatch("user/refreshToken", { "refreshToken": refreshToken });
       
       return axios(originalRequest)
