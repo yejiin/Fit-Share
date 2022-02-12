@@ -17,49 +17,35 @@
   </div>
 </template>
 
+
 <script>
-import axios from 'axios'
-import { useCookies } from 'vue3-cookies'
+import axios from '../../api/axios'
 
 export default {
   name: 'SearchedUsers',
   props: ['friend'],
-  setup(props) {
-    
-    const { cookies } = useCookies() 
-
-    const setToken = () => {
-      const token = cookies.get('accessToken')
-      const config = {
-        Authorization: `Bearer ${token}`
-      }
-      return config
-    }
-
-    console.log('props 데이터')
-    console.log(props.friend)
+  setup() {
 
     // 친구 요청 post
     const RequestFriend = (friend) => {
       axios({
         method: 'POST',
-        url: 'http://i6a405.p.ssafy.io:8081/api/v1/friends/requests',
-        headers: setToken(),
+        url: 'friends/requests',
         data: {"friendId": friend.id}
       })
       .then(res => {
         console.log(res)
       })
-      friend.profileImg = null 
+      friend.profileImg = null
     }
 
     return {
       RequestFriend,
-      setToken,
     }
   }
 }
 </script>
+
 
 <style scoped>
 .input-box {
@@ -81,9 +67,14 @@ input::placeholder {
   width: 180px;
 }
 
-/* user 이름 font-size */
+/* user 이름 font-size /
 .name-box {
-  font-size: 20px;
+  font-size: 16px;
+}
+
+/ email font-size */
+.email-box {
+  font-size: 12px;
 }
 
 img {
@@ -98,7 +89,6 @@ img {
   border-radius: 25px;
   background-color: #FDFAF3;
 }
-
 .btn-box {
   width: 50px;
 }

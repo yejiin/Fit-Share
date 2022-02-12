@@ -5,7 +5,6 @@ import com.fitshare.backend.common.model.KakaoProfile;
 import com.fitshare.backend.common.model.NaverProfile;
 import com.fitshare.backend.db.entity.Member;
 
-import java.util.List;
 import java.util.Optional;
 
 
@@ -17,9 +16,11 @@ public interface MemberService {
 
     Optional<Member> findMemberById(Long id);
 
-    List<BaseMemberRes> searchMembersByEmail(String email);
+    BaseMemberRes findMemberByEmail(String email);
 
     Member createKakaoMember(KakaoProfile kakaoProfile);
 
     Member createNaverMember(NaverProfile naverProfile);
+
+    void updateProfileImage(Member member,String imageUrl);
 }

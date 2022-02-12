@@ -19,9 +19,8 @@ export default {
 <style scoped>
 video {
   height: 135px;
-  margin: 25px 30px 0;
+  margin: 20px 30px 0;
 	border-radius: 10px;
 	cursor: pointer;
-	/* line-height: 130px; */
 }
 </style>

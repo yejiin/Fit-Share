@@ -2,65 +2,54 @@
   <div class="room-container">
    <h2>Live</h2>
    <div class="row">
-     <!-- emit event room 정보 -->
-     <div id="room" class="room col-6" :class="index % 2 ? 'room-right' : 'room-left'" 
-      :style="{ 'background-image': `url(${require(`../../assets/shopping_${index % 5 + 1}.png`)})` }"
-      v-for="(room, index) in shoppingRoomList" :key="index" 
-      @click="$emit('change-host-closet', room)"
+      <div id="room" class="room col-6" :class="index % 2 ? 'room-right' : 'room-left'" 
+        :style="{ 'background-image': `url(${require(`@/assets/shopping_${index % 5 + 1}.png`)})` }"
+        v-for="(room, index) in shoppingRoomList" :key="index" 
+        @click="selectShoppingRoom(room)"
       >
-       <div class="room-info">
+      <div class="participant"><i class="bi bi-eye me-1"></i> {{room.participantCount}} / {{room.maxParticipantCount}}</div>
+      <div class="room-info">
         <p class="mall-name">{{ room.shoppingMallName }}</p>
-        <p class="host-name">{{ room.hostName }}님의 쇼핑룸</p>
-       </div>
+        <div>
+          <span class="host-name">[ {{ room.hostName }} ]</span><span>님의 쇼핑룸</span>
+        </div>
+        <!-- <p class="host-name">{{ room.hostName }}님의 쇼핑룸</p> -->
+      </div>
      </div>
    </div>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs, } from 'vue';
-import { useStore } from 'vuex'
-import axios from 'axios'
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 
 export default {
     name: 'ShoppingRoomList',
     
-    emits: ['first-host-closet', 'change-host-closet'],
-
-    setup(props, { emit }) {
-      const store = useStore()
-
-      const state = reactive({
-        shoppingRoomList: [],  //뒤에 
-        
-        // shoppingRoomList : [
-        //   { shoppingRoomId: 1, hostName: '김싸피', maxParticipantCount: 2, participantCount: 1, isPrivate: true, shoppingMallName: 'nike', shoppingMallUrl: '..' },  // 이 외에 추가적으로
-        // ],
-
-      })
-
-      // methods
-      // 쇼핑룸 목록 불러오기 
-      function getShoppingRoomList () {
-        axios({
-          method: 'get',
-          url: `${store.state.url}/v1/shopping-rooms/`,
-          headers: { Authorization : `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZXMiOiJVU0VSIiwiZXhwIjoxNjQ3OTA5NTI5fQ.l1TfGZtQarYUWrLy6uI-6gFLX5CVQn62t28USVkJe0_kazLFL824YCDLrGbxx1hAhBWe5lxbtK5SArTgOP77uA` }
-        })
-          .then(res => {
-            // console.log(res.data.data)
-            state.shoppingRoomList = res.data.data
-          })
-          .then(() => {
-            emit('first-host-closet', state.shoppingRoomList[0])
-          })
-      }
+    setup() {
+      const store = useStore();
+      // shoppingRoomList : [
+      //   { shoppingRoomId: 1, hostName: '김싸피', maxParticipantCount: 2, participantCount: 1, isPrivate: true, shoppingMallName: 'nike', shoppingMallUrl: '..' },  // 이 외에 추가적으로
+      // ],
       
+      const shoppingRoomList = computed(() => {
+        return store.state.room.shoppingRoomList
+      });
+
+      const loadShoppingRoomList = () => {
+        store.dispatch('room/loadShoppingRoomList')
+      };
+      
+      const selectShoppingRoom = (room) => {
+        store.dispatch('room/selectedRoom', room)
+      };
+
       // created
-      getShoppingRoomList()
+      loadShoppingRoomList()
 
       return {
-        ...toRefs(state), getShoppingRoomList, 
+        shoppingRoomList, selectShoppingRoom,
       }
     }
 }
@@ -90,7 +79,7 @@ h2 {
   margin: 0;
 }
 
-/* 스크롤바 */
+/* 스크롤 */
 .row::-webkit-scrollbar {
   width: 7px;
 }
@@ -99,7 +88,7 @@ h2 {
 }
 .row::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: #D3E2E7;
+  background-color: #2f3542;
 }
 
 .room {
@@ -110,6 +99,7 @@ h2 {
   height: 297px;  
   border-radius: 10px;
   border: 3px solid #D3E2E7;
+  /* background-color: white; */
   cursor: pointer;
 
   background-repeat : no-repeat;
@@ -128,6 +118,18 @@ h2 {
   margin-left: 20px;
 }
 
+.participant {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 65px;
+  background-color: rgba(224, 222, 222, 0.884);
+  border-radius: 5px;
+  padding: 0 5px 0;
+  text-align: center;
+  font-size: 14px;
+}
+
 .room-info {
   position: absolute;
   bottom: 0;
@@ -137,10 +139,24 @@ h2 {
   font-size: 16px;
   font-weight: bold;
 }
+
+.room-info div {
+  margin-bottom: 18px;
+}
+
+.room-info span {
+  font-size: 16px;
+  font-weight: bold;
+}
+
 .mall-name {
   margin: 0 23px 11px;
 }
+
 .host-name {
-  margin: 0 23px 18px;
+  margin: 0 0 18px 23px;
+  /* border-bottom: 3px solid #f2af46; */
+  /* color: #f2af46; */
 }
+
 </style>
