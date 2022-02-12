@@ -42,7 +42,7 @@
               </div>
               <div @click="changeFilter('hat')">
                 <input class="form-check-input" type="radio" name="flexRadioDefault" id="hat">
-                <label class="form-check-label" for="hat" >모자</label>
+                <label class="form-check-label" for="hat">모자</label>
               </div>
             </div>
           </div>
@@ -101,7 +101,7 @@ export default {
         });
         
         const userData = computed(() => {
-          return store.getters['login/userData']
+          return store.getters['user/userData']
         });
 
         // methods        
