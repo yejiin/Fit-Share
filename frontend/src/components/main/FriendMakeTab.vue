@@ -5,15 +5,17 @@
       class="input-box"
       type="text"
       placeholder="이메일 검색"
-      @keyup.enter="SearchUserEmail"
+      @keyup="SearchUserEmail"
       v-model="SearchUser"
     >
     
     <!-- 이름, 이메일로 검색 시 나오는 users들 components -->
     <searched-users :friend="state.friend"></searched-users>
 
+
   </div>
 </template>
+
 
 <script>
 import SearchedUsers from './SearchedUsers.vue'
@@ -28,7 +30,7 @@ export default {
   setup() {
     const state = reactive({
       searchedUsers: [],
-      friend: {},
+      friend: {}
     })
 
     // input에 입력하는 값
@@ -45,9 +47,6 @@ export default {
             console.log(res)
             state.friend = res.data.data
           })
-          .catch(res => {
-            console.log(res)
-          })
       }
       else{
         state.friend = {}
@@ -62,6 +61,7 @@ export default {
   }
 }
 </script>
+
 
 <style>
 .result {
