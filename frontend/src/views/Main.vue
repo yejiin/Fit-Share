@@ -17,9 +17,10 @@
       </button>
       <div v-if="status">
         <friend class="tab-box" @close-tab="CloseTab"></friend>
-        <button class="close-btn" @click="CloseTab">
+        <!-- <button class="close-btn" @click="CloseTab">
           <img class="close-img" src="@/assets/close-icon.png" alt="close-img">
-        </button>
+        </button> -->
+        <button type="button" class="btn-close" @click="CloseTab"></button>
       </div>
     </div>
 
@@ -401,6 +402,34 @@ i {
   top: 265px;
   left: 1100px;
 }
+
+/* button hover 사용시 코드 */
+/* .tab-box button {
+  transition-duration: 0.4s;
+} */
+
+/* 닫기 버튼 */
+.btn-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 25px;
+  position: fixed;
+  top: 265px;
+  /* left: 1100px; */
+  left: 1090px;
+}
+
+/* .btn-close:hover {
+  width: 30px;
+  height: 30px;
+  border-radius: 25px;
+  position: fixed;
+  top: 265px;
+  left: 1100px;
+  background-color: #555555;
+  color: white;
+} */
+
 
 
 </style>
