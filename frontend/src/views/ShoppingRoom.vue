@@ -25,10 +25,10 @@
               <i class="fas fa-arrow-left"></i><p>피팅 종료하기</p>
             </button>
             <!-- 기본기능 -->
-            <button v-if="isAudio" class="btn shadow-none" @click="offAudio()"><i class="bi bi-mic-mute-fill"></i></button>
-            <button v-if="!isAudio" class="btn shadow-none" @click="onAudio()"><i class="bi bi-mic-fill"></i></button>
-            <button v-if="isVideo" class="btn shadow-none" @click="offVideo()"><i class="bi bi-camera-video-off-fill"></i></button>
-            <button v-if="!isVideo" class="btn shadow-none" @click="onVideo()"><i class="bi bi-camera-video-fill"></i></button>
+            <button v-if="isAudio" class="btn shadow-none" @click="changeAudio()"><i class="bi bi-mic-mute-fill"></i></button>
+            <button v-if="!isAudio" class="btn shadow-none" @click="changeAudio()"><i class="bi bi-mic-fill"></i></button>
+            <button v-if="isVideo" class="btn shadow-none" @click="changeVideo()"><i class="bi bi-camera-video-off-fill"></i></button>
+            <button v-if="!isVideo" class="btn shadow-none" @click="changeVideo()"><i class="bi bi-camera-video-fill"></i></button>
             <input class="btn shadow-none" type="button" id="buttonLeaveSession" @click="leaveSession" value="나가기">
             <!-- 필터 change -->
             <div v-if="radioSelect" class="radio-box">
@@ -81,7 +81,7 @@ export default {
         
         let clothesUrl = ref('');
         let isFitting = ref(false);
-        let showMainVideo = ref(false) ; // 중앙 비디오 여부 
+        let showMainVideo = ref(false) ; // 피팅 비디오 
         let radioSelect = ref(false);
 
         const loading = reactive({
@@ -111,24 +111,18 @@ export default {
           router.push({ name: 'Main' });
         };
         
-        const offAudio = () => {
+        const changeAudio = () => {
           state.publisher.publishAudio(state.isAudio);
-          state.isAudio = false;
-        };
-        const onAudio = () => {
-          state.publisher.publishAudio(state.isAudio);
-          state.isAudio = true;
+          let audio = (state.isAudio) ? false : true ;
+          state.isAudio = audio;
         };
 
-        const offVideo = () => {
+        const changeVideo = () => {
           state.publisher.publishVideo(state.isVideo);
-          state.isVideo = false;
+          let video = (state.isVideo) ? false : true ;
+          state.isVideo = video;
         };
-        const onVideo = () => {
-          state.publisher.publishVideo(state.isVideo);
-          state.isVideo = true;
-        };
-        
+
         // 옷장과 연결 
         const overlayFilter = (url) => {
           clothesUrl.value = url
@@ -142,7 +136,7 @@ export default {
                     {
                         "uri": clothesUrl.value,
                         "offsetXPercent":"-1.5F",
-                        "offsetYPercent":"0.4F",
+                        "offsetYPercent":"0.6F",
                         "widthPercent":"4.0F",
                         "heightPercent":"4.0F"
                     });
@@ -166,7 +160,7 @@ export default {
                     {
                         "uri": clothesUrl.value,
                         "offsetXPercent":"-1.5F",
-                        "offsetYPercent":"0.4F",
+                        "offsetYPercent":"0.6F",
                         "widthPercent":"4.0F",
                         "heightPercent":"4.2F"
                      });
@@ -306,9 +300,10 @@ export default {
         joinSession() 
 
         return { 
-          goToMain, offAudio, offVideo, onAudio, onVideo, overlayFilter, changeFilter, removeFilter, backToSite,
+          goToMain, changeAudio, changeVideo, overlayFilter, changeFilter, removeFilter, backToSite,
           joinSession, leaveSession, updateMainVideoStreamManager,
           ...toRefs(state), ...toRefs(loading), isFitting, showMainVideo, clothesUrl, radioSelect,
+          
         }
     }
 
