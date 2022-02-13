@@ -61,7 +61,13 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<PrivateChatRes> getPrivateChatListByDate(Long memberId, Long friendId, LocalDate date) {
         String dateString = date.toString();
-        return privateChatRepository.findByCreatedTime(memberId, friendId, dateString);
+        if (date.isEqual(LocalDate.now())) {
+            List<PrivateChatRes> privateChatRes = (List<PrivateChatRes>) redisService.getHashDataList("chat_" + memberId + "_" + friendId + "_" + dateString + "*");
+            privateChatRes.addAll((List<PrivateChatRes>) redisService.getHashDataList("chat_" + friendId + "_" + memberId + "_" + dateString + "*"));
+            return privateChatRes;
+        } else {
+            return privateChatRepository.findByCreatedTime(memberId, friendId, dateString);
+        }
     }
 }
 

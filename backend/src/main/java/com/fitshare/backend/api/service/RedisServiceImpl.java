@@ -1,12 +1,12 @@
 package com.fitshare.backend.api.service;
 
+import com.fitshare.backend.api.response.PrivateChatRes;
 import com.fitshare.backend.db.entity.PrivateChat;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.LocalTime;
-import java.util.Set;
+import java.time.*;
+import java.util.*;
 
 @Service
 public class RedisServiceImpl implements RedisService {
@@ -49,10 +49,38 @@ public class RedisServiceImpl implements RedisService {
         return values.get(key);
     }
 
-    // 키값으로 벨류 가져오기
+    // 키값으로 hash 벨류 가져오기
     public Object getHashData(String key, String hashKey) {
         HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
         return hashOperations.get(key, hashKey);
+    }
+
+    // 와일드카드 키값으로 hash 벨류 리스트 가져오기
+    public List<?> getHashDataList(String keyPattern) {
+        Set<String> keys = redisTemplate.keys(keyPattern);
+        List<PrivateChatRes> values = new ArrayList<>();
+
+        if (keyPattern.startsWith("chat_")) {
+            for (String key : keys) {
+                PrivateChatRes privateChatRes = new PrivateChatRes();
+
+                String temp = (String) getHashData(key, "sender_id");
+                privateChatRes.setSenderId(Long.valueOf(temp));
+
+                temp = (String) getHashData(key, "receiver_id");
+                privateChatRes.setReceiverId(Long.valueOf(temp));
+
+                temp = (String) getHashData(key, "message");
+                privateChatRes.setMessage(temp);
+
+                temp = (String) getHashData(key, "created_time");
+                privateChatRes.setCreatedTime(LocalDateTime.parse(temp));
+
+                values.add(privateChatRes);
+            }
+        }
+
+        return values;
     }
 
     // 만료 기간 설정

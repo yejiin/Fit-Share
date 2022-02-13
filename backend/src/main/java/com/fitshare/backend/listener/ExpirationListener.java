@@ -20,18 +20,20 @@ public class ExpirationListener implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
         String key = message.toString().substring(10);
 
-        String senderId = (String) redisService.getHashData(key, "sender_id");
-        String receiverId = (String) redisService.getHashData(key, "receiver_id");
-        String messageContents = (String) redisService.getHashData(key, "message");
-        String createdTime = (String) redisService.getHashData(key, "created_time");
+        if (key.startsWith("shadowkey")) {
+            String senderId = (String) redisService.getHashData(key, "sender_id");
+            String receiverId = (String) redisService.getHashData(key, "receiver_id");
+            String messageContents = (String) redisService.getHashData(key, "message");
+            String createdTime = (String) redisService.getHashData(key, "created_time");
 
-        PrivateChatReq privateChatReq = new PrivateChatReq();
-        privateChatReq.setReceiverId(receiverId);
-        privateChatReq.setMessage(messageContents);
-        privateChatReq.setCreatedTime(LocalDateTime.parse(createdTime));
+            PrivateChatReq privateChatReq = new PrivateChatReq();
+            privateChatReq.setReceiverId(receiverId);
+            privateChatReq.setMessage(messageContents);
+            privateChatReq.setCreatedTime(LocalDateTime.parse(createdTime));
 
-        chatService.addPrivateChatInMySql(Long.valueOf(senderId), privateChatReq);
+            chatService.addPrivateChatInMySql(Long.valueOf(senderId), privateChatReq);
 
-        redisService.delData(key);
+            redisService.delData(key);
+        }
     }
 }
