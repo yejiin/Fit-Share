@@ -42,4 +42,5 @@ public class ResponseMessage {
 
     // Chat
     public static final String GET_CHAT_LIST = "채팅 목록 조회 성공입니다.";
+    public static final String CHECK_CHAT = "채팅 읽음여부 업데이트 성공입니다.";
 }

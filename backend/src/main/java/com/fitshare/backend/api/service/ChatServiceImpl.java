@@ -53,8 +53,9 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public void checkChat(Long senderId, Long receiverId) {
-//        privateChatRepository.updateIsChecked(senderId, receiverId);
+    public void checkChat(Long memberId, Long friendId) {
+        // friend가 보낸 메시지를 member가 읽는다
+        privateChatRepository.updateIsChecked(friendId, memberId);
     }
 
     @Override

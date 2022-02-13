@@ -15,7 +15,7 @@ public interface ChatService {
 
     void addPrivateChatInMySql(Long memberId, PrivateChatReq privateChatReq);
 
-    void checkChat(Long senderId, Long receiverId);
+    void checkChat(Long memberId, Long friendId);
 
     List<PrivateChatRes> getPrivateChatListByDate(Long memberId, Long friendId, LocalDate date);
 
