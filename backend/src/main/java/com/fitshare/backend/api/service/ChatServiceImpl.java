@@ -1,6 +1,7 @@
 package com.fitshare.backend.api.service;
 
 import com.fitshare.backend.api.request.PrivateChatReq;
+import com.fitshare.backend.api.response.PrivateChatRes;
 import com.fitshare.backend.common.exception.MemberNotFoundException;
 import com.fitshare.backend.db.entity.Member;
 import com.fitshare.backend.db.entity.PrivateChat;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -56,10 +58,9 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<PrivateChat> getPrivateChatListByMembers(Long memberId, Long friendId) {
-        // TODO: pagination
-        return null;
-//        return privateChatRepository.findBySenderIdAndReceiverId(memberId, friendId);
+    public List<PrivateChatRes> getPrivateChatListByDate(Long memberId, Long friendId, LocalDate date) {
+        String dateString = date.toString();
+        return privateChatRepository.findByCreatedTime(memberId, friendId, dateString);
     }
 }
 
