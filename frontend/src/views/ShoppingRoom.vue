@@ -1,21 +1,23 @@
 <template> 
   <div id="session">
-    <div id="session" class="" v-if="session">
-      <!-- 화상화면 -->
-			<div id="video-container" class="d-flex flex-row">
-        <publisher-video :stream-manager="publisher" :loading="pub" @click="updateMainVideoStreamManager(publisher)"/>
-        <subscriber-video v-for="(subscriber, index) in subscribers" :key="subscriber.stream.connection.connectionId"
-          :stream-manager="subscriber" :loading="sub" :subscriber="index"
-          @click="updateMainVideoStreamManager(subscriber)"
-        />
-      </div>
+    <div id="session" v-if="session">
       <!-- 컴포넌트 -->
       <div class="components-container">
         <group-chat class="group-chat"></group-chat>
         <div class="center">
+          <!-- 화상화면 -->
+          <div id="video-container" class="d-flex flex-row">
+            <publisher-video :stream-manager="publisher" :loading="pub" @click="updateMainVideoStreamManager(publisher)"/>
+            <subscriber-video v-for="(subscriber, index) in subscribers" :key="subscriber.stream.connection.connectionId"
+              :stream-manager="subscriber" :loading="sub" :subscriber="index"
+              @click="updateMainVideoStreamManager(subscriber)"
+            />
+          </div>
+          <!-- 메인 화면 -->
           <div id="main-video" v-if="showMainVideo">  
             <main-video :stream-manager="mainStreamManager"/>
           </div>
+          <!-- 쇼핑사이트 -->
           <shopping-site v-if="!showMainVideo" :shopping-mall-url="shoppingMallUrl" class="shopping-site"></shopping-site>
           <div class="buttons">
             <!-- 가상피팅화면 종료 -->
@@ -323,8 +325,8 @@ export default {
 #video-container {
   justify-content: center;
   background-color: #D3E2E7;
-  height: 18vh;
-  border-bottom: 3px solid #8ABDBE;  
+  height: 15vh;
+  /* border-bottom: 3px solid #8ABDBE;   */
 }
 
 .video-row {
@@ -337,8 +339,10 @@ export default {
 }
 
 .group-chat, .closet {
-  width: 290px;
-  height: 82vh;
+  min-width: 290px;
+  width: 29vh;
+  /* ------------------------------ */
+  height: 92.3vh;
   margin: 0;
   background-color: white;
 }
@@ -346,7 +350,8 @@ export default {
 .center {
   position: relative;
   width: 100%;
-  height: 82vh;
+  /* ------------------------------- */
+  height: 100vh;  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -358,7 +363,7 @@ export default {
 }
 
 .shopping-site {
-  height: 73vh;
+  height: 77.1vh;
   margin-bottom: 6px;
 }
 
