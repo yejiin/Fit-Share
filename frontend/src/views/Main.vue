@@ -8,7 +8,12 @@
           <shopping-room-list></shopping-room-list>
           <div class="host-container">
             <host-closet class="host-closet"></host-closet>
-            <button class="btn shadow-none" @click="selectedShoppingRoom.isPrivate ? isPrivate=true : goToRoom()">입장하기</button>
+            <button class="btn shadow-none" 
+              v-if="selectedShoppingRoom" 
+              @click="selectedShoppingRoom.isPrivate ? isPrivate=true : goToRoom()"
+            >
+              입장하기
+            </button>
           </div>
         </div>
 

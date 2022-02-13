@@ -1,7 +1,7 @@
 <template>
   <div class="room-container">
    <h2>Live</h2>
-   <div class="row">
+   <div v-if="shoppingRoomList.length" class="row">
       <div id="room" class="room col-6" :class="index % 2 ? 'room-right' : 'room-left'" 
         :style="{ 'background-image': `url(${require(`@/assets/shopping_${index % 5 + 1}.png`)})` }"
         v-for="(room, index) in shoppingRoomList" :key="index" 
@@ -19,6 +19,10 @@
         </div>
       </div>
     </div>
+    <div v-else class="info-message">
+      <h4>라이브 중인 <span>쇼핑룸</span>이 없습니다.</h4>
+      <h5>친구를 추가하거나 쇼핑룸을 생성해주세요.</h5>
+    </div>
   </div>
 </template>
 
@@ -28,7 +32,6 @@ import { useStore } from 'vuex';
 
 export default {
     name: 'ShoppingRoomList',
-    
     setup() {
       const store = useStore();
 
@@ -162,6 +165,19 @@ h2 {
 
 .host-name {
   margin: 0 0 18px 23px;
+}
+
+.info-message {
+  margin-top: 200px;
+}
+
+h4, h5 {
+  text-align: center;
+  font-weight: bold;
+}
+
+h4 span {
+  color: #f2af46;
 }
 
 </style>
