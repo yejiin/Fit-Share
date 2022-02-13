@@ -7,16 +7,18 @@
         v-for="(room, index) in shoppingRoomList" :key="index" 
         @click="selectShoppingRoom(room)"
       >
-      <div class="participant"><i class="bi bi-eye me-1"></i> {{room.participantCount}} / {{room.maxParticipantCount}}</div>
-      <div class="room-info">
-        <p class="mall-name">{{ room.shoppingMallName }}</p>
-        <div>
-          <span class="host-name">[ {{ room.hostName }} ]</span><span>님의 쇼핑룸</span>
+        <div class="participant">
+          <i class="bi bi-eye me-1"></i> {{room.participantCount}} / {{room.maxParticipantCount}}
         </div>
-        <!-- <p class="host-name">{{ room.hostName }}님의 쇼핑룸</p> -->
+        <i v-if="room.isPrivate" class="fas fa-lock"></i>
+        <div class="room-info">
+          <p class="mall-name">{{ room.shoppingMallName }}</p>
+          <div>
+            <span class="host-name">[ {{ room.hostName }} ]</span><span>님의 쇼핑룸</span>
+          </div>
+        </div>
       </div>
-     </div>
-   </div>
+    </div>
   </div>
 </template>
 
@@ -29,10 +31,7 @@ export default {
     
     setup() {
       const store = useStore();
-      // shoppingRoomList : [
-      //   { shoppingRoomId: 1, hostName: '김싸피', maxParticipantCount: 2, participantCount: 1, isPrivate: true, shoppingMallName: 'nike', shoppingMallUrl: '..' },  // 이 외에 추가적으로
-      // ],
-      
+
       const shoppingRoomList = computed(() => {
         return store.state.room.shoppingRoomList
       });
@@ -100,7 +99,6 @@ h2 {
   height: 297px;  
   border-radius: 10px;
   border: 3px solid #D3E2E7;
-  /* background-color: white; */
   cursor: pointer;
 
   background-repeat : no-repeat;
@@ -131,6 +129,14 @@ h2 {
   font-size: 14px;
 }
 
+.fa-lock {
+  position: absolute;
+  top: 17px;
+  right: 18px;
+  font-size: 20px;
+  color: #ad1d4e;
+}
+
 .room-info {
   position: absolute;
   bottom: 0;
@@ -156,8 +162,6 @@ h2 {
 
 .host-name {
   margin: 0 0 18px 23px;
-  /* border-bottom: 3px solid #f2af46; */
-  /* color: #f2af46; */
 }
 
 </style>
