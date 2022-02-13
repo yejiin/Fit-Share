@@ -348,6 +348,42 @@ i {
   z-index: 2;
 }
 
+@media ( max-width: 1440px ) {
+  .tab-box {
+    top: 300px;
+    left: 900px;
+    position: fixed;
+    z-index: 2;
+  }
+}
+
+@media ( max-width: 1280px ) {
+  .tab-box {
+    top: 300px;
+    left: 700px;
+    position: fixed;
+    z-index: 2;
+  }
+}
+
+@media ( max-width: 1024px ) {
+  .tab-box {
+    top: 300px;
+    left: 500px;
+    position: fixed;
+    z-index: 2;
+  }
+}
+
+@media ( max-width: 768px ) {
+  .tab-box {
+    top: 300px;
+    left: 300px;
+    position: fixed;
+    z-index: 2;
+  }
+}
+
 /* 닫기 이미지 style */
 .close-img {
   width: 30px;
