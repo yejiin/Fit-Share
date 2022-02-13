@@ -38,7 +38,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public void checkChat(Long senderId, Long receiverId) {
-        privateChatRepository.updateIsChecked(senderId, receiverId);
+//        privateChatRepository.updateIsChecked(senderId, receiverId);
     }
 
     @Override

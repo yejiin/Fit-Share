@@ -14,4 +14,10 @@ public interface RedisService {
 
     Long getExpire(String key);
 
+    Set<Object> getSessionParticipants(String sessionId);
+
+    void delSessionParticipant(String sessionId, String memberId);
+
+    Long getSessionParticipantCount(String sessionId);
+
 }

@@ -1,30 +1,40 @@
 package com.fitshare.backend.api.service;
 
 import com.fitshare.backend.db.entity.PrivateChat;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
+import java.util.Set;
 
 @Service
 public class RedisServiceImpl implements RedisService {
     private final static long EXPIRE_TIME = 3600L * 24 * 30; // 30일
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
+    private ValueOperations<String, Object> valueOperations;
+    private SetOperations<String, Object> setOperations;
+    private HashOperations<String, Object, Object> hashOperations;
+
+    private RedisServiceImpl(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+        this.valueOperations = redisTemplate.opsForValue();
+        this.setOperations = redisTemplate.opsForSet();
+        this.hashOperations = redisTemplate.opsForHash();
+    }
 
     // 키-벨류 설정
     public void setData(String key, Object value) {
         if (value instanceof String) {
-            ValueOperations<String, Object> values = redisTemplate.opsForValue();
-            values.set(key, value, Duration.ofSeconds(EXPIRE_TIME));
+            valueOperations.set(key, value, Duration.ofSeconds(EXPIRE_TIME));
+        } else if (value instanceof Long) {
+            setOperations.add(key, String.valueOf(value));
         } else if (value instanceof PrivateChat) {
             // key : chat_senderId_receiverId_createdTime
             String createdTime = LocalDateTime.now().toString();
             key = key + "_" + createdTime;
 
             redisTemplate.expire(key, getSecondsUntilTomorrow());
-            HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
 
             PrivateChat privateChat = (PrivateChat) value;
             hashOperations.put(key, "sender_id", String.valueOf(privateChat.getSender().getId()));
@@ -52,7 +62,6 @@ public class RedisServiceImpl implements RedisService {
         redisTemplate.delete(key);
     }
 
-
     // 만료 기간 가져오기
     public Long getExpire(String key) {
         return redisTemplate.getExpire(key);
@@ -66,16 +75,9 @@ public class RedisServiceImpl implements RedisService {
         return Duration.between(endTime, nowTime);
     }
 
-
-    // 세션에 입장 유저 id 저장
-    @Override
-    public void setSessionParticipant(String sessionId, String memberId) {
-        setOperations.add(sessionId, memberId);
-    }
-
     // 세션에 참여하고 있는 유저 id 가져오기
     @Override
-    public Set<String> getSessionParticipants(String sessionId) {
+    public Set<Object> getSessionParticipants(String sessionId) {
         return setOperations.members(sessionId);
     }
 
