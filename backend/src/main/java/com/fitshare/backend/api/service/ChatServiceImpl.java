@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,24 +19,26 @@ public class ChatServiceImpl implements ChatService {
 
     private final PrivateChatRepository privateChatRepository;
     private final MemberRepository memberRepository;
+    private final RedisService redisService;
 
     @Override
     public void addPrivateChat(Long memberId, PrivateChatReq privateChatReq) {
         Member sender = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
         Member receiver = memberRepository.findById(privateChatReq.getReceiverId()).orElseThrow(() -> new MemberNotFoundException(memberId));
 
-        PrivateChat privateChat = new PrivateChat();
-        privateChat.setSender(sender);
-        privateChat.setReceiver(receiver);
-        privateChat.setMessage(privateChatReq.getMessage());
-        privateChat.setIsChecked(false);
+        PrivateChat privateChat = PrivateChat.builder()
+                .sender(sender)
+                .receiver(receiver)
+                .message(privateChatReq.getMessage())
+                .build();
 
-        privateChatRepository.save(privateChat);
+        String key = "chat_" + memberId + "_" + privateChatReq.getReceiverId();
+        redisService.setData(key, privateChat);
     }
 
     @Override
-    public void checkChatByTime(LocalDateTime time) {
-
+    public void checkChat(Long senderId, Long receiverId) {
+        privateChatRepository.updateIsChecked(senderId, receiverId);
     }
 
     @Override

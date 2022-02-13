@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider implements InitializingBean {
 
     private static final String AUTHORITIES_KEY = "roles";
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     private Key key;
     private final String secret;
@@ -36,7 +36,7 @@ public class JwtTokenProvider implements InitializingBean {
     private final long tokenValidityInMilliseconds;
 
     public JwtTokenProvider(@org.springframework.beans.factory.annotation.Value("${jwt.secret}") String secret,
-                            @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds, RedisTemplate<String,String> redisTemplate) {
+                            @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds, RedisTemplate<String,Object> redisTemplate) {
         this.secret = secret;
         this.tokenValidityInMilliseconds = tokenValidityInSeconds;
         this.redisTemplate = redisTemplate;

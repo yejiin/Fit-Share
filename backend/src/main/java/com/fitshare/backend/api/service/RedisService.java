@@ -2,13 +2,14 @@ package com.fitshare.backend.api.service;
 
 public interface RedisService {
 
-    void setData(String token, String id);
+    void setData(String key, Object value);
 
-    String getData(String token);
+    Object getData(String key);
 
-    void delData(String token);
+    void delData(String key);
 
-    void setDataExpire(String token,String id,long duration);
+    void setDataExpire(String key, Object value, long duration);
 
-    Long getExpire(String token);
+    Long getExpire(String key);
+
 }
