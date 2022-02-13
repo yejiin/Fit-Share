@@ -9,7 +9,7 @@
           @click="updateMainVideoStreamManager(subscriber)"
         />
       </div>
-      <!-- 나머지 컴포넌트 -->
+      <!-- 컴포넌트 -->
       <div class="components-container">
         <group-chat class="group-chat"></group-chat>
         <div class="center">
@@ -17,14 +17,12 @@
             <main-video :stream-manager="mainStreamManager"/>
           </div>
           <shopping-site v-if="!showMainVideo" :shopping-mall-url="shoppingMallUrl" class="shopping-site"></shopping-site>
-          
-          <!-- 화상회의 버튼 -->
           <div class="buttons">
             <!-- 가상피팅화면 종료 -->
             <button v-if="showMainVideo" class="btn shadow-none stop-fitting-btn" @click="backToSite">
               <i class="fas fa-arrow-left"></i><p>피팅 종료하기</p>
             </button>
-            <!-- 기본기능 -->
+            <!-- 기본 기능 -->
             <button v-if="isAudio" class="btn shadow-none" @click="changeAudio()"><i class="bi bi-mic-mute-fill"></i></button>
             <button v-if="!isAudio" class="btn shadow-none" @click="changeAudio()"><i class="bi bi-mic-fill"></i></button>
             <button v-if="isVideo" class="btn shadow-none" @click="changeVideo()"><i class="bi bi-camera-video-off-fill"></i></button>
@@ -47,9 +45,8 @@
             </div>
           </div>
         </div>
-
+        <!-- 옷장 -->
         <closet :subscribers="subscribers" :my-session-id="mySessionId" :publisher="publisher" @fitting="overlayFilter" class="closet"></closet>
-
       </div>
 		</div>
   </div>
@@ -81,7 +78,7 @@ export default {
         
         let clothesUrl = ref('');
         let isFitting = ref(false);
-        let showMainVideo = ref(false) ; // 피팅 비디오 
+        let showMainVideo = ref(false) ; // fitting 비디오 
         let radioSelect = ref(false);
 
         const loading = reactive({
@@ -123,7 +120,7 @@ export default {
           state.isVideo = video;
         };
 
-        // 옷장과 연결 
+        // 입어보기 버튼의 filter 적용
         const overlayFilter = (url) => {
           clothesUrl.value = url
           radioSelect.value = false
@@ -286,7 +283,7 @@ export default {
             .catch(err => console.log(err));
         }
 
-        // 화상화면 클릭시 해당 화면이 메인으로 이동
+        // 화상화면 클릭시 메인 화면 전환
         const updateMainVideoStreamManager = (stream) => {   
           state.mainStreamManager = stream;
           if (!showMainVideo.value) showMainVideo.value = true;
@@ -326,7 +323,6 @@ export default {
 #video-container {
   justify-content: center;
   background-color: #D3E2E7;
-  /* height: 185px; */
   height: 18vh;
   border-bottom: 3px solid #8ABDBE;  
 }
@@ -338,13 +334,10 @@ export default {
 .components-container {
   display: flex;
   justify-content: space-between;
-  /* border-bottom: 3px solid #8ABDBE; */
 }
 
 .group-chat, .closet {
   width: 290px;
-  /* height: 849px; */
-  /* min-height: 849px; */
   height: 82vh;
   margin: 0;
   background-color: white;
@@ -353,7 +346,6 @@ export default {
 .center {
   position: relative;
   width: 100%;
-  /* min-height: 849px; */
   height: 82vh;
   display: flex;
   flex-direction: column;
@@ -363,18 +355,15 @@ export default {
 .center #main-video {
   position: relative;
   width: 100%;
-  /* height: 780px;   */
 }
 
 .shopping-site {
-  /* height: 79vh; */
   height: 73vh;
   margin-bottom: 6px;
 }
 
 .buttons {
   width: 860px;
-  /* height: 70px; */
   height: 7vh;
   line-height: 70px;
   text-align: center;
@@ -406,7 +395,6 @@ p {
   margin-top: 3px;
 }
 
-/* 확인! */
 .buttons .btn {  
   margin: 0 5px 0;
   cursor: pointer;
