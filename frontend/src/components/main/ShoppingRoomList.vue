@@ -7,10 +7,14 @@
         v-for="(room, index) in shoppingRoomList" :key="index" 
         @click="selectShoppingRoom(room)"
       >
-       <div class="room-info">
+      <div class="participant"><i class="bi bi-eye me-1"></i> {{room.participantCount}} / {{room.maxParticipantCount}}</div>
+      <div class="room-info">
         <p class="mall-name">{{ room.shoppingMallName }}</p>
-        <p class="host-name">{{ room.hostName }}님의 쇼핑룸</p>
-       </div>
+        <div>
+          <span class="host-name">[ {{ room.hostName }} ]</span><span>님의 쇼핑룸</span>
+        </div>
+        <!-- <p class="host-name">{{ room.hostName }}님의 쇼핑룸</p> -->
+      </div>
      </div>
    </div>
   </div>
@@ -19,14 +23,12 @@
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
-import { useCookies } from "vue3-cookies";
 
 export default {
     name: 'ShoppingRoomList',
     
     setup() {
       const store = useStore();
-      const { cookies } = useCookies();
       // shoppingRoomList : [
       //   { shoppingRoomId: 1, hostName: '김싸피', maxParticipantCount: 2, participantCount: 1, isPrivate: true, shoppingMallName: 'nike', shoppingMallUrl: '..' },  // 이 외에 추가적으로
       // ],
@@ -35,15 +37,8 @@ export default {
         return store.state.room.shoppingRoomList
       });
 
-      const setToken = () => {
-        const token = cookies.get('accessToken');
-        const config = { Authorization: `Bearer ${token}`};
-        return config
-      };
-
       const loadShoppingRoomList = () => {
-        const config = setToken()
-        store.dispatch('room/loadShoppingRoomList', config)
+        store.dispatch('room/loadShoppingRoomList')
       };
       
       const selectShoppingRoom = (room) => {
@@ -67,6 +62,7 @@ export default {
   background-color: #FDFAF3;
   border-radius: 16px;
   padding: 0;
+  margin-bottom: 20px;
 }
 
 h2 {
@@ -123,6 +119,18 @@ h2 {
   margin-left: 20px;
 }
 
+.participant {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 65px;
+  background-color: rgba(224, 222, 222, 0.884);
+  border-radius: 5px;
+  padding: 0 5px 0;
+  text-align: center;
+  font-size: 14px;
+}
+
 .room-info {
   position: absolute;
   bottom: 0;
@@ -132,10 +140,24 @@ h2 {
   font-size: 16px;
   font-weight: bold;
 }
+
+.room-info div {
+  margin-bottom: 18px;
+}
+
+.room-info span {
+  font-size: 16px;
+  font-weight: bold;
+}
+
 .mall-name {
   margin: 0 23px 11px;
 }
+
 .host-name {
-  margin: 0 23px 18px;
+  margin: 0 0 18px 23px;
+  /* border-bottom: 3px solid #f2af46; */
+  /* color: #f2af46; */
 }
+
 </style>

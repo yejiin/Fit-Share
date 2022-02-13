@@ -1,20 +1,15 @@
 <template>
   <div>
-    <div v-if="friends.length > 0" class="text-center result-box mt-3">
+    <div v-if="friend.profileImg" class="text-center result-box mt-3">
       검색 결과
     </div>
-    <div v-for="(friend, index) in friends" :key="friend.id" class="d-flex mt-3">
+    <div class="d-flex mt-3" v-if="friend.profileImg">
       <img :src="friend.profileImg" alt="profile-img">
-      <div class="ms-3 d-flex flex-column profile-box">
-        <div class="d-flex justify-content-between name-box">
-          {{ friend.name }}
-        </div>
-        <div class="d-flex mt-2 email-box">
-          {{ friend.email }}
-        </div>
+      <div class="ms-3 profile-box name-box">
+        {{ friend.name }}
       </div>
       <div class="d-flex align-self-center btn-box justify-content-center">
-        <button class="plus-btn" @click="RequestFriend(friends, index)">
+        <button class="plus-btn" @click="RequestFriend(friend)">
           +
         </button>
       </div>
@@ -22,46 +17,35 @@
   </div>
 </template>
 
+
 <script>
-import axios from 'axios'
-import { useCookies } from 'vue3-cookies'
+import axios from '../../api/axios'
 
 export default {
   name: 'SearchedUsers',
-  props: ['friends'],
+  props: ['friend'],
   setup() {
-    
-    const { cookies } = useCookies() 
-
-    const setToken = () => {
-      const token = cookies.get('accessToken')
-      const config = {
-        Authorization: `Bearer ${token}`
-      }
-      return config
-    }
 
     // 친구 요청 post
-    const RequestFriend = (friends, index) => {
+    const RequestFriend = (friend) => {
       axios({
         method: 'POST',
-        url: 'http://i6a405.p.ssafy.io:8081/api/v1/friends/requests',
-        headers: setToken(),
-        data: {"friendId": friends[index].id}
+        url: 'friends/requests',
+        data: {"friendId": friend.id}
       })
       .then(res => {
         console.log(res)
       })
-      friends.splice(index, 1)
+      friend.profileImg = null
     }
 
     return {
       RequestFriend,
-      setToken,
     }
   }
 }
 </script>
+
 
 <style scoped>
 .input-box {
@@ -83,12 +67,12 @@ input::placeholder {
   width: 180px;
 }
 
-/* user 이름 font-size */
+/* user 이름 font-size /
 .name-box {
   font-size: 16px;
 }
 
-/* email font-size */
+/ email font-size */
 .email-box {
   font-size: 12px;
 }

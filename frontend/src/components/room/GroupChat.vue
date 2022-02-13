@@ -62,7 +62,7 @@ export default {
     });
 
     state.roomId = route.params.roomId; // 쇼핑룸 생성 시 쇼핑룸 id 가져오기
-    state.userName = computed(() => store.state.login.user_name); // vuex에서 가져오기
+    state.userName = computed(() => store.state.user.user_name); // vuex에서 가져오기
 
     let accessToken = cookies.get("accessToken");
 

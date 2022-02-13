@@ -7,6 +7,7 @@ import com.fitshare.backend.api.service.AuthService;
 import com.fitshare.backend.api.service.MemberService;
 import com.fitshare.backend.api.service.RedisService;
 import com.fitshare.backend.common.auth.JwtTokenProvider;
+import com.fitshare.backend.common.exception.RefreshInvalidException;
 import com.fitshare.backend.common.exception.handler.ErrorResponse;
 import com.fitshare.backend.common.model.BaseResponseBody;
 import com.fitshare.backend.common.model.KakaoProfile;
@@ -63,17 +64,23 @@ public class AuthController {
         // 2. DB에서 카카오회원번호로 회원 정보 불러오기
         String uid = Long.toString(kakaoProfile.getId());
 
-        Optional<Member> member = memberService.findMemberByUid(uid);
+        Member member = memberService.findMemberByUid(uid).orElse(null);
 
         // 3. 없으면 DB에 저장
-        if(!member.isPresent())
-           member = Optional.ofNullable(memberService.createKakaoMember(kakaoProfile));
+        if(member == null)
+           member = memberService.createKakaoMember(kakaoProfile);
+        else {
+            String profileUrl = kakaoProfile.getKakao_account().getProfile().getProfile_image_url();
+            if(!profileUrl.equals(member.getProfileImg()))
+                memberService.updateProfileImage(member,profileUrl);
+        }
+
 
         // 4. JWT token 발급
-        String token = authService.createToken(member.get().getId(), RoleType.USER);
-        String refreshToken = authService.createRefreshToken(member.get().getId());
+        String token = authService.createToken(member.getId(), RoleType.USER);
+        String refreshToken = authService.createRefreshToken(member.getId());
 
-        LoginRes loginRes = new LoginRes(member.get().getId(), token, refreshToken, member.get().getName(), member.get().getProfileImg());
+        LoginRes loginRes = new LoginRes(member.getId(), token, refreshToken, member.getName(), member.getProfileImg());
 
 
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED, LOGIN, loginRes));
@@ -115,7 +122,7 @@ public class AuthController {
 
         Optional<Member> member = memberService.findMemberByUid(uid);
 
-        if(!member.isPresent())
+        if(member == null)
             member = Optional.ofNullable(memberService.createNaverMember(naverProfile));
 
         String token = authService.createToken(member.get().getId(), RoleType.USER);
@@ -132,7 +139,7 @@ public class AuthController {
     @PostMapping(value = "/refresh")
     public ResponseEntity<BaseResponseBody> refreshToken(@RequestParam String refreshToken){
         if(!tokenProvider.validateToken(refreshToken))
-            throw new AccessDeniedException(INVALID_TOKEN);
+            throw new RefreshInvalidException();
 
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED,REFRESH_TOKEN,authService.refreshAccessToken(refreshToken)));
     }

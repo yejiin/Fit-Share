@@ -1,8 +1,8 @@
 import { createStore } from 'vuex';
-
-import { room } from '@/store/modules/room';
-import { login } from '@/store/modules/login'
-import { friend } from '@/store/modules/friend'
+import createPersisedState from 'vuex-persistedstate';
+import { room } from "@/store/modules/room";
+import { user } from "@/store/modules/user";
+import { friend } from "@/store/modules/friend";
 
 export default createStore({
 	state: {
@@ -13,13 +13,13 @@ export default createStore({
 	mutations: {
 	},
 	actions: {
-	},
-
+  },
+  plugins: [
+    createPersisedState()
+  ],
 	modules: {
 		room,
-		login,
+    user,
 		friend,
 	}
 });
-
-
