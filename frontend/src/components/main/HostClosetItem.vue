@@ -2,9 +2,12 @@
   <div>
     <div class="row">
       <!-- cloth.clothId, clothes => hostClothes -->
-      <div v-for="cloth in hostClothes.clothId" :key="cloth.id" class="col-4">
+      <div v-for="cloth in hostClothes" :key="cloth.clothId" class="col-4">
         <img :src="cloth.imageUrl" alt="cloth-img">
       </div>
+      <!-- <div v-for="cloth in clothes" :key="cloth.id" class="col-4">
+        <img :src="cloth.src" alt="cloth-img">
+      </div> -->
     </div>
   </div>
 

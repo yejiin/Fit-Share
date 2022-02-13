@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { computed, ref, watch } from 'vue'  // watch
+import { computed, ref, watch } from 'vue'  
 import { useStore } from 'vuex'
 import axios from '@/api/axios'
 import HostClosetItem from './HostClosetItem.vue'
@@ -19,7 +19,7 @@ export default {
 
   setup() {
     const store = useStore();
-    let hostClothes = ref([])  // {clothId: 1, imageUrl: ''}
+    let hostClothes = ref([]) 
     
     const hostCloset = () => {
       console.log(selectedShoppingRoom.value.hostId)
@@ -31,18 +31,12 @@ export default {
     }
 
     const selectedShoppingRoom = computed(() => {
-        hostCloset()
-        console.log('computed')
         return store.state.room.selectedShoppingRoom
     });
 
     watch(selectedShoppingRoom, () => {
-      console.log('watch')
-      hostCloset(selectedShoppingRoom)
+      hostCloset()
     });
-
-    // hostCloset()
-    // // console.log('created')
 
     return {
      selectedShoppingRoom, hostCloset, hostClothes
