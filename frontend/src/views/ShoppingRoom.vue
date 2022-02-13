@@ -10,13 +10,13 @@
         />
       </div>
       <!-- 나머지 컴포넌트 -->
-      <div class="components-container d-flex flex-row">
+      <div class="components-container">
         <group-chat class="group-chat"></group-chat>
         <div class="center">
           <div id="main-video" v-if="showMainVideo">  
             <main-video :stream-manager="mainStreamManager"/>
           </div>
-          <shopping-site :shopping-mall-url="shoppingMallUrl" class="shopping-site"></shopping-site>
+          <shopping-site v-if="!showMainVideo" :shopping-mall-url="shoppingMallUrl" class="shopping-site"></shopping-site>
           
           <!-- 화상회의 버튼 -->
           <div class="buttons">
@@ -142,7 +142,7 @@ export default {
                     {
                         "uri": clothesUrl.value,
                         "offsetXPercent":"-1.5F",
-                        "offsetYPercent":"0.4F", 
+                        "offsetYPercent":"0.4F",
                         "widthPercent":"4.0F",
                         "heightPercent":"4.0F"
                     });
@@ -331,7 +331,8 @@ export default {
 #video-container {
   justify-content: center;
   background-color: #D3E2E7;
-  height: 185px;
+  /* height: 185px; */
+  height: 18vh;
   border-bottom: 3px solid #8ABDBE;  
 }
 
@@ -342,29 +343,44 @@ export default {
 .components-container {
   display: flex;
   justify-content: space-between;
-  border-bottom: 3px solid #8ABDBE;
+  /* border-bottom: 3px solid #8ABDBE; */
 }
 
 .group-chat, .closet {
   width: 290px;
-  height: 849px;
+  /* height: 849px; */
+  /* min-height: 849px; */
+  height: 82vh;
+  margin: 0;
   background-color: white;
 }
 
 .center {
   position: relative;
+  width: 100%;
+  /* min-height: 849px; */
+  height: 82vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .center #main-video {
-  position: absolute;
+  position: relative;
+  width: 100%;
+  /* height: 780px;   */
 }
 
 .shopping-site {
-  height: 780px
+  /* height: 79vh; */
+  height: 73vh;
+  margin-bottom: 6px;
 }
 
 .buttons {
-  height: 70px;
+  width: 860px;
+  /* height: 70px; */
+  height: 7vh;
   line-height: 70px;
   text-align: center;
   position: relative;
@@ -405,10 +421,11 @@ p {
   background-color: red;
   color: white;
   margin-left: 15px;
+  font-size: 1.6vh;
 }
 
 i {
-  font-size: 30px;
+  font-size: 3.3vh;
 }
 
 /* 필터 change */
