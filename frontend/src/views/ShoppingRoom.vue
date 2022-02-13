@@ -47,8 +47,15 @@
             </div>
           </div>
         </div>
-
-        <closet :subscribers="subscribers" :my-session-id="mySessionId" :publisher="publisher" @fitting="overlayFilter" class="closet"></closet>
+        
+        <!-- test -->
+        <details>
+          <summary>
+            <i class="bi bi-arrow-bar-left" v-if="clickStatus" @click="changeClickStatus"></i>
+            <i class="bi bi-arrow-bar-right closeIcon" v-if="clickStatus === false" @click="changeClickStatus"></i>
+          </summary>
+          <closet :subscribers="subscribers" :my-session-id="mySessionId" :publisher="publisher" @fitting="overlayFilter" class="closet"></closet>
+        </details>
 
       </div>
 		</div>
@@ -100,7 +107,13 @@ export default {
           shoppingMallUrl: '',
           isAudio: false,
           isVideo: false,
+
+          clickStatus: true
         });
+
+        const changeClickStatus = () => {
+          state.clickStatus = !state.clickStatus;
+        }
         
         const userData = computed(() => {
           return store.getters['user/userData']
@@ -308,7 +321,7 @@ export default {
         return { 
           goToMain, offAudio, offVideo, onAudio, onVideo, overlayFilter, changeFilter, removeFilter, backToSite,
           joinSession, leaveSession, updateMainVideoStreamManager,
-          ...toRefs(state), ...toRefs(loading), isFitting, showMainVideo, clothesUrl, radioSelect,
+          ...toRefs(state), ...toRefs(loading), isFitting, showMainVideo, clothesUrl, radioSelect, changeClickStatus
         }
     }
 
@@ -432,4 +445,21 @@ i {
   cursor: pointer;
 }
 
+details > summary {
+  list-style: none;
+}
+
+details > summary > i {
+  position: fixed;
+  top: 250px;
+  right: 20px;
+  z-index: 2;
+  width: 20px;
+  height: 30px;
+}
+
+details > summary > .closeIcon {
+  position: fixed;
+  right: 275px;
+}
 </style>

@@ -1,8 +1,6 @@
 <template>
   <div id="closet">
-  
     <div class="accordion" id="accordionExample">
-      <!-- 내 옷장 -->
       <div class="accordion-item">
         <h2 class="accordion-header" :id="'heading'+myId">
           <button class="accordion-button" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+myId" aria-expanded="true" :aria-controls="'collapse'+myId" @click="getClothes(myId)">
@@ -25,7 +23,7 @@
           </div>
         </div>
       </div>
-      <!-- subscribers 옷장 -->
+      
       <div class="accordion-item" v-for="(subscribe, index) in subscribers" :key="index">
         <h2 class="accordion-header" :id="'heading'+index">
           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+index" aria-expanded="false" :aria-controls="'collapse'+index" @click="getFriendsClothes(subscribe)">
@@ -77,6 +75,7 @@ export default {
         return Number(clientData.split(' ')[1])
       }),
       friendsClothes: [],
+      isLoaded: false,
     })
 
 
@@ -165,7 +164,6 @@ export default {
 
     }
 
-
     return {
       ImgUrl,
       AddUrl,
@@ -174,16 +172,16 @@ export default {
       getClothes,
       state,
       myId,
-      getConnectionData, splitName, getFriendsClothes, deleteCloth
+      getConnectionData, splitName, getFriendsClothes, deleteCloth,
     }
   }
 }
 </script>
 
 <style scoped>
-#closet {
+/* #closet {
   border: solid black;
-}
+} */
 
 .head-style {
   font-size: 24px;
