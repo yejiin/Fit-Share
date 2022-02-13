@@ -22,18 +22,32 @@ public class ChatServiceImpl implements ChatService {
     private final RedisService redisService;
 
     @Override
-    public void addPrivateChat(Long memberId, PrivateChatReq privateChatReq) {
+    public PrivateChat makePrivateChatEntity(Long memberId, PrivateChatReq privateChatReq) {
         Member sender = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
-        Member receiver = memberRepository.findById(privateChatReq.getReceiverId()).orElseThrow(() -> new MemberNotFoundException(memberId));
+        Member receiver = memberRepository.findById(Long.valueOf(privateChatReq.getReceiverId())).orElseThrow(() -> new MemberNotFoundException(memberId));
 
         PrivateChat privateChat = PrivateChat.builder()
                 .sender(sender)
                 .receiver(receiver)
                 .message(privateChatReq.getMessage())
+                .createdTime(privateChatReq.getCreatedTime())
                 .build();
 
-        String key = "chat_" + memberId + "_" + privateChatReq.getReceiverId();
+        return privateChat;
+    }
+
+    @Override
+    public void addPrivateChatInRedis(Long memberId, PrivateChatReq privateChatReq) {
+        PrivateChat privateChat = makePrivateChatEntity(memberId, privateChatReq);
+
+        String key = "chat_" + memberId + "_" + privateChatReq.getReceiverId() + "_" + privateChatReq.getCreatedTime();
         redisService.setData(key, privateChat);
+    }
+
+    @Override
+    public void addPrivateChatInMySql(Long memberId, PrivateChatReq privateChatReq) {
+        PrivateChat privateChat = makePrivateChatEntity(memberId, privateChatReq);
+        privateChatRepository.save(privateChat);
     }
 
     @Override

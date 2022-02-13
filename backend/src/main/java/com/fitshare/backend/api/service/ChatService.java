@@ -7,7 +7,11 @@ import java.util.List;
 
 public interface ChatService {
 
-    void addPrivateChat(Long memberId, PrivateChatReq privateChatReq);
+    PrivateChat makePrivateChatEntity(Long memberId, PrivateChatReq privateChatReq);
+
+    void addPrivateChatInRedis(Long memberId, PrivateChatReq privateChatReq);
+
+    void addPrivateChatInMySql(Long memberId, PrivateChatReq privateChatReq);
 
     void checkChat(Long senderId, Long receiverId);
 

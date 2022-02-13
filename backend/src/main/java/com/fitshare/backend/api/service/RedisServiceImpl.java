@@ -4,7 +4,8 @@ import com.fitshare.backend.db.entity.PrivateChat;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.Set;
 
 @Service
@@ -14,7 +15,7 @@ public class RedisServiceImpl implements RedisService {
     private RedisTemplate<String, Object> redisTemplate;
     private ValueOperations<String, Object> valueOperations;
     private SetOperations<String, Object> setOperations;
-    private HashOperations<String, Object, Object> hashOperations;
+    HashOperations<String, Object, Object> hashOperations;
 
     private RedisServiceImpl(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -31,16 +32,14 @@ public class RedisServiceImpl implements RedisService {
             setOperations.add(key, String.valueOf(value));
         } else if (value instanceof PrivateChat) {
             // key : chat_senderId_receiverId_createdTime
-            String createdTime = LocalDateTime.now().toString();
-            key = key + "_" + createdTime;
-
-            redisTemplate.expire(key, getSecondsUntilTomorrow());
-
             PrivateChat privateChat = (PrivateChat) value;
             hashOperations.put(key, "sender_id", String.valueOf(privateChat.getSender().getId()));
             hashOperations.put(key, "receiver_id", String.valueOf(privateChat.getReceiver().getId()));
             hashOperations.put(key, "message", privateChat.getMessage());
-            hashOperations.put(key, "created_time", createdTime);
+            hashOperations.put(key, "created_time", String.valueOf(privateChat.getCreatedTime()));
+
+            String shadowKey = "shadowkey:" + key;
+            valueOperations.set(shadowKey, "", getSecondsUntilTomorrow());
         }
     }
 
@@ -48,6 +47,12 @@ public class RedisServiceImpl implements RedisService {
     public Object getData(String key) {
         ValueOperations<String, Object> values = redisTemplate.opsForValue();
         return values.get(key);
+    }
+
+    // 키값으로 벨류 가져오기
+    public Object getHashData(String key, String hashKey) {
+        HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
+        return hashOperations.get(key, hashKey);
     }
 
     // 만료 기간 설정

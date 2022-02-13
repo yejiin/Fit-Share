@@ -8,6 +8,8 @@ public interface RedisService {
 
     Object getData(String key);
 
+    Object getHashData(String key, String sender_id);
+
     void delData(String key);
 
     void setDataExpire(String key, Object value, long duration);
