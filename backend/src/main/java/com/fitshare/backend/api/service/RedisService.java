@@ -1,5 +1,7 @@
 package com.fitshare.backend.api.service;
 
+import java.util.Set;
+
 public interface RedisService {
 
     void setData(String key, Object value);

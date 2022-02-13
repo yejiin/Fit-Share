@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.time.*;
 
 @Service
-@RequiredArgsConstructor
 public class RedisServiceImpl implements RedisService {
     private final static long EXPIRE_TIME = 3600L * 24 * 30; // 30일
 
@@ -65,5 +64,30 @@ public class RedisServiceImpl implements RedisService {
         LocalTime endTime = LocalTime.of(00, 00, 00);
 
         return Duration.between(endTime, nowTime);
+    }
+
+
+    // 세션에 입장 유저 id 저장
+    @Override
+    public void setSessionParticipant(String sessionId, String memberId) {
+        setOperations.add(sessionId, memberId);
+    }
+
+    // 세션에 참여하고 있는 유저 id 가져오기
+    @Override
+    public Set<String> getSessionParticipants(String sessionId) {
+        return setOperations.members(sessionId);
+    }
+
+    // 세션에서 나간 유저 id 삭제
+    @Override
+    public void delSessionParticipant(String sessionId, String memberId) {
+        setOperations.remove(sessionId, memberId);
+    }
+
+    // 세션에 참여하고 있는 유저 수
+    @Override
+    public Long getSessionParticipantCount(String sessionId) {
+        return setOperations.size(sessionId);
     }
 }
