@@ -150,7 +150,6 @@ export default {
         console.log("szfdz");
         console.log(koreaTime());
         let sendMsg = {
-          roomId: state.roomId,
           senderName: state.userName,
           message: state.message,
           createdTime: koreaTime(),
