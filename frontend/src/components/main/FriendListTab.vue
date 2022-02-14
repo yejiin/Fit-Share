@@ -18,10 +18,13 @@
         </div>
         <div class="d-flex mt-2 button-box">
           <button class="" @click="DeleteFriend(stateFriends, index)">친구삭제</button>
-          <button class="ms-3">채팅하기</button>
+          <button type="button" class="ms-3" @click="openChatting">채팅하기</button>
         </div>
       </div>
     </div>
+
+    <friend-chatting v-if="state.chattingStatus" class="chattingRoom"></friend-chatting>
+    <button v-if="state.chattingStatus" @click="openChatting" class="btn-close btn-secondary closeChatting"></button>
 
   </div>
 </template>
@@ -30,17 +33,19 @@
 import { ref, reactive, computed } from 'vue'
 import axios from '../../api/axios'
 import { useStore } from "vuex";
+import FriendChatting from './FriendChatting.vue';
 
 export default {
   name: 'FriendListTab',
   components: {
-
+    FriendChatting,
   },
   setup() {
     const state = reactive({
       friends: [],
       friendLists: [],
       friendEmail: [],
+      chattingStatus: false,
     })
 
     const SearchFriend = ref('')
@@ -107,6 +112,9 @@ export default {
         })
     }
 
+    const openChatting = () => {
+      state.chattingStatus = !state.chattingStatus;
+    }
 
     return {
       state,
@@ -114,7 +122,7 @@ export default {
       GetFriendList,
       DeleteFriend,
       stateFriends,
-      SearchFriendEmail,
+      SearchFriendEmail, openChatting
     }
   }
 }
@@ -155,5 +163,19 @@ img {
   width: 60px;
   height: 60px;
   border-radius: 30px;
+}
+
+.chattingRoom {
+  position: fixed;
+  right: 410px;
+  top: 300px;
+  z-index: 3;
+}
+
+.closeChatting {
+  position: fixed;
+  right: 773px;
+  top: 272px;
+  z-index: 3;
 }
 </style>
