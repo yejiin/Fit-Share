@@ -1,6 +1,6 @@
 package com.fitshare.backend.api.service;
 
-import java.util.Set;
+import java.util.Map;
 
 public interface RedisService {
 
@@ -8,15 +8,13 @@ public interface RedisService {
 
     Object getData(String key);
 
+    Map<?, ?> getEntries(String key);
+
     void delData(String key);
 
-    void setDataExpire(String key, Object value, long duration);
-
-    Long getExpire(String key);
-
-    Set<Object> getSessionParticipants(String sessionId);
-
     void delSessionParticipant(String sessionId, String memberId);
+
+    void delSession(String sessionId);
 
     Long getSessionParticipantCount(String sessionId);
 

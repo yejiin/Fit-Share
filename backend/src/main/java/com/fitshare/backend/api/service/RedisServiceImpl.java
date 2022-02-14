@@ -4,8 +4,9 @@ import com.fitshare.backend.db.entity.PrivateChat;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
 
-import java.time.*;
-import java.util.Set;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.Map;
 
 @Service
 public class RedisServiceImpl implements RedisService {
@@ -24,47 +25,41 @@ public class RedisServiceImpl implements RedisService {
     }
 
     // 키-벨류 설정
+    @Override
     public void setData(String key, Object value) {
         if (value instanceof String) {
             valueOperations.set(key, value, Duration.ofSeconds(EXPIRE_TIME));
         } else if (value instanceof Long) {
             setOperations.add(key, String.valueOf(value));
         } else if (value instanceof PrivateChat) {
-            // key : chat_senderId_receiverId_createdTime
-            String createdTime = LocalDateTime.now().toString();
-            key = key + "_" + createdTime;
-
-            redisTemplate.expire(key, getSecondsUntilTomorrow());
-
+            // key : chat_senderId_receiverId
             PrivateChat privateChat = (PrivateChat) value;
-            hashOperations.put(key, "sender_id", String.valueOf(privateChat.getSender().getId()));
-            hashOperations.put(key, "receiver_id", String.valueOf(privateChat.getReceiver().getId()));
-            hashOperations.put(key, "message", privateChat.getMessage());
-            hashOperations.put(key, "created_time", createdTime);
+            hashOperations.put(key, String.valueOf(privateChat.getCreatedTime()), privateChat.getMessage());
+
+            String shadowKey = "shadowkey:" + key;
+            if (redisTemplate.getExpire(shadowKey) <= 0) {
+                valueOperations.set(shadowKey, "", getSecondsUntilTomorrow());
+            }
         }
     }
 
     // 키값으로 벨류 가져오기
+    @Override
     public Object getData(String key) {
-        ValueOperations<String, Object> values = redisTemplate.opsForValue();
-        return values.get(key);
+        return valueOperations.get(key);
     }
 
-    // 만료 기간 설정
-    public void setDataExpire(String key, Object value, long duration) {
-        ValueOperations<String, Object> values = redisTemplate.opsForValue();
-        Duration expireDuration = Duration.ofSeconds(duration);
-        values.set(key, value, expireDuration);
+    // 키값으로 hashkey, value HashMap 가져오기
+    @Override
+    public Map<?, ?> getEntries(String key) {
+        Map<?, ?> entries = hashOperations.entries(key);
+        return entries;
     }
 
     // 키-벨류 삭제
+    @Override
     public void delData(String key) {
         redisTemplate.delete(key);
-    }
-
-    // 만료 기간 가져오기
-    public Long getExpire(String key) {
-        return redisTemplate.getExpire(key);
     }
 
     // 다음날 정각까지 남은 시간을 초단위로 계산
@@ -75,16 +70,15 @@ public class RedisServiceImpl implements RedisService {
         return Duration.between(endTime, nowTime);
     }
 
-    // 세션에 참여하고 있는 유저 id 가져오기
-    @Override
-    public Set<Object> getSessionParticipants(String sessionId) {
-        return setOperations.members(sessionId);
-    }
-
     // 세션에서 나간 유저 id 삭제
     @Override
     public void delSessionParticipant(String sessionId, String memberId) {
         setOperations.remove(sessionId, memberId);
+    }
+
+    @Override
+    public void delSession(String sessionId) {
+        setOperations.pop(sessionId, getSessionParticipantCount(sessionId));
     }
 
     // 세션에 참여하고 있는 유저 수
