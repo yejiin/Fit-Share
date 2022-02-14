@@ -7,6 +7,7 @@ import com.fitshare.backend.api.service.AuthService;
 import com.fitshare.backend.api.service.MemberService;
 import com.fitshare.backend.api.service.RedisService;
 import com.fitshare.backend.common.auth.JwtTokenProvider;
+import com.fitshare.backend.common.exception.RefreshInvalidException;
 import com.fitshare.backend.common.exception.handler.ErrorResponse;
 import com.fitshare.backend.common.model.BaseResponseBody;
 import com.fitshare.backend.common.model.KakaoProfile;
@@ -119,15 +120,15 @@ public class AuthController {
 
         String uid = naverProfile.getResponse().getId();
 
-        Optional<Member> member = memberService.findMemberByUid(uid);
+        Member member = memberService.findMemberByUid(uid).orElse(null);
 
         if(member == null)
-            member = Optional.ofNullable(memberService.createNaverMember(naverProfile));
+            member = memberService.createNaverMember(naverProfile);
 
-        String token = authService.createToken(member.get().getId(), RoleType.USER);
-        String refreshToken = authService.createRefreshToken(member.get().getId());
+        String token = authService.createToken(member.getId(), RoleType.USER);
+        String refreshToken = authService.createRefreshToken(member.getId());
 
-        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED, LOGIN, new LoginRes(member.get().getId(), token,refreshToken, member.get().getName(), member.get().getProfileImg())));
+        return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED, LOGIN, new LoginRes(member.getId(), token,refreshToken, member.getName(), member.getProfileImg())));
     }
 
     @ApiOperation(value = "토큰 재발급 요청", notes = "만료된 accessToken을 refreshToken을 통해 재발급하는 api입니다.")
@@ -138,7 +139,7 @@ public class AuthController {
     @PostMapping(value = "/refresh")
     public ResponseEntity<BaseResponseBody> refreshToken(@RequestParam String refreshToken){
         if(!tokenProvider.validateToken(refreshToken))
-            throw new AccessDeniedException(INVALID_TOKEN);
+            throw new RefreshInvalidException();
 
         return ResponseEntity.ok(BaseResponseBody.of(HttpStatus.CREATED,REFRESH_TOKEN,authService.refreshAccessToken(refreshToken)));
     }

@@ -1,26 +1,21 @@
 package com.fitshare.backend.api.service;
 
-import java.util.Set;
+import java.util.Map;
 
 public interface RedisService {
 
-    void setData(String token, String id);
+    void setData(String key, Object value);
 
-    String getData(String token);
+    Object getData(String key);
 
-    void delData(String token);
+    Map<?, ?> getEntries(String key);
 
-    void setDataExpire(String token,String id,long duration);
-
-    Long getExpire(String token);
-
-    void setSessionParticipant(String sessionId, String memberId);
-
-    Set<String> getSessionParticipants(String sessionId);
+    void delData(String key);
 
     void delSessionParticipant(String sessionId, String memberId);
 
     void delSession(String sessionId);
 
     Long getSessionParticipantCount(String sessionId);
+
 }

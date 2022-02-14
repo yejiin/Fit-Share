@@ -43,36 +43,9 @@ export default {
     const getKakaoAccount = async (kakaoToken) => {
       let path = "https://i6a405.p.ssafy.io/api/v1/auth/kakao/login";
       await axios
-        .get(path,{
-          params: {
-            accessToken: kakaoToken,
-          },
-        })
-        .then((res) => {
-          if (res.data.statusCode === 201) {
-            // Cookie에 'accessToken' 설정
-            cookies.set("accessToken", res.data.data.accessToken);
-            store.dispatch("user/setId", res.data.data.id, { root: true });
-            store.dispatch("user/setName", res.data.data.name, { root: true });
-            store.dispatch("user/setProfileURI", res.data.data.profileURI, {
-              root: true,
-            });
-            store.dispatch("user/setRefreshToken", res.data.data.refreshToken);
-            movePage();
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        }); 
-    };
-
-    /* 네이버 로그인 요청  */
-    const getNaverAccount = async (naverToken) => {
-      let path = "https://i6a405.p.ssafy.io/api/v1/auth/naver/user";
-      await axios
         .get(path, {
           params: {
-            accessToken: naverToken,
+            accessToken: kakaoToken,
           },
         })
         .then((res) => {
@@ -93,12 +66,40 @@ export default {
         });
     };
 
+    /* 네이버 로그인 요청  */
+    const getNaverAccount = async (naverToken) => {
+      let path = "https://i6a405.p.ssafy.io/api/v1/auth/naver/login";
+      await axios
+        .get(path, {
+          params: {
+            accessToken: naverToken,
+          },
+        })
+        .then((res) => {
+          if (res.data.statusCode === 201) {
+            // Cookie에 'accessToken' 설정
+            cookies.set("accessToken", res.data.data.accessToken);
+            store.dispatch("user/setId", res.data.data.id, { root: true });
+            store.dispatch("user/setName", res.data.data.name, { root: true });
+            store.dispatch("user/setProfileURI", res.data.data.profileURI, {
+              root: true,
+            });
+            store.dispatch("user/setRefreshToken", res.data.data.refreshToken);
+            store.dispatch("user/setIsLogin", true);
+            movePage();
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
+
     /* 카카오 액세스 토큰 요청  */
     const getKakakoToken = async (kakaoCode) => {
       let path = `https://i6a405.p.ssafy.io/api/v1/auth/kakao/token?code=${kakaoCode}`;
-      
+
       await axios
-      // await http
+        // await http
         .get(path)
         .then((res) => {
           if (res.data.statusCode === 200) {
