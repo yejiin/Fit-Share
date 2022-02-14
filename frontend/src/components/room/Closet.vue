@@ -42,7 +42,11 @@
         </div>
       </div>
     </div>
-    
+
+    <div v-if="state.errorStaus" class="alert alert-warning" role="alert">
+      <i class="bi bi-exclamation-triangle-fill"></i>이미지 주소를 확인해 주세요
+    </div>
+
   </div>
 </template>
 
@@ -75,6 +79,7 @@ export default {
         return Number(clientData.split(' ')[1])
       }),
       friendsClothes: [],
+      errorStaus: false,
     })
 
 
@@ -105,7 +110,7 @@ export default {
         alert('이미지 주소를 입력하세요')
       }
       else {
-        alert('옷장에 추가되었습니다.')
+        // alert('옷장에 추가되었습니다.')
         axios({
           method: 'POST',
           url: `clothes`,
@@ -114,9 +119,14 @@ export default {
           .then(res => {
             console.log(res)
             state.clothes.push(res.data.data)
+            alert('옷장에 추가되었습니다')
           })
-          .catch(res => {
-            console.log(res)
+          .catch(err => {
+            console.log(err.response)
+            if (err.response.status === 400) {
+              // alert('이미지 주소를 확인해 주세요')
+              state.errorStaus = !state.errorStaus
+            }
           })
         ImgUrl.value = ''
       }
