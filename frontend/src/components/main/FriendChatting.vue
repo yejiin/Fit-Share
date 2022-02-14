@@ -2,10 +2,28 @@
   <div>
     <div class="container">
       <div class="msg-box">
-        <div :value="state.textarea"></div>
-        <div v-for="msg in state.myMessage" :key="msg.createdTime">
-          [나] <br>
-          {{ msg.message }}
+        <div>
+          {{ state.textarea }}
+        </div>
+
+        <!-- test -->
+        <!-- <div v-for="msg in state.testMessage" :key="msg.createdTime" class="friend-msg-box">
+          <div class="mt-2 friend-name" align="right">
+            [{{ msg.username }}] {{ msg.createdTime }} <br/>
+          </div>
+          <div class="friend-msg rounded mt-1">
+            {{ msg.Message }}
+          </div>
+        </div> -->
+
+        <!-- 내 메시지 -->
+        <div v-for="msg in state.myMessage" :key="msg.createdTime" class="my-msg-box">
+          <div class="mt-2">
+            [나] {{ dateFormatChange(msg.createdTime) }} <br/>
+          </div>
+          <div class="my-msg rounded mt-1">
+            {{ msg.message }}
+          </div>
         </div>
       </div>
       <div class="inputDiv">
@@ -48,6 +66,10 @@ export default {
       connected: false,
       currentTime: "",
       myMessage: [],
+      testMessage: [
+        { Message: '하이하이', createdTime: 'dddd', username: 'test' },
+        { Message: '하이하', createdTime: 'ssss', username: 'test1' }
+      ]
     });
 
     state.userName = computed(() => store.state.user.user_name); // vuex에서 가져오기
@@ -61,15 +83,21 @@ export default {
     const sockJs = new SockJS("http://i6a405.p.ssafy.io:8081/api/v1/chat");
     const stomp = Stomp.over(sockJs);
 
-    const now = () => {
-      let date = new Date();
-      if (date.getHours() > 12) {
-        state.currentTime =
-          "오후 " + (date.getHours() - 12) + ":" + date.getMinutes();
+    const dateFormatChange = (date) => {
+      let changedDate = new Date(date);
+      // console.log(changedDate.getHours() + changedDate.getMinutes());
+      if (changedDate.getHours() > 12) {
+        return (
+          "오후 " +
+          pad(changedDate.getHours() - 12) +
+          ":" +
+          pad(changedDate.getMinutes())
+        );
       } else {
-        state.currentTime = "오전 " + date.getHours() + ":" + date.getMinutes();
+        return (
+          "오전 " + pad(changedDate.getHours()) + ":" + pad(changedDate.getMinutes())
+        );
       }
-      return state.currentTime;
     };
 
     const connect = () => {
@@ -87,11 +115,13 @@ export default {
               "[" +
               receiveMsgBody.senderName +
               "] " +
-              receiveMsgBody.createdTime +
+              dateFormatChange(receiveMsgBody.createdTime) +
               "\n" +
               receiveMsgBody.message +
               "\n";
           },
+          console.log('aptlwl'),
+          console.log(state.textarea),
           headers
         );
         (error) => {
@@ -101,17 +131,46 @@ export default {
       });
     };
 
+    const koreaTime = () => {
+      const now = new Date();
+      let temp =
+        now.getFullYear() +
+        "-" +
+        pad(now.getMonth() + 1) +
+        "-" +
+        pad(now.getDate()) +
+        "T" +
+        pad(now.getHours()) +
+        ":" +
+        pad(now.getMinutes()) +
+        ":" +
+        pad(now.getSeconds()) +
+        "." +
+        (now.getMilliseconds() / 1000).toFixed(3).slice(2, 5) +
+        "Z";
+      return temp;
+    };
+
+    const pad = (number) => {
+      if (number < 10) {
+        return "0" + number;
+      }
+      return number;
+    };
+
     // 메세지를 보냈을 때
-    const sendMessage = () => {
+    const sendMessage = async () => {
       // message의 값이 있고 연결된 상태라면
       if (state.message !== "" && state.connected) {
         let sendMsg = {
           senderName: state.userName,
           message: state.message,
-          createdTime: now(),
+          createdTime: koreaTime(),
         };
+        await stomp.send(
+          `/app/messages`, headers, JSON.stringify(sendMsg)
+        )
         console.log(sendMsg.createdTime)
-        stomp.send(`/app/messages`, headers, JSON.stringify(sendMsg));
         state.myMessage.push(sendMsg)
         state.message = "";
       }
@@ -119,13 +178,13 @@ export default {
 
     return {
       state, stomp, headers,
-      now, connect, sendMessage,
+      dateFormatChange, connect, sendMessage,
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
 .container {
   width: 387px;
   height: 464px;
@@ -133,13 +192,13 @@ export default {
   background-color: #fdfaf3;
 }
 
-/* .inputDiv {
+.inputDiv {
   position: relative;
-} */
+}
 
 i {
-  position: fixed;
-  left: 69%;
+  position: absolute;
+  left: 90%;
   top: 95%;
 }
 
@@ -154,14 +213,14 @@ i {
   width: 100%;
   height: 85%;
   overflow-y: scroll;
-  background-color: white;
+  background-color: #fdfaf3;
 }
 
 .msg-box::-webkit-scrollbar {
-  width: 7px;
-  /* background-color: beige; */
+  /* width: 7px; */
+  display: none;
 }
-.msg-box::-webkit-scrollbar-thumb {
+/* .msg-box::-webkit-scrollbar-thumb {
   background-color: #2f3542;
   border-radius: 10px;
 }
@@ -169,5 +228,28 @@ i {
   background-color: #FDFAF3;
   border-radius: 10px;
   box-shadow: inset 0px 0px 5px white;
+} */
+
+.my-msg-box {
+  width: 70%;
+}
+
+.my-msg {
+  /* width: 100%; */
+  /* background-color: #D3E2E7; */
+  /* background-color: #E5EBF7; */
+  /* background-color: #EFEFEF; */
+  background-color: #FFBDBD;
+}
+
+/* .friend-msg-box {
+  width: 70%;
+} */
+
+.friend-msg {
+  width: 70%;
+  margin-left: 30%;
+  background-color: #E5EBF7;
+  text-align: right;
 }
 </style>
