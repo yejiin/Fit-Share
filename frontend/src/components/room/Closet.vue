@@ -183,15 +183,10 @@ export default {
       })
     }
 
-    const fitting = () => {
-
-    }
-
     return {
       ImgUrl,
       AddUrl,
       Urls,
-      fitting,
       getClothes,
       state,
       myId,
