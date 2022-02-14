@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="Main">
     <Navbar/>
     <div id="container">
       <div class="container-box">
@@ -329,5 +329,9 @@ i {
   position: fixed;
   top: 270px;
   right: 383px;
+}
+
+#Main {
+  overflow-x: hidden;
 }
 </style>
