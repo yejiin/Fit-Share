@@ -1,12 +1,10 @@
 <template>
   <div class="video-container" v-if="streamManager">
-    <div>
-      <div v-if="loading" class="spinner-border text-secondary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <ov-publisher-video :stream-manager="streamManager"/>
-      <div v-show="!loading"><p>{{ state.clientData }}</p></div>
+    <div v-if="loading" class="spinner-border text-secondary" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
+    <ov-publisher-video :stream-manager="streamManager"/>
+    <div v-show="!loading"><p>{{ state.clientData }}</p></div>
   </div>
 </template>
 
@@ -52,23 +50,21 @@ export default {
 
 p {
   display: inline-block;
-	/* background: #f8f8f8a8; */
 	padding-left: 5px;
 	padding-right: 5px;
-	color: black;
-	font-weight: bold;
-	border-bottom-left-radius: 10px;
+  background-color: rgba(211, 211, 211, 0.363);
+	color: white;
   position: absolute;
-  font-size: 16px;
+  font-size: 1.4vh;
   left: 50%;
-  bottom: -25px;
+  bottom: -14px;
   transform: translate(-50%, -50%);  
 }
 
 .spinner-border {
   margin-bottom: 20px;
   position: absolute;
-  top: 45%;
-  left: 50%;
+  top: 35%;
+  left: 43%;
 }
 </style>

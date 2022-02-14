@@ -1,45 +1,47 @@
 <template>
   <div>
-    <div class="row">
-      <div v-for="friend in friends" :key="friend.id" class="col-4">
-        <img :src="friend.src" alt="cloth-img">
+    <div v-if="hostClothes.length > 0" class="row">
+      <div v-for="cloth in hostClothes" :key="cloth.clothId" class="col-4">
+        <img :src="cloth.imageUrl" alt="cloth-img">
       </div>
+    </div>
+    <div v-else class="d-flex flex-column">
+      <i class="fas fa-tshirt"></i>
+      <h5>친구의 옷장이 비어 있습니다.</h5>
     </div>
   </div>
 
 </template>
 
 <script>
-import { ref } from 'vue'
-
 export default {
   name: 'HostClosetItem',
-  setup() {
-    const friends= ref([
-      {id: 1, src: require('@/assets/shirt.jpg'), name:'김'},
-      {id: 2, src: require('@/assets/shirt.jpg'), name:'배'},
-      {id: 3, src: require('@/assets/shirt.jpg'), name:'이'},
-      {id: 4, src: require('@/assets/shirt.jpg'), name:'최'},
-      {id: 5, src: require('@/assets/shirt.jpg'), name:'박'},
-      {id: 6, src: require('@/assets/shirt.jpg'), name:'안'},
-      {id: 7, src: require('@/assets/shirt.jpg'), name:'강'},
-      {id: 8, src: require('@/assets/shirt.jpg'), name:'허'},
-      {id: 9, src: require('@/assets/shirt.jpg'), name:'양'},
-      {id: 10, src: require('@/assets/shirt.jpg'), name:'장'},
-    ])
-
-    return {
-      friends,
-    }
-  }
+  props: {
+    hostClothes: Object,
+  },
 }
 </script>
 
 <style scoped>
-img {
-  width: 125px;
-  height: 150px;
-  padding: 0px;
+.row div {
+  margin: 0px;
+  text-align: center;
 }
 
+img {
+  width: 135px;
+  height: 160px;
+  margin-bottom: 5px;
+}
+
+i {
+  margin: 120px 0 30px;
+  font-size: 80px;
+  color: #1B4D50;
+}
+
+h5 {
+  /* font-size: 20px; */
+  font-weight: bold;
+}
 </style>

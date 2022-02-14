@@ -1,49 +1,47 @@
 <template>
   <div class="room-container">
    <h2>Live</h2>
-   <div class="row">
+   <div v-if="shoppingRoomList.length" class="row">
       <div id="room" class="room col-6" :class="index % 2 ? 'room-right' : 'room-left'" 
         :style="{ 'background-image': `url(${require(`@/assets/shopping_${index % 5 + 1}.png`)})` }"
         v-for="(room, index) in shoppingRoomList" :key="index" 
         @click="selectShoppingRoom(room)"
       >
-       <div class="room-info">
-        <p class="mall-name">{{ room.shoppingMallName }}</p>
-        <p class="host-name">{{ room.hostName }}님의 쇼핑룸</p>
-       </div>
-     </div>
-   </div>
+        <div class="participant">
+          <i class="bi bi-eye me-1"></i> {{room.participantCount}} / {{room.maxParticipantCount}}
+        </div>
+        <i v-if="room.isPrivate" class="fas fa-lock"></i>
+        <div class="room-info">
+          <p class="mall-name">{{ room.shoppingMallName }}</p>
+          <div>
+            <span class="host-name">[ {{ room.hostName }} ]</span><span>님의 쇼핑룸</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else class="info-message">
+      <i class="fas fa-store"></i>
+      <h4>라이브 중인 <span>쇼핑룸</span>이 없습니다.</h4>
+      <h5>친구를 추가하거나 쇼핑룸을 생성해주세요.</h5>
+    </div>
   </div>
 </template>
 
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
-import { useCookies } from "vue3-cookies";
 
 export default {
     name: 'ShoppingRoomList',
-    
     setup() {
       const store = useStore();
-      const { cookies } = useCookies();
-      // shoppingRoomList : [
-      //   { shoppingRoomId: 1, hostName: '김싸피', maxParticipantCount: 2, participantCount: 1, isPrivate: true, shoppingMallName: 'nike', shoppingMallUrl: '..' },  // 이 외에 추가적으로
-      // ],
-      
+
       const shoppingRoomList = computed(() => {
         return store.state.room.shoppingRoomList
       });
 
-      const setToken = () => {
-        const token = cookies.get('accessToken');
-        const config = { Authorization: `Bearer ${token}`};
-        return config
-      };
-
       const loadShoppingRoomList = () => {
-        const config = setToken()
-        store.dispatch('room/loadShoppingRoomList', config)
+        store.dispatch('room/loadShoppingRoomList')
       };
       
       const selectShoppingRoom = (room) => {
@@ -67,13 +65,16 @@ export default {
   background-color: #FDFAF3;
   border-radius: 16px;
   padding: 0;
+  margin-bottom: 20px;
+  position: relative;
 }
 
 h2 {
-  font-size: 20px;
+  font-size: 28px;
   font-weight: bold;
   padding: 30px 43px;
   margin: 0;
+  /* color: #1B4D50; */
 }
 
 .row {
@@ -104,8 +105,8 @@ h2 {
   height: 297px;  
   border-radius: 10px;
   border: 3px solid #D3E2E7;
-  /* background-color: white; */
   cursor: pointer;
+  background-color: white;
 
   background-repeat : no-repeat;
   background-size : contain;
@@ -123,6 +124,26 @@ h2 {
   margin-left: 20px;
 }
 
+.participant {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 65px;
+  background-color: rgba(224, 222, 222, 0.884);
+  border-radius: 5px;
+  padding: 0 5px 0;
+  text-align: center;
+  font-size: 14px;
+}
+
+.fa-lock {
+  position: absolute;
+  top: 17px;
+  right: 18px;
+  font-size: 20px;
+  color: #ad1d4e;
+}
+
 .room-info {
   position: absolute;
   bottom: 0;
@@ -132,10 +153,44 @@ h2 {
   font-size: 16px;
   font-weight: bold;
 }
+
+.room-info div {
+  margin-bottom: 18px;
+}
+
+.room-info span {
+  font-size: 16px;
+  font-weight: bold;
+}
+
 .mall-name {
   margin: 0 23px 11px;
 }
+
 .host-name {
-  margin: 0 23px 18px;
+  margin: 0 0 18px 23px;
 }
+
+.info-message {
+  margin-top: 240px;
+}
+
+.info-message i {
+  position: absolute;
+  left: 50%;
+  top: 28%;
+  transform: translate(-50%, 0);
+  font-size: 80px;
+  color: #1B4D50;
+}
+
+h4, h5 {
+  text-align: center;
+  font-weight: bold;
+}
+
+h4 > span {
+  color: #f2af46;
+}
+
 </style>

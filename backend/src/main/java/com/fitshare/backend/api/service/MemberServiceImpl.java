@@ -42,7 +42,7 @@ public class MemberServiceImpl implements MemberService  {
 
     @Override
     public Member createNaverMember(NaverProfile naverProfile) {
-
+        
         checkDuplicatedEmail(naverProfile.getResponse().getEmail());
 
         Member member = new Member();
@@ -51,31 +51,28 @@ public class MemberServiceImpl implements MemberService  {
         member.setUid(naverProfile.getResponse().getId());
         member.setName(naverProfile.getResponse().getName());
         member.setEmail(naverProfile.getResponse().getEmail());
-        member.setProfileImg(naverProfile.getResponse().getMobile());
+        member.setProfileImg(naverProfile.getResponse().getProfile_image());
         member.setPhone(naverProfile.getResponse().getMobile());
 
         return createMember(member);
     }
 
     @Override
+    public void updateProfileImage(Member member, String imageUrl) {
+        member.setProfileImg(imageUrl);
+        memberRepository.save(member);
+    }
+
+    @Override
     public Optional<Member> findMemberByUid(String uid) {
-
-        Optional<Member> member = memberRepository.findByUid(uid);
-
-        if(member.isPresent())
-            return member;
-
-        return null;
+      
+        return memberRepository.findByUid(uid);
     }
 
     @Override
     public Optional<Member> findMemberById(Long id) {
 
-        Optional<Member> member = memberRepository.findById(id);
-
-        if (member.isPresent()) return member;
-
-        return null;
+        return memberRepository.findById(id);
     }
 
     @Override
@@ -84,6 +81,10 @@ public class MemberServiceImpl implements MemberService  {
     }
 
     private void checkDuplicatedEmail(String email) {
-        memberRepository.findByEmail(email).orElseThrow(EmailDuplicatedException::new);
+        Optional<Member> member = memberRepository.findByEmail(email);
+
+        if (member.isPresent())
+            throw new EmailDuplicatedException();
     }
+
 }

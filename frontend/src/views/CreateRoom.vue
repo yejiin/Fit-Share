@@ -87,8 +87,8 @@
               <input v-model="password" class="form-control shadow-none" type="password" placeholder="6자리 이하로 작성해주세요">
               <p class="password-error" v-if="passwordError">{{ passwordError }}</p>
             </div>
-            <div class="text-center">
-              <button class="btn create-btn shadow-none" @click="validationCheck()">생성하기</button>
+            <div class="button-box">
+              <button class="btn shadow-none" @click="validationCheck()">생성하기</button>
               <button class="btn shadow-none" @click="goToMain()">취소</button>
             </div>        
           </div>
@@ -101,9 +101,7 @@
 <script>
 import { reactive, ref, toRefs, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex'
-import axios from 'axios'
-import { useCookies } from "vue3-cookies";
+import axios from '../api/axios'
 import Navbar from '@/components/Navbar.vue'
 
 export default {
@@ -111,8 +109,6 @@ export default {
   components: { Navbar },
   setup() {
     const router = useRouter();
-    const store = useStore();
-    const { cookies } = useCookies();
     
     let counts = ref([1, 2, 3, 4, 5, 6]);
     let selectedCnt = ref(null);
@@ -126,11 +122,13 @@ export default {
     let isPrivate = ref(false);
     let password = ref(null);
     
+
     const error = reactive({
       cntError: null,
       mallError: null,
       passwordError: null,
     });
+
 
     const state = reactive({
       isMall: true,
@@ -161,7 +159,7 @@ export default {
     
     // 쇼핑몰 검색
    const searchMall = () => {
-      axios.get(`${store.state.url}/v1/shopping-malls?keyword=${searchQuery.value}`)
+      axios.get(`shopping-malls?keyword=${searchQuery.value}`)
         .then(res => {
           searchedMalls.value = res.data.data
         })
@@ -187,12 +185,6 @@ export default {
 
     const selectPublic = () => {
       isPrivate.value = false
-    };
-
-    const setToken = () => {
-      const token = cookies.get('accessToken');
-      const config = { Authorization: `Bearer ${token}`};
-      return config
     };
 
     // 유효성 검사 
@@ -244,17 +236,11 @@ export default {
         shoppingMallName: state.inputMallName, 
         shoppingMallUrl: state.inputMallUrl,  
       };
-      console.log(roomData)
 
-      axios({
-        method : 'post',
-        url: `${store.state.url}/v1/shopping-rooms/`,
-        data: roomData,
-        headers: setToken(),
-      })
+      axios.post('shopping-rooms/', roomData)
         .then(res => {
           const data = res.data.data
-          router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl }}) 
+          router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl, hostId: data.hostId }}) 
         })
         .catch(err => {
           console.log(err.response)
@@ -419,7 +405,7 @@ label {
 .form-radio {
   display: flex;
   flex-direction: row;
-  margin-right: 192px;
+  margin-right: 115px;
   width: 350px;
 }
 
@@ -429,13 +415,13 @@ label {
 }
 
 .form-radio input {
-  margin: 9px 18px 5px 76px;
+  margin: 9px 18px 5px 0;
 }
 
 .form-radio label {
   font-size: 20px;
   width: 60px;
-  margin: 0;
+  margin-right: 73px;
   cursor: pointer;
 }
 
@@ -474,16 +460,20 @@ label {
   text-align: start;
 }
 
+.button-box {
+  /* display: flex;
+  justify-content: space-between; */
+
+  text-align: center;
+}
+
 button {
   width: 330px;
   height: 50px;
   flex-grow: 0;
+  margin: 0 15px;
   border-radius: 12px;
   border: solid 2px #000;
-}
-
-.create-btn {
-  margin: 0 34px 0 0;
 }
 
 /* error */
