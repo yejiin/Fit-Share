@@ -1,5 +1,6 @@
 package com.fitshare.backend.api.response;
 
+import com.fitshare.backend.db.entity.ShoppingRoom;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -25,4 +26,7 @@ public class ShoppingRoomTokenRes {
 
     @ApiModelProperty(name = "쇼핑룸 입장 토큰", example = "token")
     private String token;
+
+    @ApiModelProperty(name = "호스트 Id", example = "1")
+    private Long hostId;
 }

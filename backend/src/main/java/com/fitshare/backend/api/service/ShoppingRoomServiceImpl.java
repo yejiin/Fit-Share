@@ -93,7 +93,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
         // host member 참여자 DB에 저장
         roomParticipantRepository.save(new RoomParticipant(shoppingRoom, member));
 
-        return new ShoppingRoomTokenRes(shoppingRoom.getId(), shoppingRoom.getShoppingMallName(), shoppingRoom.getShoppingMallUrl(), sessionToken);
+        return new ShoppingRoomTokenRes(shoppingRoom.getId(), shoppingRoom.getShoppingMallName(), shoppingRoom.getShoppingMallUrl(), sessionToken, shoppingRoom.getHost().getId());
     }
 
     /**
@@ -120,7 +120,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
             roomParticipantRepository.save(new RoomParticipant(shoppingRoom, member));
         }
 
-        return new ShoppingRoomTokenRes(shoppingRoomId, shoppingRoom.getShoppingMallName(), shoppingRoom.getShoppingMallUrl(), sessionToken);
+        return new ShoppingRoomTokenRes(shoppingRoomId, shoppingRoom.getShoppingMallName(), shoppingRoom.getShoppingMallUrl(), sessionToken, shoppingRoom.getHost().getId());
     }
 
     /**
