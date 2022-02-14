@@ -4,7 +4,7 @@
       {{ selectedShoppingRoom.hostName }}님의 옷장
     </h2>
     <h2 v-else class="host-name fw-bold">옷장</h2>
-    <host-closet-item v-if="selectedShoppingRoom" :host-clothes="hostClothes" class="host-closet-item"></host-closet-item>
+    <host-closet-item :host-clothes="hostClothes" class="host-closet-item"></host-closet-item>
   </div>
 </template>
 
@@ -22,6 +22,7 @@ export default {
     const store = useStore();
     let hostClothes = ref([]);
     
+    // hostcloset 요청 
     const hostCloset = () => {
       if (selectedShoppingRoom.value) {
         axios.get(`clothes/${selectedShoppingRoom.value.shoppingRoomId}/${selectedShoppingRoom.value.hostId}`)
@@ -44,13 +45,12 @@ export default {
      selectedShoppingRoom, hostCloset, hostClothes
     }
   }
-  
 }
 </script>
 
 <style scoped>
 .host-name {
-  font-size: 20px;
+  font-size: 28px;
   font-weight: bold;
   padding: 30px 43px;
   margin: 0;
@@ -76,7 +76,7 @@ export default {
 
 .host-closet-item {
   padding: 0 20px 14px;
-  height: 505px;
+  height: 496px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
@@ -89,6 +89,6 @@ export default {
 }
 .host-closet-item::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: #2f3542;
+  background-color: #B0D8DA;
 }
 </style>
