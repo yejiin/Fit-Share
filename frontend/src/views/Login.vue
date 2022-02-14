@@ -20,7 +20,7 @@
         <div id="imageButton">
           <div id="kakao">
             <a
-              href="https://kauth.kakao.com/oauth/authorize?client_id=9596c9c79f92bc2d9fbdeacfee238961&redirect_uri=http://localhost:8080/callback&response_type=code"
+              href="https://kauth.kakao.com/oauth/authorize?client_id=9596c9c79f92bc2d9fbdeacfee238961&redirect_uri=https://i6a405.p.ssafy.io/callback&response_type=code"
             >
               <img
                 src="//k.kakaocdn.net/14/dn/btqCn0WEmI3/nijroPfbpCa4at5EIsjyf0/o.jpg"

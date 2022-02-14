@@ -49,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
 
         String param = "grant_type=authorization_code" +
                 "&client_id=" + KAKAO_CLIENT_ID +
-                "&redirect_uri=http://localhost:8080/callback" +
+                "&redirect_uri=https://i6a405.p.ssafy.io/callback" +
                 "&code=" + code;
         return getAccessToken(reqURL, param);
     }
