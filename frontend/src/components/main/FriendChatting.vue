@@ -2,19 +2,15 @@
   <div>
     <div class="container">
       <div class="msg-box">
-        <div>
-          {{ state.textarea }}
-        </div>
 
-        <!-- test -->
-        <!-- <div v-for="msg in state.testMessage" :key="msg.createdTime" class="friend-msg-box">
+        <div v-for="msg in state.testMessage" :key="msg.createdTime" class="friend-msg-box">
           <div class="mt-2 friend-name" align="right">
-            [{{ msg.username }}] {{ msg.createdTime }} <br/>
+            [{{ msg.receiveMsgBody.senderName }}] {{ dateFormatChange(msg.receiveMsgBody.createdTime) }} <br/>
           </div>
           <div class="friend-msg rounded mt-1">
-            {{ msg.Message }}
+            {{ msg.receiveMsgBody.message }}
           </div>
-        </div> -->
+        </div>
 
         <!-- 내 메시지 -->
         <div v-for="msg in state.myMessage" :key="msg.createdTime" class="my-msg-box">
@@ -113,17 +109,20 @@ export default {
             // 구독을 설정할 때, 메시지를 받으면 어떻게 처리할건지도 설정
             console.log(response);
             let receiveMsgBody = JSON.parse(response.body);
-            state.textarea +=
-              "[" +
-              receiveMsgBody.senderName +
-              "] " +
-              dateFormatChange(receiveMsgBody.createdTime) +
-              "\n" +
-              receiveMsgBody.message +
-              "\n";
+            // state.textarea +=
+            //   "[" +
+            //   receiveMsgBody.senderName +
+            //   "] " +
+            //   dateFormatChange(receiveMsgBody.createdTime) +
+            //   "\n" +
+            //   receiveMsgBody.message +
+            //   "\n";
+            state.textarea += [
+              receiveMsgBody.senderName,
+              dateFormatChange(receiveMsgBody.createdTime),
+              receiveMsgBody.message
+            ]
           },
-          console.log('aptlwl'),
-          console.log(state.textarea),
           headers
         );
         (error) => {
@@ -132,6 +131,8 @@ export default {
         };
       });
     };
+
+    console.log(state.textarea)
 
     const koreaTime = () => {
       const now = new Date();
@@ -182,8 +183,8 @@ export default {
     console.log(props.friendId)
 
     return {
-      state, stomp, headers,
-      dateFormatChange, connect, sendMessage,
+      state, stomp, headers, accessToken,
+      dateFormatChange, connect, sendMessage, koreaTime, pad,
     }
   }
 }
