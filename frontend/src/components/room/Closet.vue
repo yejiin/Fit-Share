@@ -178,10 +178,6 @@ export default {
 </script>
 
 <style scoped>
-/* #closet {
-  border: solid black;
-} */
-
 .head-style {
   font-size: 24px;
 }
