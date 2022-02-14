@@ -20,5 +20,7 @@ public interface RedisService {
 
     void delSessionParticipant(String sessionId, String memberId);
 
+    void delSession(String sessionId);
+
     Long getSessionParticipantCount(String sessionId);
 }
