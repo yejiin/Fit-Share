@@ -277,13 +277,13 @@ export default {
 
 .warn-alert {
   position: absolute;
-  left:75%;
-  top: 10%;
+  left:80%;
+  top: 6%;
 }
 
 .success-alert {
   position: absolute;
-  left: 40%;
-  top: 15%;
+  left: 80%;
+  top: 6%;
 }
 </style>
