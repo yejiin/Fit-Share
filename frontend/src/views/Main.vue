@@ -355,11 +355,8 @@ i {
 }
 
 .btn-close {
-  width: 30px;
-  height: 30px;
-  border-radius: 25px;
   position: fixed;
-  top: 265px;
-  right: 380px;
+  top: 270px;
+  right: 383px;
 }
 </style>
