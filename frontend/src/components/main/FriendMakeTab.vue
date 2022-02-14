@@ -5,7 +5,7 @@
       class="input-box"
       type="text"
       placeholder="이메일 검색"
-      @keyup="SearchUserEmail"
+      @keyup.enter="SearchUserEmail"
       v-model="SearchUser"
     >
     
