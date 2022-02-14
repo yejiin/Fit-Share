@@ -1,5 +1,6 @@
 package com.fitshare.backend.api.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.Set;
 
+@Slf4j
 @Service
 public class RedisServiceImpl implements RedisService {
     private final static long EXPIRE_TIME = 3600L * 24 * 30; // 30일
@@ -52,6 +54,7 @@ public class RedisServiceImpl implements RedisService {
     // 세션에 입장 유저 id 저장
     @Override
     public void setSessionParticipant(String sessionId, String memberId) {
+        log.info("{} member save in {} session", memberId, sessionId);
         setOperations.add(sessionId, memberId);
     }
 
@@ -64,11 +67,13 @@ public class RedisServiceImpl implements RedisService {
     // 세션에서 나간 유저 id 삭제
     @Override
     public void delSessionParticipant(String sessionId, String memberId) {
+        log.info("{} member in {} session is deleted", memberId, sessionId);
         setOperations.remove(sessionId, memberId);
     }
 
     @Override
     public void delSession(String sessionId) {
+        log.info("{} session is deleted", sessionId);
         setOperations.pop(sessionId, getSessionParticipantCount(sessionId));
     }
 
