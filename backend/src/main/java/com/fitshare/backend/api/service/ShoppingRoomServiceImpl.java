@@ -87,7 +87,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
         // host member 참여자 DB에 저장
         roomParticipantRepository.save(new RoomParticipant(shoppingRoom, member));
 
-        return new ShoppingRoomTokenRes(shoppingRoom.getId(), shoppingRoom.getShoppingMallName(), shoppingRoom.getShoppingMallUrl(), sessionToken);
+        return new ShoppingRoomTokenRes(shoppingRoom.getId(), shoppingRoom.getShoppingMallName(), shoppingRoom.getShoppingMallUrl(), sessionToken, shoppingRoom.getHost().getId());
     }
 
     /**
@@ -100,13 +100,13 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
         ShoppingRoom shoppingRoom = shoppingRoomRepository.findById(shoppingRoomId).orElseThrow(() -> new ShoppingRoomNotFoundException(shoppingRoomId));
 
-        Session session = getSession(shoppingRoom.getSessionId());
-        String sessionToken = getSessionToken(memberId, session, OpenViduRole.PUBLISHER);
-
         // 입장 가능 인원 확인, 참여 인원이 같거나 많은 경우 인원 초과 예외 발생
         if (shoppingRoom.getParticipantCount() <= redisService.getSessionParticipantCount(shoppingRoom.getSessionId())) {
             throw new ExceedParticipantCountException();
         }
+
+        Session session = getSession(shoppingRoom.getSessionId());
+        String sessionToken = getSessionToken(memberId, session, OpenViduRole.PUBLISHER);
 
         // 이미 입장했던 사용자인지 확인
         if (!checkParticipant(memberId, shoppingRoomId)) {
@@ -114,7 +114,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
             roomParticipantRepository.save(new RoomParticipant(shoppingRoom, member));
         }
 
-        return new ShoppingRoomTokenRes(shoppingRoomId, shoppingRoom.getShoppingMallName(), shoppingRoom.getShoppingMallUrl(), sessionToken);
+        return new ShoppingRoomTokenRes(shoppingRoomId, shoppingRoom.getShoppingMallName(), shoppingRoom.getShoppingMallUrl(), sessionToken, shoppingRoom.getHost().getId());
     }
 
     /**
@@ -129,10 +129,24 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
         if (!checkParticipant(memberId, shoppingRoomId))
             throw new ParticipantNotFoundException(memberId, shoppingRoomId);
 
+        Session session = getSession(shoppingRoom.getSessionId());
+
         redisService.delSessionParticipant(shoppingRoom.getSessionId(), String.valueOf(memberId));
 
-        if (redisService.getSessionParticipantCount(shoppingRoom.getSessionId()) == 0)
+        if (redisService.getSessionParticipantCount(shoppingRoom.getSessionId()) == 0) {
             updateShoppingRoomStatus(shoppingRoomId, false);
+        } else {
+            // 호스트가 방을 나가면 세션 종료
+            if (memberId == shoppingRoom.getHost().getId()) {
+                try {
+                    session.close();
+                    redisService.delSession(session.getSessionId());
+                    updateShoppingRoomStatus(shoppingRoomId, false);
+                } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /**
@@ -189,6 +203,7 @@ public class ShoppingRoomServiceImpl implements ShoppingRoomService {
     }
 
     private String getSessionToken(Long memberId, Session session, OpenViduRole role) {
+        log.info("getSessionToken 호출 - {} member, {} session.id", memberId, session.getSessionId());
         String token = "";
         try {
             // 세션 입장 토큰 생성
