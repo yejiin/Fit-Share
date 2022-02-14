@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, ref, computed } from 'vue';
+import { reactive, toRefs, ref, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { OpenVidu } from 'openvidu-browser';
@@ -104,6 +104,7 @@ export default {
           mySessionId: '',
           myUserName: '',  
           shoppingMallUrl: '',
+          hostId: null,
           isAudio: false,
           isVideo: false,
 
@@ -276,6 +277,12 @@ export default {
           window.addEventListener('beforeunload', leaveSession);
         }
 
+        // 화상화면 클릭시 메인 화면 전환
+        const updateMainVideoStreamManager = (stream) => {   
+          state.mainStreamManager = stream;
+          if (!showMainVideo.value) showMainVideo.value = true;
+        }
+
         const leaveSession = () => {
           if (state.session) state.session.disconnect();
           state.session = undefined;
@@ -286,26 +293,25 @@ export default {
 
           window.removeEventListener('beforeunload', leaveSession);
 
-          axios({
-            method : 'post',
-            url: `shopping-rooms/${state.mySessionId}`,
-          })
-            .then(() => {
-              goToMain()
-            })
+          axios.post(`shopping-rooms/${state.mySessionId}`)
+            .then(() => goToMain())
             .catch(err => console.log(err));
         }
 
-        // 화상화면 클릭시 메인 화면 전환
-        const updateMainVideoStreamManager = (stream) => {   
-          state.mainStreamManager = stream;
-          if (!showMainVideo.value) showMainVideo.value = true;
-        }
+        watch(state.subscribers, () => {
+          const userId = store.state.user.user_id
+          if (state.hostId == userId) {
+            return;
+          } else {
+            if (state.subscribers.length == 0) goToMain();
+          }
+        }) 
 
         // created 
         state.mySessionId = route.params.roomId  
         state.shoppingMallUrl = route.params.mallUrl 
         state.myUserName = userData
+        state.hostId = route.params.hostId
         
         joinSession() 
 
@@ -380,7 +386,6 @@ export default {
 
 .buttons {
   width: 900px;
-  /* left: 8%; */
   height: 70px;
   line-height: 70px;
   text-align: center;
