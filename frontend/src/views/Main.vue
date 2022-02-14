@@ -108,7 +108,7 @@ export default {
       axios.get(`shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}`)
         .then(res => {
           const data = res.data.data 
-          router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl }}) 
+          router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl, hostId: data.hostId }}) 
         })
         .catch(err => {
           console.log(err.response)
@@ -304,7 +304,7 @@ i {
   border: none;
   position: fixed;
   right: 120px;
-  bottom: 20px;
+  bottom: 50px;
   background-color: #8ABDBE;
 }
 
@@ -318,19 +318,20 @@ i {
 
 /* 친구버튼 클릭시 나오는 tab style */
 .tab-box {
-  top: 300px;
-  right: 20px;
-  bottom: 10px;
+  right: 120px;
+  bottom: 50px;
   position: fixed;
   z-index: 2;
 }
 
 .friend-close {
-  width: 30px;
-  height: 30px;
-  border-radius: 25px;
   position: fixed;
-  top: 265px;
-  right: 380px;
+  bottom: 614px;
+  right: 486px;
+  z-index: 3;
+}
+
+#Main {
+  overflow-x: hidden;
 }
 </style>
