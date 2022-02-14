@@ -2,7 +2,6 @@
   <div class="container">
     <div>
       <span id="chatLogo"><b>Chat</b></span>
-      <span></span>
     </div>
     <div>
       <textarea
@@ -124,7 +123,7 @@ export default {
         pad(now.getMonth() + 1) +
         "-" +
         pad(now.getDate()) +
-        "T" +
+        "T" + 
         pad(now.getHours()) +
         ":" +
         pad(now.getMinutes()) +
@@ -179,6 +178,7 @@ export default {
 
 <style scoped>
 #container {
+  display: none;
 }
 #chatLogo {
   font-size: 24px;
@@ -186,8 +186,9 @@ export default {
 #textarea {
   height: 82vh;
   resize: none;
-  background-color: #d3e2e7;
-  color: gray;
+  background-color: #6eb1b9;
+  color: black;
+  font-family:'Courier New', Courier, monospace
 }
 #message {
   width: 100%;
