@@ -75,7 +75,6 @@ export default {
         return Number(clientData.split(' ')[1])
       }),
       friendsClothes: [],
-      isLoaded: false,
     })
 
 
@@ -198,12 +197,6 @@ export default {
 .img-url {
   width: 170px; 
 }
-
-/* 버튼 사용 시 스타일 */
-/* .add-button {
-  background-color: white;
-  border: none;
-} */
 
 /* 버튼모양 이미지로 대체했을 때 스타일 */
 .plus-img {
