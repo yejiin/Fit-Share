@@ -1,8 +1,6 @@
 <template>
   <div id="closet">
-  
     <div class="accordion" id="accordionExample">
-      <!-- 내 옷장 -->
       <div class="accordion-item">
         <h2 class="accordion-header" :id="'heading'+myId">
           <button class="accordion-button" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+myId" aria-expanded="true" :aria-controls="'collapse'+myId" @click="getClothes(myId)">
@@ -25,7 +23,7 @@
           </div>
         </div>
       </div>
-      <!-- subscribers 옷장 -->
+      
       <div class="accordion-item" v-for="(subscribe, index) in subscribers" :key="index">
         <h2 class="accordion-header" :id="'heading'+index">
           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse'+index" aria-expanded="false" :aria-controls="'collapse'+index" @click="getFriendsClothes(subscribe)">
@@ -45,11 +43,19 @@
       </div>
     </div>
     
+    <div v-if="warn_alert" class="alert alert-warning warn-alert" role="alert">
+      <i class="bi bi-exclamation-triangle-fill"></i>이미지 주소를 확인해 주세요 
+    </div>
+
+    <div v-if="success_alert" class="alert alert-primary success-alert" role="alert">
+      <i class="bi bi-basket"></i>옷장에 추가되었습니다
+    </div>
+
   </div>
 </template>
 
 <script scoped>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import axios from '../../api/axios'
 
@@ -69,6 +75,10 @@ export default {
     
     const Urls = ref('')
 
+    let warn_alert = ref(false);
+
+    let success_alert = ref(false);
+
     const state = reactive({
       clothes: [],
       subscribers: [],
@@ -77,8 +87,8 @@ export default {
         return Number(clientData.split(' ')[1])
       }),
       friendsClothes: [],
+      errorStatus: false,
     })
-
 
     // publisher data 객체만 추출
     const getConnectionData = () => {
@@ -107,7 +117,7 @@ export default {
         alert('이미지 주소를 입력하세요')
       }
       else {
-        alert('옷장에 추가되었습니다.')
+        // alert('옷장에 추가되었습니다.')
         axios({
           method: 'POST',
           url: `clothes`,
@@ -116,13 +126,25 @@ export default {
           .then(res => {
             console.log(res)
             state.clothes.push(res.data.data)
+            success_alert.value = true
           })
-          .catch(res => {
-            console.log(res)
+          .catch(err => {
+            console.log(err)
+            if (err.response.status == 400) {
+              warn_alert.value = true
+            }
           })
         ImgUrl.value = ''
       }
     }
+
+    watch(success_alert, () => {
+      if (success_alert.value) setTimeout(() => success_alert.value = false, 3000);
+    });
+
+    watch(warn_alert, () => {
+      if (warn_alert.value) setTimeout(() => warn_alert.value = false, 3000);
+    });
 
     // mySessionId번 방의 내 memberId(myId) 의 옷 리스트 GET 요청
     const getClothes = (myId) => {
@@ -161,30 +183,20 @@ export default {
       })
     }
 
-    const fitting = () => {
-
-    }
-
-
     return {
       ImgUrl,
       AddUrl,
       Urls,
-      fitting,
       getClothes,
       state,
       myId,
-      getConnectionData, splitName, getFriendsClothes, deleteCloth
+      getConnectionData, splitName, getFriendsClothes, deleteCloth, warn_alert, success_alert
     }
   }
 }
 </script>
 
 <style scoped>
-#closet {
-  border: solid black;
-}
-
 .head-style {
   font-size: 24px;
 }
@@ -200,12 +212,6 @@ export default {
 .img-url {
   width: 170px; 
 }
-
-/* 버튼 사용 시 스타일 */
-/* .add-button {
-  background-color: white;
-  border: none;
-} */
 
 /* 버튼모양 이미지로 대체했을 때 스타일 */
 .plus-img {
@@ -262,5 +268,17 @@ export default {
 .clth-style {
   width: 300px;
   height: 300px;;
+}
+
+.warn-alert {
+  position: absolute;
+  left:80%;
+  top: 6%;
+}
+
+.success-alert {
+  position: absolute;
+  left: 80%;
+  top: 6%;
 }
 </style>

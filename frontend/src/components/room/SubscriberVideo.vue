@@ -1,12 +1,10 @@
 <template>
   <div class="video-container" v-if="streamManager">
-    <div>
-      <div v-if="loading.length == (subscriber+1) && loading[subscriber] " class="spinner-border text-secondary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <ov-subscriber-video :stream-manager="streamManager"/>
-      <div v-show="!loading[subscriber]"><p>{{ state.clientData }}</p></div>
+    <div v-if="loading.length == (subscriber+1) && loading[subscriber] " class="spinner-border text-secondary" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
+    <ov-subscriber-video :stream-manager="streamManager"/>
+    <div v-show="!loading[subscriber]"><p>{{ state.clientData }}</p></div>
   </div>
 </template>
 
@@ -57,21 +55,19 @@ p {
   display: inline-block;
 	padding-left: 5px;
 	padding-right: 5px;
-	color: black;
-	font-weight: bold;
-	border-bottom-left-radius: 10px;
+	color: white;
   position: absolute;
-  /* font-size: 16px; */
-  font-size: 1.6vh;
+  background-color: rgba(211, 211, 211, 0.363);
+  font-size: 1.4vh;
   left: 50%;
-  bottom: -23px;
-  transform: translate(-50%, -50%);  
+  bottom: -13px;
+  transform: translate(-50%, -50%); 
 }
 
 .spinner-border {
   margin-bottom: 20px;
   position: absolute;
-  top: 40%;
-  left: 42%;
+  top: 35%;
+  left: 43%;
 }
 </style>
