@@ -34,6 +34,7 @@
           id="message"
           v-model="state.message"
           @keyup.enter="sendMessage()"
+          placeholder="Message를 입력해주세요."
           autofocus
         />
         <i class="bi bi-send" @click="sendMessage()"></i>
@@ -51,7 +52,8 @@ import SockJS from "sockjs-client";
 
 export default {
   name: 'FriendChatting',
-  setup() {
+  props: ['friendId'],
+  setup(props) {
     const store = useStore();
     const { cookies } = useCookies();
 
@@ -166,6 +168,7 @@ export default {
           senderName: state.userName,
           message: state.message,
           createdTime: koreaTime(),
+          receiverId: props.friendId,
         };
         await stomp.send(
           `/app/messages`, headers, JSON.stringify(sendMsg)
@@ -175,6 +178,8 @@ export default {
         state.message = "";
       }
     };
+
+    console.log(props.friendId)
 
     return {
       state, stomp, headers,
@@ -241,10 +246,6 @@ i {
   /* background-color: #EFEFEF; */
   background-color: #FFBDBD;
 }
-
-/* .friend-msg-box {
-  width: 70%;
-} */
 
 .friend-msg {
   width: 70%;
