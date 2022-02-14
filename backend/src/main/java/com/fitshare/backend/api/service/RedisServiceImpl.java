@@ -45,13 +45,11 @@ public class RedisServiceImpl implements RedisService {
 
     // 키값으로 벨류 가져오기
     public Object getData(String key) {
-        ValueOperations<String, Object> values = redisTemplate.opsForValue();
-        return values.get(key);
+        return valueOperations.get(key);
     }
 
     // 키값으로 hash 벨류 가져오기
     public Object getHashData(String key, String hashKey) {
-        HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
         return hashOperations.get(key, hashKey);
     }
 
@@ -83,21 +81,9 @@ public class RedisServiceImpl implements RedisService {
         return values;
     }
 
-    // 만료 기간 설정
-    public void setDataExpire(String key, Object value, long duration) {
-        ValueOperations<String, Object> values = redisTemplate.opsForValue();
-        Duration expireDuration = Duration.ofSeconds(duration);
-        values.set(key, value, expireDuration);
-    }
-
     // 키-벨류 삭제
     public void delData(String key) {
         redisTemplate.delete(key);
-    }
-
-    // 만료 기간 가져오기
-    public Long getExpire(String key) {
-        return redisTemplate.getExpire(key);
     }
 
     // 다음날 정각까지 남은 시간을 초단위로 계산
@@ -106,12 +92,6 @@ public class RedisServiceImpl implements RedisService {
         LocalTime endTime = LocalTime.of(00, 00, 00);
 
         return Duration.between(endTime, nowTime);
-    }
-
-    // 세션에 참여하고 있는 유저 id 가져오기
-    @Override
-    public Set<Object> getSessionParticipants(String sessionId) {
-        return setOperations.members(sessionId);
     }
 
     // 세션에서 나간 유저 id 삭제
