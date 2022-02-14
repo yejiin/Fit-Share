@@ -15,7 +15,7 @@ public class RedisServiceImpl implements RedisService {
     private RedisTemplate<String, Object> redisTemplate;
     private ValueOperations<String, Object> valueOperations;
     private SetOperations<String, Object> setOperations;
-    HashOperations<String, Object, Object> hashOperations;
+    private HashOperations<String, Object, Object> hashOperations;
 
     private RedisServiceImpl(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
