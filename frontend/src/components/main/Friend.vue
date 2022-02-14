@@ -132,7 +132,7 @@ input[name="tab_item"] {
 /* 탭 컨텐츠 스타일 */
 .tab_content {
   display: none;
-  padding: 15px 40px 0;
+  padding: 15px 55px 0;
   clear: both;
   height: 400px;
   overflow-y: scroll;
