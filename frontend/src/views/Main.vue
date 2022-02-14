@@ -82,16 +82,16 @@ export default {
     let alert = ref(false);
 
     const OpenTab = () => {
-      status.value = true
+      status.value = true;
     };
 
     const CloseTab = () => {
-      status.value = false
+      status.value = false;
     };
 
     // host 옷장
     const selectedShoppingRoom = computed(() => {
-        return store.state.room.selectedShoppingRoom
+        return store.state.room.selectedShoppingRoom;
     });
     
     // 입장하기
@@ -99,20 +99,20 @@ export default {
       const maxCnt = selectedShoppingRoom.value.maxParticipantCount;
       const cnt = selectedShoppingRoom.value.participantCount;
       if (maxCnt <= cnt) {
-        alert.value = true
+        alert.value = true;
         return;
       }
 
       axios.get(`shopping-rooms/${selectedShoppingRoom.value.shoppingRoomId}`)
         .then(res => {
-          const data = res.data.data 
-          router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl, hostId: data.hostId }}) 
+          const data = res.data.data;
+          router.push({ name: 'ShoppingRoom', params: { roomId: data.shoppingRoomId, token: data.token, mallUrl: data.shoppingRoomUrl, hostId: data.hostId }}); 
         })
         .catch(err => {
-          console.log(err)
+          console.log(err);
           if (err.response.status == 403) alert.value = true;
         })
-    }
+    };
     
     watch(alert, () => {
       if (alert.value) setTimeout(() => alert.value = false, 3000);
@@ -123,19 +123,19 @@ export default {
         .then(res => {
           const data = res.data.data;
           if (data) { 
-            goToRoom()
+            goToRoom();
           } else {
-            errorMessage.value = '비밀번호가 일치하지 않습니다.'
+            errorMessage.value = '비밀번호가 일치하지 않습니다.';
           }
         })
-        .catch(err => console.log(err))
+        .catch(err => console.log(err));
     }
 
     const closeModal = () => {
       isPrivate.value = false;
       inputPassword.value = null;
       if (errorMessage.value) errorMessage.value = '';
-    }
+    };
 
     return {
       status, selectedShoppingRoom, isPrivate, inputPassword, errorMessage, alert,

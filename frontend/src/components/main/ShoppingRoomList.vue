@@ -33,26 +33,27 @@ import { useStore } from 'vuex';
 
 export default {
     name: 'ShoppingRoomList',
+    
     setup() {
       const store = useStore();
 
       const clicked = ref(0);
 
       const shoppingRoomList = computed(() => {
-        return store.state.room.shoppingRoomList
+        return store.state.room.shoppingRoomList;
       });
 
       const loadShoppingRoomList = () => {
-        store.dispatch('room/loadShoppingRoomList')
+        store.dispatch('room/loadShoppingRoomList');
       };
       
       const selectShoppingRoom = (room, index) => {
-        store.dispatch('room/selectedRoom', room)
-        clicked.value = index
+        store.dispatch('room/selectedRoom', room);
+        clicked.value = index;
       };
 
       // created
-      loadShoppingRoomList()
+      loadShoppingRoomList();
 
       return {
         shoppingRoomList, selectShoppingRoom, clicked

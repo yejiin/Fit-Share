@@ -93,7 +93,8 @@ export default {
         const loading = reactive({
           pub: true,
           sub: [],
-        })
+        });
+
         const state = reactive({
           OV: undefined,
           session: undefined,
@@ -138,7 +139,7 @@ export default {
 
         // 입어보기 버튼의 filter 적용
         const overlayFilter = (url) => {
-          clothesUrl.value = url
+          clothesUrl.value = url;
           if (isFitting.value) removeFilter();
           
           state.publisher.stream.applyFilter("FaceOverlayFilter")
@@ -155,8 +156,8 @@ export default {
             })
             .then(() => {
               state.mainStreamManager = state.publisher;
-              isFitting.value = true
-              showMainVideo.value = true
+              isFitting.value = true;
+              showMainVideo.value = true;
             })
             .catch(err => console.log(err));
         };
@@ -198,7 +199,7 @@ export default {
                 } 
             })
             .then(() => {
-              isFitting.value = true
+              isFitting.value = true;
               state.mainStreamManager = state.publisher;
             })
         };
@@ -206,7 +207,7 @@ export default {
         // filter 제거 
         const removeFilter = () => {
           state.publisher.stream.removeFilter()
-            .then(() => console.log("Filter removed"))
+            .then(() => {})
             .catch(err => console.error(err));
         };
 
@@ -267,7 +268,7 @@ export default {
               state.session.publish(publisher);
 
               publisher.on('streamPlaying', function () {
-                loading.pub = false
+                loading.pub = false;
               })
             })
             .catch(error => {
@@ -281,8 +282,9 @@ export default {
         const updateMainVideoStreamManager = (stream) => {   
           state.mainStreamManager = stream;
           if (!showMainVideo.value) showMainVideo.value = true;
-        }
+        };
 
+        // 세션 종료
         const leaveSession = () => {
           if (state.session) state.session.disconnect();
           state.session = undefined;
@@ -296,7 +298,7 @@ export default {
           axios.post(`shopping-rooms/${state.mySessionId}`)
             .then(() => goToMain())
             .catch(err => console.log(err));
-        }
+        };
 
         watch(state.subscribers, () => {
           const userId = store.state.user.user_id
@@ -305,15 +307,15 @@ export default {
           } else {
             if (state.subscribers.length == 0) goToMain();
           }
-        }) 
+        });
 
         // created 
-        state.mySessionId = route.params.roomId  
-        state.shoppingMallUrl = route.params.mallUrl 
-        state.myUserName = userData
-        state.hostId = route.params.hostId
+        state.mySessionId = route.params.roomId; 
+        state.shoppingMallUrl = route.params.mallUrl;
+        state.myUserName = userData;
+        state.hostId = route.params.hostId;
         
-        joinSession() 
+        joinSession();
 
         return { 
           goToMain, changeAudio, changeVideo, overlayFilter, changeFilter, removeFilter, backToSite,
@@ -344,7 +346,6 @@ export default {
   justify-content: center;
   align-items: center;
   background-color: #8ABDBE;
-  /* height: 91vh; */
   width: 220px;
   height: 100vh;
 }
