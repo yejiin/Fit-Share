@@ -31,7 +31,7 @@
             <button v-if="!isVideo" class="btn shadow-none" @click="changeVideo()"><i class="bi bi-camera-video-fill"></i></button>
             <input class="btn shadow-none" type="button" id="buttonLeaveSession" @click="leaveSession" value="나가기">
             <!-- 필터 change -->
-            <div v-if="radioSelect" class="radio-box">
+            <div v-if="isFitting && showMainVideo" class="radio-box">
               <div @click="changeFilter('top')">
                 <input class="form-check-input" type="radio" name="flexRadioDefault" checked="checked" id="top">
                 <label class="form-check-label" for="top">상의</label>
@@ -81,7 +81,7 @@ export default {
         let clothesUrl = ref('');
         let isFitting = ref(false);
         let showMainVideo = ref(false) ; // fitting 비디오 
-        let radioSelect = ref(false);
+        // let radioSelect = ref(false);
 
         const loading = reactive({
           pub: true,
@@ -125,7 +125,7 @@ export default {
         // 입어보기 버튼의 filter 적용
         const overlayFilter = (url) => {
           clothesUrl.value = url
-          radioSelect.value = false
+          // radioSelect.value = false
           if (isFitting.value) removeFilter();
           
           state.publisher.stream.applyFilter("FaceOverlayFilter")
@@ -144,7 +144,7 @@ export default {
               state.mainStreamManager = state.publisher;
               isFitting.value = true
               showMainVideo.value = true
-              radioSelect.value = true
+              // radioSelect.value = true
             })
             .catch(err => console.log(err));
         };
@@ -202,7 +202,7 @@ export default {
         const backToSite = () => {
           if (isFitting.value) removeFilter();
           isFitting.value = false;
-          radioSelect.value = false; 
+          // radioSelect.value = false; 
           showMainVideo.value = false;
         };
 
@@ -301,7 +301,8 @@ export default {
         return { 
           goToMain, changeAudio, changeVideo, overlayFilter, changeFilter, removeFilter, backToSite,
           joinSession, leaveSession, updateMainVideoStreamManager,
-          ...toRefs(state), ...toRefs(loading), isFitting, showMainVideo, clothesUrl, radioSelect,
+          ...toRefs(state), ...toRefs(loading), isFitting, showMainVideo, clothesUrl, 
+          // radioSelect,
           
         }
     }
