@@ -17,7 +17,7 @@
             <!-- 메인 화면 -->
             <main-video id="main-video" v-if="showMainVideo" :stream-manager="mainStreamManager"/>
             <!-- 쇼핑사이트 -->
-            <shopping-site v-if="!showMainVideo" :shopping-mall-url="shoppingMallUrl" class="shopping-site"></shopping-site>
+            <shopping-site v-show="!showMainVideo" :shopping-mall-url="shoppingMallUrl" class="shopping-site"></shopping-site>
             <!-- 옷장 접기 -->
             <details>
               <summary>
