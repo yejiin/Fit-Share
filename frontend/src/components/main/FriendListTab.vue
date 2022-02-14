@@ -18,12 +18,12 @@
         </div>
         <div class="d-flex mt-2 button-box">
           <button class="" @click="DeleteFriend(stateFriends, index)">친구삭제</button>
-          <button type="button" class="ms-3" @click="openChatting">채팅하기</button>
+          <button type="button" class="ms-3" @click="openChatting(friend.id)">채팅하기</button>
         </div>
       </div>
     </div>
 
-    <friend-chatting v-if="state.chattingStatus" class="chattingRoom"></friend-chatting>
+    <friend-chatting v-if="state.chattingStatus" class="chattingRoom" :friendId="state.friendId"></friend-chatting>
     <button v-if="state.chattingStatus" @click="openChatting" class="btn-close btn-secondary closeChatting"></button>
 
   </div>
@@ -46,6 +46,7 @@ export default {
       friendLists: [],
       friendEmail: [],
       chattingStatus: false,
+      friendId: '',
     })
 
     const SearchFriend = ref('')
@@ -112,8 +113,9 @@ export default {
         })
     }
 
-    const openChatting = () => {
+    const openChatting = (friendId) => {
       state.chattingStatus = !state.chattingStatus;
+      state.friendId = friendId
     }
 
     return {
@@ -170,6 +172,21 @@ img {
   right: 410px;
   top: 300px;
   z-index: 3;
+}
+
+@media (max-width: 820px) {
+  .chattingRoom {
+    position: fixed;
+    left: 20px;
+    top: 300px;
+    z-index: 3;
+  }
+  .closeChatting {
+    position: fixed;
+    left: 20px;
+    top: 272px;
+    z-index: 3;
+  }
 }
 
 .closeChatting {
