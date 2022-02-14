@@ -15,8 +15,8 @@ public enum ErrorCode {
     // Shopping Room
     EXCEED_PARTICIPANT_COUNT(403, "S001", "Exceed the number of participants"),
 
-    // Cloth
-    IMAGE_NOT_FOUND(404,"C003","Converting Image is failed");
+    // Dress
+    IMAGE_NOT_FOUND(404,"D001","Converting Image is failed");
 
     private int status;
     private final String code;
