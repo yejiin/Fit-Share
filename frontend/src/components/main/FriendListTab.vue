@@ -1,18 +1,13 @@
 <template>
   <div>
     <!-- 친구 이름 검색 input-box -->
-    <div class="d-flex">
-      <input
-        class="input-box"
-        type="text"
-        v-model="SearchFriend"
-        placeholder="이름 검색"
-        @keyup="SearchFriendEmail"
-      >
-      <button class="search-btn" @click="SearchFriendEmail">
-        <i class="bi bi-search"></i>
-      </button>
-    </div>
+    <input
+      class="input-box"
+      type="text"
+      v-model="SearchFriend"
+      placeholder="이름 검색"
+      @keyup="SearchFriendEmail"
+    >
 
     <!-- 친구 목록 -->
     <div v-for="(friend, index) in stateFriends" :key="friend.id" class="d-flex mt-3">
@@ -23,10 +18,13 @@
         </div>
         <div class="d-flex mt-2 button-box">
           <button class="" @click="DeleteFriend(stateFriends, index)">친구삭제</button>
-          <button class="ms-3">채팅하기</button>
+          <button type="button" class="ms-3" @click="openChatting(friend.id, friend.name)">채팅하기</button>
         </div>
       </div>
     </div>
+
+    <friend-chatting v-if="state.chattingStatus" class="chattingRoom" :friendId="state.friendId" :friendName="state.friendName"></friend-chatting>
+    <button v-if="state.chattingStatus" @click="openChatting" class="btn-close btn-secondary closeChatting"></button>
 
   </div>
 </template>
@@ -35,17 +33,21 @@
 import { ref, reactive, computed } from 'vue'
 import axios from '../../api/axios'
 import { useStore } from "vuex";
+import FriendChatting from './FriendChatting.vue';
 
 export default {
   name: 'FriendListTab',
   components: {
-
+    FriendChatting,
   },
   setup() {
     const state = reactive({
       friends: [],
       friendLists: [],
       friendEmail: [],
+      chattingStatus: false,
+      friendId: '',
+      friendName: '',
     })
 
     const SearchFriend = ref('')
@@ -103,6 +105,11 @@ export default {
         })
     }
 
+    const openChatting = (friendId, friendName) => {
+      state.chattingStatus = !state.chattingStatus;
+      state.friendId = friendId
+      state.friendName = friendName
+    }
 
     return {
       state,
@@ -110,7 +117,7 @@ export default {
       GetFriendList,
       DeleteFriend,
       stateFriends,
-      SearchFriendEmail,
+      SearchFriendEmail, openChatting
     }
   }
 }
@@ -123,8 +130,7 @@ export default {
 }
 
 .input-box {
-  /* width: 301px; */
-  width: 250px;
+  width: 301px;
   border-radius: 20px;
   text-align: center;
 }
@@ -159,6 +165,7 @@ img {
   right: 410px;
   top: 300px;
   z-index: 3;
+  box-shadow: 3px 3px 15px rgb(121 121 121);
 }
 
 @media (max-width: 820px) {
@@ -168,23 +175,18 @@ img {
     top: 300px;
     z-index: 3;
   }
-  .closeChatting {
+  /* .closeChatting {
     position: fixed;
     left: 20px;
     top: 272px;
     z-index: 3;
-  }
+  } */
 }
 
 .closeChatting {
-  position: fixed;
-  right: 773px;
-  top: 272px;
+  position: absolute;
+  right: 755px;
+  top: -24px;
   z-index: 3;
-}
-
-.search-btn {
-  border: none;
-  background-color: #FDFAF3;
 }
 </style>

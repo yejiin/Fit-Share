@@ -21,19 +21,16 @@
         </div>
         <div class="content">
           <div class="viewer">
-            <!-- <group-chat class="group-chat"></group-chat> -->
             <!-- 메인 화면 -->
-            <main-video
-              id="main-video"
-              v-if="showMainVideo"
-              :stream-manager="mainStreamManager"
-            />
+            <main-video id="main-video" v-if="showMainVideo" :stream-manager="mainStreamManager" />
             <!-- 쇼핑사이트 -->
             <shopping-site
               v-show="!showMainVideo"
               :shopping-mall-url="shoppingMallUrl"
               class="shopping-site"
             ></shopping-site>
+            <!-- 단체 채팅 -->
+            <group-chat class="group-chat" v-if="clickChatStatus === false"></group-chat>
             <!-- 옷장 접기 -->
             <closet
               :subscribers="subscribers"
@@ -46,97 +43,64 @@
           </div>
           <!-- 버튼 -->
           <div class="buttons" :class="buttons - center">
-            <!-- 가상피팅화면 종료 -->
-            <button
-              v-if="showMainVideo"
-              class="btn shadow-none stop-fitting-btn"
-              @click="backToSite"
-            >
-              <i class="fas fa-arrow-left"></i>
-              <p>피팅 종료하기</p>
-            </button>
-            <!-- 기본 기능 -->
-            <button
-              v-if="isAudio"
-              class="btn shadow-none"
-              @click="changeAudio()"
-            >
-              <i class="bi bi-mic-mute-fill"></i>
-            </button>
-            <button
-              v-if="!isAudio"
-              class="btn shadow-none"
-              @click="changeAudio()"
-            >
-              <i class="bi bi-mic-fill"></i>
-            </button>
-            <button
-              v-if="isVideo"
-              class="btn shadow-none"
-              @click="changeVideo()"
-            >
-              <i class="bi bi-camera-video-off-fill"></i>
-            </button>
-            <button
-              v-if="!isVideo"
-              class="btn shadow-none"
-              @click="changeVideo()"
-            >
-              <i class="bi bi-camera-video-fill"></i>
-            </button>
-            <input
-              class="btn shadow-none"
-              type="button"
-              id="buttonLeaveSession"
-              @click="leaveSession"
-              value="나가기"
-            />
+            <div id="video-btn" align="right">
+              <!-- 가상피팅화면 종료 -->
+              <button v-if="showMainVideo" class="btn shadow-none stop-fitting-btn" @click="backToSite">
+                <i class="fas fa-arrow-left"></i>
+                <p>피팅 종료하기</p>
+              </button>
+              <!-- 기본 기능 -->
+              <button v-if="isAudio" class="btn shadow-none" @click="changeAudio()">
+                <i class="bi bi-mic-mute-fill"></i>
+              </button>
+              <button v-if="!isAudio" class="btn shadow-none" @click="changeAudio()">
+                <i class="bi bi-mic-fill"></i>
+              </button>
+              <button v-if="isVideo" class="btn shadow-none" @click="changeVideo()">
+                <i class="bi bi-camera-video-off-fill"></i>
+              </button>
+              <button v-if="!isVideo" class="btn shadow-none" @click="changeVideo()">
+                <i class="bi bi-camera-video-fill"></i>
+              </button>
+              <input
+                class="btn shadow-none"
+                type="button"
+                id="buttonLeaveSession"
+                @click="leaveSession"
+                value="나가기"
+              />
 
-            <!-- 필터 change -->
-            <div v-if="isFitting && showMainVideo" class="radio-box">
-              <div @click="changeFilter('top')">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="flexRadioDefault"
-                  checked="checked"
-                  id="top"
-                />
-                <label class="form-check-label" for="top">상의</label>
-              </div>
-              <div @click="changeFilter('bottoms')">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="flexRadioDefault"
-                  id="bottom"
-                />
-                <label class="form-check-label" for="bottom">하의</label>
-              </div>
-              <div @click="changeFilter('hat')">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="flexRadioDefault"
-                  id="hat"
-                />
-                <label class="form-check-label" for="hat">모자</label>
+              <!-- 필터 change -->
+              <div v-if="isFitting && showMainVideo" class="radio-box">
+                <div @click="changeFilter('top')">
+                  <input class="form-check-input" type="radio" name="flexRadioDefault" checked="checked" id="top" />
+                  <label class="form-check-label" for="top">상의</label>
+                </div>
+                <div @click="changeFilter('bottoms')">
+                  <input class="form-check-input" type="radio" name="flexRadioDefault" id="bottom" />
+                  <label class="form-check-label" for="bottom">하의</label>
+                </div>
+                <div @click="changeFilter('hat')">
+                  <input class="form-check-input" type="radio" name="flexRadioDefault" id="hat" />
+                  <label class="form-check-label" for="hat">모자</label>
+                </div>
               </div>
             </div>
-            <button
-              class="btn shadow-none right"
-              v-if="clickStatus"
-              @click="changeClickStatus"
-            >
-              <img src="@/assets/closed_closet.png" alt="" class="closetBtn" />
-            </button>
-            <button
-              class="btn shadow-none right"
-              v-if="clickStatus === false"
-              @click="changeClickStatus"
-            >
-              <img src="@/assets/opened_closet.png" alt="" class="closetBtn" />
-            </button>
+            <div id="closet-btn" align="right">
+              <button class="btn shadow-none right" v-if="clickChatStatus" @click="changeClickChatStatus">
+                <img src="@/assets/chatting_icon.png" alt="" class="chatBtn" />
+              </button>
+              <button class="btn shadow-none right" v-if="clickChatStatus === false" @click="changeClickChatStatus">
+                <img src="@/assets/chatting_icon.png" alt="" class="chatBtn" />
+              </button>
+              <button class="btn shadow-none right" v-if="clickStatus" @click="changeClickStatus">
+                <img src="@/assets/closed_closet.png" alt="" class="closetBtn" />
+              </button>
+
+              <button class="btn shadow-none right" v-if="clickStatus === false" @click="changeClickStatus">
+                <img src="@/assets/opened_closet.png" alt="" class="closetBtn" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -145,17 +109,20 @@
 </template>
 
 <script>
-import { reactive, toRefs, ref, computed, watch } from "vue";
+import { reactive, toRefs, ref, computed, watch, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useStore } from "vuex";
 import { OpenVidu } from "openvidu-browser";
+import { useCookies } from "vue3-cookies";
+import Stomp from "stompjs";
+import SockJS from "sockjs-client";
 import axios from "../api/axios";
 import PublisherVideo from "@/components/room/PublisherVideo.vue";
 import SubscriberVideo from "@/components/room/SubscriberVideo.vue";
 import MainVideo from "@/components/room/MainVideo.vue";
 import ShoppingSite from "@/components/room/ShoppingSite.vue";
 import Closet from "@/components/room/Closet.vue";
-// import GroupChat from '@/components/room/GroupChat.vue';
+import GroupChat from "@/components/room/GroupChat.vue";
 
 export default {
   name: "ShoppingRoom",
@@ -165,9 +132,13 @@ export default {
     MainVideo,
     ShoppingSite,
     Closet,
+    GroupChat,
   },
 
   setup() {
+    const sockJs = new SockJS("https://i6a405.p.ssafy.io/api/v1/chat");
+    const stomp = Stomp.over(sockJs);
+    const { cookies } = useCookies();
     const router = useRouter();
     const route = useRoute();
     const store = useStore();
@@ -194,13 +165,46 @@ export default {
       isAudio: false,
       isVideo: false,
       closetClass: "closet",
+      chatClass: "group-chat",
       clickStatus: true,
+      clickChatStatus: true,
     });
 
+    const accessToken = cookies.get("accessToken");
+
+    const headers = {
+      Authorization: "Bearer " + accessToken,
+    };
+
+    onMounted(() => {
+      connect();
+    });
+
+    const connect = () => {
+      stomp.connect(headers, (frame) => {
+        console.log("Connect Status : " + frame);
+        stomp.subscribe(
+          `/topic/rooms/${state.mySessionId}`,
+          (response) => {
+            store.dispatch("chat/pushMsg", JSON.parse(response.body));
+          },
+          headers
+        );
+        (error) => {
+          console.log("Connect Status : ", error);
+        };
+      });
+    };
     const changeClickStatus = () => {
       state.clickStatus = !state.clickStatus;
       if (state.clickStatus) state.closetClass = "closet blocked";
       else state.closetClass = "closet";
+    };
+
+    const changeClickChatStatus = () => {
+      state.clickChatStatus = !state.clickChatStatus;
+      if (state.clickChatStatus) state.chatClass = "group-chat blocked";
+      else state.chatClass = "group-chat";
     };
 
     const userData = computed(() => {
@@ -355,11 +359,7 @@ export default {
           });
         })
         .catch((error) => {
-          console.log(
-            "There was an error connecting to the session:",
-            error.code,
-            error.message
-          );
+          console.log("There was an error connecting to the session:", error.code, error.message);
         });
 
       window.addEventListener("beforeunload", leaveSession);
@@ -421,6 +421,8 @@ export default {
       showMainVideo,
       clothesUrl,
       changeClickStatus,
+      changeClickChatStatus,
+      connect,
     };
   },
 };
@@ -444,7 +446,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #8ABDBE;
+  background-color: #8abdbe;
   width: 220px;
   height: 100vh;
 }
@@ -467,7 +469,21 @@ export default {
   width: 100%;
 }
 
-.group-chat,
+/* change */
+.group-chat {
+  position: fixed;
+  right: 40px;
+  bottom: 110px;
+  min-width: 290px;
+  width: 180px;
+  height: 530px;
+  margin: 0;
+  background-color: white;
+  border-radius: 10px;
+  /* background-color: #1B4D50; */
+  /* border: 1px solid black; */
+  box-shadow: 3px 3px 15px rgb(121 121 121);
+}
 .closet {
   min-width: 290px;
   width: 29vh;
@@ -490,7 +506,7 @@ export default {
 }
 
 .buttons {
-  width: 900px;
+  width: 100%;
   height: 70px;
   line-height: 70px;
   text-align: center;
@@ -532,6 +548,12 @@ p {
 }
 
 .closetBtn {
+  vertical-align: middle;
+  width: 44px;
+  height: auto;
+}
+
+.chatBtn {
   vertical-align: middle;
   width: 44px;
   height: auto;
@@ -590,5 +612,15 @@ details > summary > i {
 details > summary > .closeIcon {
   position: fixed;
   right: 275px;
+}
+
+#video-btn {
+  float: left;
+  width: 55%;
+}
+
+#closet-btn {
+  float: left;
+  width: 45%;
 }
 </style>

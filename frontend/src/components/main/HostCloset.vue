@@ -1,51 +1,52 @@
 <template>
   <div>
-    <h2 v-if="selectedShoppingRoom" class="host-name fw-bold">
-      {{ selectedShoppingRoom.hostName }}님의 옷장
-    </h2>
+    <h2 v-if="selectedShoppingRoom" class="host-name fw-bold">{{ selectedShoppingRoom.hostName }}님의 옷장</h2>
     <h2 v-else class="host-name fw-bold">옷장</h2>
     <host-closet-item :host-clothes="hostClothes" class="host-closet-item"></host-closet-item>
   </div>
 </template>
 
 <script>
-import { computed, ref, watch } from 'vue';
-import { useStore } from 'vuex';
-import axios from '@/api/axios';
-import HostClosetItem from './HostClosetItem.vue';
+import { computed, ref, watch } from "vue";
+import { useStore } from "vuex";
+import axios from "@/api/axios";
+import HostClosetItem from "./HostClosetItem.vue";
 
 export default {
-  name: 'HostCloset',
+  name: "HostCloset",
   components: { HostClosetItem },
 
   setup() {
     const store = useStore();
     let hostClothes = ref([]);
-    
-    // hostcloset 요청 
+
+    // host 옷장 요청
     const hostCloset = () => {
       if (selectedShoppingRoom.value) {
-        axios.get(`clothes/${selectedShoppingRoom.value.shoppingRoomId}/${selectedShoppingRoom.value.hostId}`)
-          .then(res => {
-            hostClothes.value = res.data.data
+        axios
+          .get(`clothes/${selectedShoppingRoom.value.shoppingRoomId}/${selectedShoppingRoom.value.hostId}`)
+          .then((res) => {
+            hostClothes.value = res.data.data;
           })
-          .catch(err => console.log(err))
+          .catch((err) => console.log(err));
       }
-    }
+    };
 
     const selectedShoppingRoom = computed(() => {
-      return store.state.room.selectedShoppingRoom
+      return store.state.room.selectedShoppingRoom;
     });
 
     watch(selectedShoppingRoom, () => {
-      hostCloset()
+      hostCloset();
     });
 
     return {
-     selectedShoppingRoom, hostCloset, hostClothes
-    }
-  }
-}
+      selectedShoppingRoom,
+      hostCloset,
+      hostClothes,
+    };
+  },
+};
 </script>
 
 <style scoped>
@@ -89,6 +90,6 @@ export default {
 }
 .host-closet-item::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: #B0D8DA;
+  background-color: hsl(210deg 8% 65%);
 }
 </style>
