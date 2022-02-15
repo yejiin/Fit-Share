@@ -36,7 +36,7 @@ export default {
       .then(res => {
         console.log(res)
       })
-      friend.profileImg = null
+      friend = null
     }
 
     return {
