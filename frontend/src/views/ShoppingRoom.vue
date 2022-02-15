@@ -87,6 +87,12 @@
               </div>
             </div>
             <div id="closet-btn" align="right">
+              <button class="btn shadow-none right" v-if="clickChatStatus" @click="changeClickChatStatus">
+                <img src="@/assets/chatting_icon.png" alt="" class="chatBtn" />
+              </button>
+              <button class="btn shadow-none right" v-if="clickChatStatus === false" @click="changeClickChatStatus">
+                <img src="@/assets/chatting_icon.png" alt="" class="chatBtn" />
+              </button>
               <button class="btn shadow-none right" v-if="clickStatus" @click="changeClickStatus">
                 <img src="@/assets/closed_closet.png" alt="" class="closetBtn" />
               </button>
@@ -95,16 +101,6 @@
                 <img src="@/assets/opened_closet.png" alt="" class="closetBtn" />
               </button>
             </div>
-            <!-- <button class="btn shadow-none right" v-if="clickChatStatus" @click="changeClickChatStatus">
-              <img src="@/assets/chatting_icon.png" alt="" class="chatBtn" />
-            </button> -->
-            <!-- <button
-              class="btn shadow-none right"
-              v-if="clickChatStatus === false"
-              @click="changeClickChatStatus"
-            >
-              <img src="@/assets/chatting_icon.png" alt="" class="chatBtn" /> -->
-            <!-- </button> -->
           </div>
         </div>
       </div>
@@ -175,7 +171,7 @@ export default {
     });
 
     const accessToken = cookies.get("accessToken");
-   
+
     const headers = {
       Authorization: "Bearer " + accessToken,
     };
