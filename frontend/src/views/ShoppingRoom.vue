@@ -113,10 +113,13 @@
 </template>
 
 <script>
-import { reactive, toRefs, ref, computed, watch } from "vue";
+import { reactive, toRefs, ref, computed, watch, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useStore } from "vuex";
 import { OpenVidu } from "openvidu-browser";
+import { useCookies } from "vue3-cookies";
+import Stomp from "stompjs";
+import SockJS from "sockjs-client";
 import axios from "../api/axios";
 import PublisherVideo from "@/components/room/PublisherVideo.vue";
 import SubscriberVideo from "@/components/room/SubscriberVideo.vue";
@@ -136,7 +139,14 @@ export default {
     GroupChat,
   },
 
-  setup() {
+  setup(props, {emit}) {
+    onMounted(() => {
+      connect();
+    });
+
+    const sockJs = new SockJS("https://i6a405.p.ssafy.io/api/v1/chat");
+    const stomp = Stomp.over(sockJs);
+    const { cookies } = useCookies();
     const router = useRouter();
     const route = useRoute();
     const store = useStore();
@@ -168,6 +178,28 @@ export default {
       clickChatStatus: true,
     });
 
+    let accessToken = cookies.get("accessToken");
+    let headers = {
+      Authorization: "Bearer " + accessToken,
+    };
+
+    let roomId = route.params.roomId;
+    const connect = () => {
+      stomp.connect(headers, (frame) => {
+        console.log("Connect Status : " + frame);
+        stomp.subscribe(
+          `/topic/rooms/${roomId}`,
+          (response) => {
+            emit('emitMsg', response.body);
+            store.dispatch("chat/pushMsg", response.body, { root: true });
+          },
+          headers
+        );
+        (error) => {
+          console.log("Connect Status : ", error);
+        };
+      });
+    };
     const changeClickStatus = () => {
       state.clickStatus = !state.clickStatus;
       if (state.clickStatus) state.closetClass = "closet blocked";
