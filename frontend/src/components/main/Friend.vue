@@ -59,11 +59,8 @@ export default {
         .then(res => {
           state.friendLists = res.data.data
         })
-        .then(res => {
-          console.log(res)
+        .then(() => {
           const friend = state.friendLists
-          console.log(state.friendLists)
-          console.log(friend)
           store.dispatch('friend/getfriendsbyclick', friend)
         })
     }
@@ -78,7 +75,6 @@ export default {
         'friends/requests',
       )
         .then(res => {
-          console.log(res)
           state.checkRequests = res.data.data
         })
     }

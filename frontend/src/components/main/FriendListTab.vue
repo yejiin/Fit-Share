@@ -65,9 +65,7 @@ export default {
         url: `friends/${stateFriends[index].id}`,
         data: {"friendId": stateFriends[index].id}
         })
-        .then(res => {
-          console.log(stateFriends[index].id)
-          console.log(res)
+        .then(() => {
           stateFriends.splice(index, 1)
         })
     }
@@ -79,15 +77,10 @@ export default {
         url: 'friends',
       })
         .then(res => {
-          console.log(res)
           state.friendLists = res.data.data
         })
-        .then(res => {
-          console.log(res)
+        .then(() => {
           const friend = state.friendLists
-          console.log('성공')
-          console.log(state.friendLists)
-          console.log(friend)
           store.dispatch('friend/getfriends', friend)
         })
     }
@@ -101,12 +94,10 @@ export default {
         url: `friends/${SearchFriend.value}`,
       })
         .then(res => {
-          console.log(res)
           state.friendEmail = res.data.data
           console.log(state.friendEmail)
         })
-        .then(res => {
-          console.log(res)
+        .then(() => {
           const friendbyname = state.friendEmail
           store.dispatch('friend/getfriendsbyname', friendbyname)
         })

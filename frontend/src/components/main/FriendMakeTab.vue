@@ -41,8 +41,6 @@ export default {
     // input에 입력하는 값
     const SearchUser = ref('');
 
-    let alert = ref(false)
-
     // input에 email 입력 시 server에 요청
     const SearchUserEmail = () => {
       if (SearchUser.value) {
@@ -51,7 +49,6 @@ export default {
           url: `members/${SearchUser.value}`,
           })
           .then(res => {
-            console.log(res)
             state.friend = res.data.data
             SearchUser.value = ''
           })
@@ -65,7 +62,6 @@ export default {
       state,
       SearchUser,
       SearchUserEmail,
-      alert
     }
   }
 }
