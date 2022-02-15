@@ -64,7 +64,6 @@ nav {
   justify-content: space-between;
   align-items: center;
   padding-top: 3px;
-  box-shadow: 0 5px 20px -5px #1b4d50;
   background-color: #1b4d50;
 }
 
@@ -99,7 +98,7 @@ nav > img {
   color: #f5ead2;
   font-weight: bold;
   height: 42px;
-  line-height: 57px;
+  line-height: 55px;
   margin-left: 40px;
 }
 

@@ -1,6 +1,6 @@
 <template>
   <div class="room-container">
-    <h2><i class="bi bi-record2-fill me-1"></i>Live</h2>
+    <h2><i class="bi bi-record2-fill me-1"></i>LIVE</h2>
     <div v-if="shoppingRoomList.length" class="row">
       <div
         id="room"
