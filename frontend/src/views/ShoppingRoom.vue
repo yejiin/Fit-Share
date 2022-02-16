@@ -166,7 +166,7 @@ export default {
       isVideo: false,
       closetClass: "closet",
       chatClass: "group-chat",
-      clickStatus: true,
+      clickStatus: false,
       clickChatStatus: true,
     });
 
