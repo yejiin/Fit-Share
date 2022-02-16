@@ -580,7 +580,7 @@ i {
   display: flex;
   position: absolute;
   top: 16px;
-  right: 22px;
+  right: 180px;
   height: 40px;
   line-height: 40px;
   color: #363738;
