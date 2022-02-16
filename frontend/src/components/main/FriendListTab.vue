@@ -123,6 +123,7 @@ export default {
 .profile-img {
   width: 60px;
   height: 60px;
+  min-width: 60px;
 }
 
 .input-box {

@@ -2,7 +2,7 @@
   <div>
     <div v-if="friend" class="text-center result-box mt-3">검색 결과</div>
     <div class="d-flex mt-3" v-if="friend">
-      <img :src="friend.profileImg" alt="profile-img" />
+      <img :src="friend.profileImg" alt="profile-img" class="profile-img" />
       <div class="ms-3 profile-box name-box">
         {{ friend.name }}
       </div>
@@ -40,6 +40,12 @@ export default {
 </script>
 
 <style scoped>
+.profile-img {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+}
+
 .input-box {
   width: 301px;
   border-radius: 20px;
