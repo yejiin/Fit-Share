@@ -1,51 +1,43 @@
 <template>
   <div>
-    <div v-if="friend" class="text-center result-box mt-3">
-      검색 결과
-    </div>
+    <div v-if="friend" class="text-center result-box mt-3">검색 결과</div>
     <div class="d-flex mt-3" v-if="friend">
-      <img :src="friend" alt="profile-img">
+      <img :src="friend.profileImg" alt="profile-img" />
       <div class="ms-3 profile-box name-box">
         {{ friend.name }}
       </div>
       <div class="d-flex align-self-center btn-box justify-content-center">
-        <button class="plus-btn" @click="RequestFriend(friend)">
-          +
-        </button>
+        <button class="plus-btn" @click="RequestFriend(friend)">+</button>
       </div>
     </div>
   </div>
 </template>
 
-
 <script>
-import axios from '../../api/axios'
+import axios from "../../api/axios";
 
 export default {
-  name: 'SearchedUsers',
-  props: ['friend'],
+  name: "SearchedUsers",
+  props: ["friend"],
   setup() {
-
     // 친구 요청 post
     const RequestFriend = (friend) => {
       axios({
-        method: 'POST',
-        url: 'friends/requests',
-        data: {"friendId": friend.id}
-      })
-      .then(res => {
-        console.log(res)
-      })
-      friend = null
-    }
+        method: "POST",
+        url: "friends/requests",
+        data: { friendId: friend.id },
+      }).then((res) => {
+        console.log(res);
+      });
+      friend = null;
+    };
 
     return {
       RequestFriend,
-    }
-  }
-}
+    };
+  },
+};
 </script>
-
 
 <style scoped>
 .input-box {
@@ -60,7 +52,7 @@ input::placeholder {
 
 .result-box {
   font-size: 12px;
-  color: '#565656'
+  color: "#565656";
 }
 
 .profile-box {
@@ -87,10 +79,9 @@ img {
   width: 40px;
   height: 40px;
   border-radius: 25px;
-  background-color: #FDFAF3;
+  background-color: #fdfaf3;
 }
 .btn-box {
   width: 50px;
 }
-
 </style>
