@@ -5,19 +5,30 @@
       <div class="components-container">
         <!-- 화상화면 -->
         <div id="video-container">
-          <publisher-video
-            :stream-manager="publisher"
-            :loading="pub"
-            @click="updateMainVideoStreamManager(publisher)"
-          />
-          <subscriber-video
-            v-for="(subscriber, index) in subscribers"
-            :key="subscriber.stream.connection.connectionId"
-            :stream-manager="subscriber"
-            :loading="sub"
-            :subscriber="index"
-            @click="updateMainVideoStreamManager(subscriber)"
-          />
+          <div class="video-title">
+            <i class="fas fa-users" style="margin-right: 10px;"></i>참가자
+          </div>
+          <div class="videos" style="
+              height: 98vh;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+          ">
+            <publisher-video
+              :stream-manager="publisher"
+              :loading="pub"
+              @click="updateMainVideoStreamManager(publisher)"
+            />
+            <subscriber-video
+              v-for="(subscriber, index) in subscribers"
+              :key="subscriber.stream.connection.connectionId"
+              :stream-manager="subscriber"
+              :loading="sub"
+              :subscriber="index"
+              @click="updateMainVideoStreamManager(subscriber)"
+            />
+          </div>
         </div>
         <div class="content">
           <div class="viewer">
@@ -166,7 +177,7 @@ export default {
       isVideo: false,
       closetClass: "closet",
       chatClass: "group-chat",
-      clickStatus: true,
+      clickStatus: false,
       clickChatStatus: true,
 
       myClothes: [],
@@ -444,7 +455,7 @@ export default {
 }
 
 #session {
-  background-color: #d3e2e7;
+  background-color: #f4f1ee;
 }
 
 #video-container {
@@ -452,14 +463,33 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #8abdbe;
+  background-color: #f4f1ee;
   width: 220px;
   height: 100vh;
+}
+
+.video-title {
+  font-size: 25px;
+  color: #f5f7f7fc;
+  width: 220px;
+  text-align: center;
+  font-weight: bold;
+  padding: 10px;
+  background-color: #438185;
+  height: 60px;
 }
 
 .components-container {
   display: flex;
   flex-direction: row;
+}
+
+.videos {
+  height: 98vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .content {
@@ -480,14 +510,13 @@ export default {
   position: fixed;
   right: 40px;
   bottom: 110px;
+  z-index: 1;
   min-width: 290px;
   width: 180px;
   height: 530px;
   margin: 0;
   background-color: white;
   border-radius: 10px;
-  /* background-color: #1B4D50; */
-  /* border: 1px solid black; */
   box-shadow: 3px 3px 15px rgb(121 121 121);
 }
 .closet {
@@ -586,7 +615,7 @@ i {
   display: flex;
   position: absolute;
   top: 16px;
-  right: 22px;
+  right: 180px;
   height: 40px;
   line-height: 40px;
   color: #363738;
