@@ -8,65 +8,74 @@
         placeholder="이메일 검색"
         @keyup.enter="SearchUserEmail"
         v-model="SearchUser"
-      >
+      />
       <button class="search-btn" @click="SearchUserEmail">
         <i class="bi bi-search"></i>
       </button>
     </div>
-    
+
     <!-- 이름, 이메일로 검색 시 나오는 users들 components -->
     <searched-users :friend="state.friend"></searched-users>
-
-
   </div>
 </template>
 
-
 <script>
-import SearchedUsers from './SearchedUsers.vue'
-import { ref, reactive } from 'vue'
-import axios from '../../api/axios'
+import SearchedUsers from "./SearchedUsers.vue";
+import { ref, reactive } from "vue";
+import axios from "../../api/axios";
 
 export default {
-  name: 'FriendMakeTab',
+  name: "FriendMakeTab",
   components: {
     SearchedUsers,
   },
   setup() {
     const state = reactive({
       searchedUsers: [],
-      friend: null,
-    })
+      friend: [],
+    });
 
     // input에 입력하는 값
-    const SearchUser = ref('');
+    const SearchUser = ref("");
 
     // input에 email 입력 시 server에 요청
     const SearchUserEmail = () => {
       if (SearchUser.value) {
-        axios({
-          method: 'GET',
-          url: `members/${SearchUser.value}`,
-          })
-          .then(res => {
-            state.friend = res.data.data
-            SearchUser.value = ''
-          })
+        if (state.friend.length) {
+          state.friend = [];
+          axios({
+            method: "GET",
+            url: `members/${SearchUser.value}`,
+          }).then((res) => {
+            if (res.data.data) {
+              state.friend.push(res.data.data);
+              SearchUser.value = "";
+            }
+          });
+        } else {
+          axios({
+            method: "GET",
+            url: `members/${SearchUser.value}`,
+          }).then((res) => {
+            if (res.data.data) {
+              state.friend.push(res.data.data);
+              SearchUser.value = "";
+            }
+          });
+        }
+      } else {
+        state.friend = [];
       }
-      else{
-        state.friend = null
-      }
-    }
+    };
 
     return {
       state,
       SearchUser,
       SearchUserEmail,
-    }
-  }
-}
+    };
+  },
+};
 </script>
-
 
 <style>
 .result {
@@ -92,6 +101,6 @@ input::placeholder {
 
 .search-btn {
   border: none;
-  background-color: #FDFAF3;
+  background-color: #fdfaf3;
 }
 </style>
