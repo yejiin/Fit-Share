@@ -41,6 +41,7 @@ export default {
     // input에 email 입력 시 server에 요청
     const SearchUserEmail = () => {
       if (SearchUser.value) {
+<<<<<<< HEAD
         if (state.friend.length) {
           state.friend = [];
           axios({
@@ -63,6 +64,17 @@ export default {
             }
           });
         }
+=======
+        axios({
+          method: "GET",
+          url: `members/${SearchUser.value}`,
+        }).then((res) => {
+          if (res.data.data) {
+            state.friend.push(res.data.data);
+            SearchUser.value = "";
+          }
+        });
+>>>>>>> develop
       } else {
         state.friend = [];
       }
