@@ -18,7 +18,7 @@
         </div>
 
         <!-- 버튼 클릭 시 친구 아이콘 html / css tab 버전 -->
-        <button class="friend-btn" @click="OpenTab">
+        <button class="btn friend-btn" @click="OpenTab">
           <img class="friend_icon" src="@/assets/friend_icon.png" alt="friend_icon">
         </button>
         <div v-if="status">
@@ -211,10 +211,12 @@ export default {
 .host-closet {
   width: 543px;
   height: 595px;
-  background-color: #FDFAF3;
+  background-color: #fdfaf3;
   z-index: 0;
   position: relative;
   border-radius: 16px;
+  border: 3px solid #d5d1c6;
+  box-shadow: 0px 5px 15px rgb(207 206 206);
 }
 
 /* modal */
@@ -303,9 +305,10 @@ i {
   border-radius: 50px;
   border: none;
   position: fixed;
-  right: 120px;
-  bottom: 20px;
+  right: 100px;
+  bottom: 40px;
   background-color: #8ABDBE;
+  
 }
 
 .friend_icon {
@@ -318,20 +321,19 @@ i {
 
 /* 친구버튼 클릭시 나오는 tab style */
 .tab-box {
-  top: 300px;
-  right: 20px;
-  bottom: 10px;
+  right: 80px;
+  bottom: 30px;
   position: fixed;
   z-index: 2;
 }
 
 .friend-close {
   position: fixed;
-  top: 270px;
-  right: 383px;
+  right: 447px;
+  bottom: 593px;
 }
 
-#Main {
-  overflow-x: hidden;
+.btn { 
+  box-shadow: 0 0 10px 1px #438185; 
 }
 </style>

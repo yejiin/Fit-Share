@@ -1,6 +1,7 @@
 package com.fitshare.backend.api.service;
 
 import com.fitshare.backend.db.entity.PrivateChat;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
 
@@ -8,6 +9,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class RedisServiceImpl implements RedisService {
     private final static long EXPIRE_TIME = 3600L * 24 * 30; // 30일
@@ -35,11 +37,8 @@ public class RedisServiceImpl implements RedisService {
             // key : chat_senderId_receiverId
             PrivateChat privateChat = (PrivateChat) value;
             hashOperations.put(key, String.valueOf(privateChat.getCreatedTime()), privateChat.getMessage());
-
-            String shadowKey = "shadowkey:" + key;
-            if (redisTemplate.getExpire(shadowKey) <= 0) {
-                valueOperations.set(shadowKey, "", getSecondsUntilTomorrow());
-            }
+            // 삭제 이벤트를 발생시키기 위한 shadow key set
+            valueOperations.set("shadowkey:" + key, "", getSecondsUntilTomorrow());
         }
     }
 
@@ -65,19 +64,21 @@ public class RedisServiceImpl implements RedisService {
     // 다음날 정각까지 남은 시간을 초단위로 계산
     private Duration getSecondsUntilTomorrow() {
         LocalTime nowTime = LocalTime.now();
-        LocalTime endTime = LocalTime.of(00, 00, 00);
+        LocalTime endTime = LocalTime.of(23, 59, 59);
 
-        return Duration.between(endTime, nowTime);
+        return Duration.between(nowTime, endTime).plusSeconds(2);
     }
 
     // 세션에서 나간 유저 id 삭제
     @Override
     public void delSessionParticipant(String sessionId, String memberId) {
+        log.info("{} member in {} session is deleted", memberId, sessionId);
         setOperations.remove(sessionId, memberId);
     }
 
     @Override
     public void delSession(String sessionId) {
+        log.info("{} session is deleted", sessionId);
         setOperations.pop(sessionId, getSessionParticipantCount(sessionId));
     }
 

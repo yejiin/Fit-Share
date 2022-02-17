@@ -1,9 +1,9 @@
 <template>
   <div>
     <h2 v-if="selectedShoppingRoom" class="host-name fw-bold">
-      {{ selectedShoppingRoom.hostName }}님의 옷장
+      <img src="@/assets/closed_closet_2.png" alt="closet">{{ selectedShoppingRoom.hostName }}님의 옷장
     </h2>
-    <h2 v-else class="host-name fw-bold">옷장</h2>
+    <h2 v-else class="host-name fw-bold"><img src="@/assets/closed_closet_2.png" class="" alt="closet">옷장</h2>
     <host-closet-item :host-clothes="hostClothes" class="host-closet-item"></host-closet-item>
   </div>
 </template>
@@ -50,7 +50,7 @@ export default {
 
 <style scoped>
 .host-name {
-  font-size: 28px;
+  font-size: 40px;
   font-weight: bold;
   padding: 30px 43px;
   margin: 0;
@@ -63,6 +63,12 @@ export default {
   left: 50%;
   top: 40%;
   transform: translate(-50%, -50%);
+}
+
+img {
+ width: 38px;
+ height: 38px;
+ margin-right: 10px;
 }
 
 .message {

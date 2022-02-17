@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-for="(checkRequest, index) in checkRequests" :key="checkRequest.id" class="d-flex mt-3">
-      <img :src="checkRequest.profileImg" alt="profile-img">
+      <img :src="checkRequest.profileImg" alt="profile-img" class="profile-img" />
       <div class="ms-3 d-flex flex-column">
         <div>
           {{ checkRequest.name }}
@@ -16,65 +16,65 @@
 </template>
 
 <script>
-import { reactive } from 'vue'
-import axios from '../../api/axios'
+import { reactive } from "vue";
+import axios from "../../api/axios";
 
 export default {
-  name: 'FriendCheckTab',
-  props: ['checkRequests'],
+  name: "FriendCheckTab",
+  props: ["checkRequests"],
   setup() {
     const state = reactive({
       friends: [],
-    })
+    });
 
     const AcceptFriend = async (checkRequests, index) => {
       const res = await axios({
-        method: 'POST',
-        url: 'friends',
-        data: {"friendId": checkRequests[index].id}
-      })
-      console.log(res)
-      
-      const res1 = await axios({
-        method: 'DELETE',
-        url: `friends/requests/${checkRequests[index].id}`,
-      })
-      console.log(res1)
+        method: "POST",
+        url: "friends",
+        data: { friendId: checkRequests[index].id },
+      });
+      console.log(res);
 
-      checkRequests.splice(index, 1)
-    
-    }
-    
+      const res1 = await axios({
+        method: "DELETE",
+        url: `friends/requests/${checkRequests[index].id}`,
+      });
+      console.log(res1);
+
+      checkRequests.splice(index, 1);
+    };
+
     const DeclineFriend = (checkRequests, index) => {
       axios({
-        method: 'DELETE',
+        method: "DELETE",
         url: `friends/requests/${checkRequests[index].id}`,
-        })
-        .then(res => {
-          console.log(checkRequests[index].id)
-          console.log(res)
-          checkRequests.splice(index, 1)
-          console.log(checkRequests)
-        })
-    }
-
+      }).then(() => {
+        checkRequests.splice(index, 1);
+      });
+    };
 
     return {
       state,
       AcceptFriend,
       DeclineFriend,
-    }
-  }
-}
+    };
+  },
+};
 </script>
 
 <style scoped>
+.profile-img {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+}
+
 .button-box {
   font-size: 12px;
 }
 
 .button-box > button {
-  background: #FDFAF3;
+  background: #fdfaf3;
   font-size: 12px;
   border-radius: 15px;
   width: 90px;
